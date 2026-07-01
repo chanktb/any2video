@@ -392,8 +392,8 @@ The pre-built templates already bake in EVERYTHING that keeps a video correct: t
 3-tier safe zones, `.brand-header`/`.brand-footer` bands, sustained motion, the
 reserved karaoke caption-band (auto-hides the template's own caption), and the
 universal accent-spacing guard. **Hand-writing scene HTML loses ALL of these guards
-and drifts into exactly the failure the CEO reported on a free-handed run: safezone
-violations, overlapping text, and stuck coloured words.** So:
+and drifts into exactly the failure seen on a free-handed run: safezone violations,
+overlapping text, and stuck coloured words.** So:
 - Pick the closest `templateId` per scene from `CATALOG.md`; pass the real data via `inputs`.
 - `meta.brand` + `meta.footer` render on every scene automatically — don't re-implement them.
 - `duration_sec` comes from Phase 3 TTS; reveal timing is written back into `inputs` by `narrate.py`.
