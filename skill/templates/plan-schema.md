@@ -9,7 +9,8 @@ meta:
   source: <url or path or hash>
   lang: vi                       # narration language: vi (default) or en
   total_duration_sec: 60         # target, refined after TTS measurement
-  voice: vi-VN-HoaiMyNeural      # edge-tts voice id (default per lang: vi-VN-HoaiMyNeural / en-US-AriaNeural)
+  voice: vi-VN-Chirp3-HD-Charon  # DEFAULT: MALE + Google TTS. Female only if the user asks.
+  voice_provider: google         # DEFAULT google (Chirp 3 HD); auto-falls back to edge-tts MALE (NamMinh/Guy)
   theme_hint: "dark, technical, monospace accents"
   aspect: "9:16"                 # quote ALWAYS — PyYAML reads 9:16 as sexagesimal int 556 if unquoted
 
