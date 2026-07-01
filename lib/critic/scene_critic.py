@@ -193,6 +193,46 @@ def render_and_inspect(html_path: Path, png_path: Path) -> dict:
           tight.push({ sel: sel(o.e), ratio: +(lh / o.fs).toFixed(2), lines, sample: o.t.slice(0, 24) });
       }
 
+      // (G) Empty content box — a bordered, card-sized box that rendered with NO visible
+      // content inside (icon/font/child failed → hollow rectangle showing only its border).
+      const hasVisibleContent = (el) => {
+        if ((el.textContent || '').trim().length) return true;              // any text, self or child
+        for (const m of el.querySelectorAll('img,svg,canvas,video,picture')) {
+          if (m.tagName === 'IMG') { if (m.naturalWidth > 0) return true; }
+          else { const r = m.getBoundingClientRect(); if (r.width > 1 && r.height > 1) return true; }
+        }
+        for (const c of [el, ...el.querySelectorAll('*')]) {
+          const cs = getComputedStyle(c);
+          if (cs.backgroundImage && cs.backgroundImage !== 'none') return true;
+          for (const pe of ['::before', '::after']) {
+            const p = getComputedStyle(c, pe).content;
+            if (p && p !== 'none' && p !== 'normal' && p !== '""' && p !== "''") return true;  // icon-font glyph etc.
+          }
+        }
+        return false;
+      };
+      const empty_blocks = [];
+      for (const e of allElems) {
+        if (effOpacity(e) < 0.25) continue;
+        const cs = getComputedStyle(e);
+        const sides = ['borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth']
+          .filter(k => (parseFloat(cs[k]) || 0) >= 1).length;
+        if (sides < 3 || cs.borderStyle === 'none') continue;   // need a real box outline, not a single underline/bar
+        const r = e.getBoundingClientRect();
+        if (r.width < 60 || r.height < 40) continue;            // chips / thin rules exempt
+        if (!hasVisibleContent(e))
+          empty_blocks.push({ sel: sel(e), w: Math.round(r.width), h: Math.round(r.height) });
+      }
+
+      // (H) Broken <img> — declared but failed to load → an empty image frame.
+      const broken_images = [];
+      for (const img of document.querySelectorAll('img')) {
+        const r = img.getBoundingClientRect();
+        if (r.width < 2 && r.height < 2) continue;              // hidden / spacer
+        if (img.complete && img.naturalWidth === 0)
+          broken_images.push({ sel: sel(img), src: (img.getAttribute('src') || '').slice(0, 60) });
+      }
+
       return {
         body: { scrollWidth: document.body.scrollWidth, scrollHeight: document.body.scrollHeight },
         element_count: allElems.length,
@@ -203,6 +243,8 @@ def render_and_inspect(html_path: Path, png_path: Path) -> dict:
         clipped: clipped.slice(0, 12),
         text_overlaps: overlaps.slice(0, 12),
         tight_line_height: tight.slice(0, 12),
+        empty_blocks: empty_blocks.slice(0, 12),
+        broken_images: broken_images.slice(0, 12),
       };
     }
     """
@@ -329,6 +371,26 @@ def evaluate(html_path: Path, neighbor_pngs: list[Path]) -> dict:
             "selector": t["sel"], "ratio": t["ratio"], "lines": t["lines"],
             "sample": t.get("sample", ""),
             "fix": "Raise line-height to ≥ 1.15 (VN diacritics need vertical room between lines).",
+        })
+
+    # Empty content box — a bordered card that rendered hollow (icon/font/child failed).
+    # NEVER ship a block that's just a border with nothing inside.
+    for b in dom.get("empty_blocks") or []:
+        issues.append({
+            "kind": "empty_block",
+            "selector": b["sel"], "w": b["w"], "h": b["h"],
+            "fix": "A bordered box rendered with NO content (icon/font/child failed to build). "
+                   "Fix the icon/font or fill the block — or use a different template. "
+                   "Never ship an empty box showing only its border.",
+        })
+
+    # Broken <img> — declared but failed to load → empty image frame.
+    for im in dom.get("broken_images") or []:
+        issues.append({
+            "kind": "broken_image",
+            "selector": im["sel"], "src": im.get("src", ""),
+            "fix": "Image failed to load (naturalWidth=0) — fix the src / use a reachable asset "
+                   "or a different visual. Never ship a broken image frame.",
         })
 
     # Anti-slop: scan the HTML source for banned palette + banned combos

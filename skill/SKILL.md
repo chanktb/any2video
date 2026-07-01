@@ -350,13 +350,25 @@ misses items 1–4 is **unfinished, not "chưa tới"** — re-open the phase, d
      mark (Ậ Ỗ Ồ Ề) sliced at the top edge (`text_clipped` / `text_clipped_vn_diacritic`).
    - **Two text blocks overlapping** / stuck together (`text_elements_overlap`).
    - **Line-height < 1.15** on multi-line VN text (`line_height_too_tight`).
-   - Content outside the safe zone, 4:5-cut straddle, body overflow, slop palette.
+   - **Empty box** — a bordered/card element that rendered hollow because an icon,
+     font glyph, or child failed to build (`empty_block`). NEVER ship a block that's
+     just a border with nothing inside — fix the icon/font, fill it, or pick another
+     template. **Broken image** (`broken_image`) — an `<img>` that failed to load.
+   - Content outside the safe zone, 4:5-cut straddle, slop palette.
    `pass:false` → **do NOT render.** Fix the offending scene's `inputs` (shorten the
    string) or the template (raise line-height / add top padding / move the block), re-run
    `template_render` for that scene, re-gate. Loop until `pass:true`. Rendering video on a
    failing plan throws away minutes per scene — the gate exists so you never do that.
    `template_render` already injects a VN-diacritic headroom guard, but tight custom
    `inputs` can still overflow; the gate is the backstop.
+
+   **Nothing ships until EVERY scene is perfect (HARD).** A hollow block (border with
+   no content because an icon/font/child failed to build), a broken image, a tofu glyph,
+   any clipped/overlapping/edge-cut text — every one of these means REDO that scene (fix
+   the asset, swap the icon, pick another template) or find another way. Also eyeball each
+   scene's rendered PNG (the gate writes one per scene) for anything the DOM checks can't
+   see — a mojibake glyph, a wrong colour, a broken layout. Do not ship "close enough":
+   all scenes must be correct before Phase 5.
 
 #### 2.2.8 Only ever reference the CURRENT repo (HARD)
 
@@ -518,7 +530,8 @@ returns `pass:false` with a per-scene `issues[]` on ANY of:
 - **Text clipped** — a word cut off, or a Vietnamese tone mark (Ậ Ỗ Ồ Ề) sliced at the top (`text_clipped` / `text_clipped_vn_diacritic`).
 - **Two text blocks overlapping** / stuck together (`text_elements_overlap`).
 - **Line-height < 1.15** on multi-line VN text (`line_height_too_tight`).
-- Viewport overflow ≠ 0; slop palette; scene identical to a neighbour.
+- **Empty box** (`empty_block`) — a bordered/card element that rendered hollow (icon/font/child failed) → shows only its border. **Broken image** (`broken_image`) — an `<img>` that didn't load.
+- Slop palette; scene identical to a neighbour.
 
 `pass:false` → **regenerate ONLY the failing scene's HTML** (shorten the `inputs` string,
 raise line-height, add top padding, or move the overlapping block), re-run
