@@ -29,13 +29,13 @@ def init(source: str, lang: str = "vi", fast: bool = False) -> dict:
     pack["next_steps"] = [
         "Read source_pack.json + per-type bundle (github_bundle.json / article.md / input.txt).",
         f"Draft analysis.md with the 7 fixed sections (Problem/Solution/Architecture/Flow/How to use/Why/Evidence) → {pack['run_dir']}/analysis.md",
-        f"Draft plan.md per templates/plan-schema.md. Narration MUST be in '{lang}'. Include meta.lang: '{lang}', meta.brand block (avatar URL, repo / channel name, tagline), meta.footer (stars / forks / version / license / date list).",
-        "Validate: python -m any2video.lib.critic.plan_critic <plan.md> --analysis <analysis.md>",
-        "Synthesize TTS: python -m any2video.lib.tts.narrate <plan.md>",
-        "Draft each scene HTML per templates/design-tokens.md (3-tier safe system + .brand-header + .brand-footer + .caption-overlay slots). Motion MUST sustain 60-80% of scene duration.",
-        "Validate each: python -m any2video.lib.critic.scene_critic <scene.html> --neighbors <prev pngs>",
-        f"Render scenes: python -m any2video.lib.render.{render_module} all <plan.md>",
-        "Compose final: python -m any2video.lib.compose.ffmpeg_compose <plan.md> [--crossfade 200]",
+        f"Draft plan.md per templates/plan-schema.md. Narration MUST be in '{lang}'. Include meta.lang: '{lang}', meta.brand, meta.footer. EACH non-footage scene MUST have a `templateId` from templates/scenes/CATALOG.md + an `inputs` block matching that template's slots. Default TTS = MALE + Google (voice: vi-VN-Chirp3-HD-Charon, voice_provider: google).",
+        "Validate: python -m lib.critic.plan_critic <plan.md> --analysis <analysis.md>",
+        "Synthesize TTS: python -m lib.tts.narrate <plan.md>",
+        "Generate scene HTML FROM TEMPLATES (guarded): python -m lib.render.template_render all <plan.md>. This bakes in the 3-tier safe zones + brand bars + caption-band + accent-spacing guards. DO NOT hand-write scene HTML — free-handed HTML loses every guard (safezone violations, overlapping text, stuck coloured words).",
+        "Validate each: python -m lib.critic.scene_critic <scene.html> --neighbors <prev pngs>",
+        f"Render scenes: python -m lib.render.{render_module} all <plan.md>",
+        "Compose final: python -m lib.compose.ffmpeg_compose <plan.md> --gap 350  (gap-hardcut = AV-sync; karaoke on by default; NO --crossfade)",
     ]
     return pack
 
