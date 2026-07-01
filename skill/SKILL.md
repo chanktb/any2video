@@ -47,14 +47,37 @@ Save intake to `workspace/runs/<slug>/intake.json`:
 ### Phase 1 — Source routing + deep extract
 
 Detect input type:
-- **GitHub repo URL** → `git clone --depth 1` to `workspace/scratch/<slug>/repo/`, then:
-  - Read `README.md`, `package.json` / `pyproject.toml` / `go.mod` / `Cargo.toml` (stack detect)
-  - Build tree (depth ≤ 3, skip `node_modules`, `.git`, `dist`)
-  - Identify entry points + 3-5 core files (Claude picks from tree)
-  - `git log -n 15 --oneline` for recent activity
+- **GitHub repo URL** → `git clone --depth 1` to `workspace/scratch/<slug>/repo/`, then
+  READ THE CODE (see §1.1 — HARD, not optional):
+  - `README.md` + manifest (`package.json` / `pyproject.toml` / `go.mod` / `Cargo.toml`) for stack + the author's *declared* intent
+  - Build the tree (depth ≤ 3, skip `node_modules` / `.git` / `dist`), pick the entry point(s) + **3–7 core files and OPEN them**
+  - **Trace the real end-to-end flow through the code** (entry → key functions → output) — not the README's diagram
+  - `git log -n 15 --oneline` + skim the newest-touched files for what's actually active
 - **Article URL** → WebFetch, strip nav/footer, keep body + outline
 - **Image** → vision: describe scene, extract text (OCR via Claude vision)
 - **Raw text** → passthrough
+
+#### 1.1 Read the code, not just the README (HARD)
+
+The README is the author's *pitch* — what they WANT you to think. It is NOT a reliable
+source of what the repo actually does, how it works, what's clever, or what's broken.
+**A repo tour built only from the README is disqualified — re-open Phase 1 and read the
+source.** Before writing `analysis.md` you MUST open and read the actual code:
+
+1. **Trace the real flow** from the entry point through the core files to the output.
+   Describe the pipeline you SAW in code, not the one the README claims.
+2. **Find the good — the non-obvious "weapon".** The 2–3 clever mechanisms worth a video
+   live in the code, not the marketing bullets: a specific algorithm, a guard, a data
+   structure, a regex, a scheduling trick, a fallback. Name the file it's in.
+3. **Find the bad — the honest caveat.** Read for the real limits: `TODO` / `FIXME`,
+   `NotImplementedError`, hardcoded assumptions, narrow scope, missing error handling,
+   "only works if…". This feeds the mandatory honest-caveat scene (§2.2.7 item 3).
+4. **Cross-check every README claim against the code.** If the README says "supports X"
+   and no code does X, DROP the claim — never repeat an unverified README boast (see the
+   §2.2 auto-fail "describe the README instead of the product").
+
+Every `## Evidence` line backing an Architecture / Flow / weapon / caveat claim MUST cite
+a real `path/to/file.ext:symbol` (or line) — NOT a README sentence. "Implied by README" = fail.
 
 Write **`workspace/runs/<slug>/analysis.md`** with this fixed structure:
 
@@ -76,7 +99,7 @@ Audience, impact, what differentiates it.
 Real numbers, quotes, file references — proof for every claim above.
 ```
 
-**Gate 1 (Sonnet critic):** every claim in Problem/Solution/Architecture/Flow has at least one citation in Evidence. No citation → flag, regenerate that section.
+**Gate 1 (Sonnet critic):** every claim in Problem/Solution/Architecture/Flow has ≥1 citation in Evidence — AND, for a GitHub repo, the **Architecture + Flow + at least one "weapon" + the caveat cite an actual SOURCE FILE** (`path:symbol`/line), not the README. If every Evidence line is a README quote, the agent skipped the code → **fail the whole analysis, re-read the source, regenerate.** No citation / README-only citation on a code claim → flag, regenerate that section.
 
 ### Phase 2 — Narrative plan (the critical phase — read carefully)
 

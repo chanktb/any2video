@@ -25,6 +25,10 @@ repo-tour Shorts — see `skill/references/reference-video-teardown.md`):
   as the narrator names them, not all at once.
 - **AV-sync by design** — TTS is measured first; scenes are joined with a
   gap-hardcut so the picture never drifts ahead of the voice.
+- **Reads the actual source, not just the README** — for a repo it clones and opens the
+  entry point + core files, traces the real flow, and mines the non-obvious "weapon" and
+  the honest caveat from the code. Every architecture/flow claim is cited to a file, not a
+  marketing bullet, so the tour reflects what the repo *does*, not what its README claims.
 - **Template-driven scenes** with 3-tier safe-zone enforcement for 9:16 — every scene
   is measured and gated before render (see below), so broken frames never ship.
 

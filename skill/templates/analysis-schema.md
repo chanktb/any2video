@@ -51,15 +51,24 @@ Audience, impact, what differentiates this from doing nothing or using alternati
 ## Evidence
 Proof for every claim above. This is what the critic gate checks.
 
-- **<claim from Problem/Solution/etc>** — citation (file:line, README excerpt, commit hash, article quote)
-- Repeat for every non-trivial claim.
-- If you can't cite it, remove the claim.
+- **<claim from Problem/Solution/etc>** — citation. For a **repo, code claims MUST cite a
+  source file** (`path/to/file.ext:symbol` or line), NOT a README sentence. README excerpts
+  are OK only for the author's declared *intent*, never for how it works / what it does.
+- Include at least: the real flow (file-cited), **one non-obvious "weapon"** (the clever
+  mechanism — file-cited), and **one honest caveat / limit** (TODO / hardcoded assumption /
+  narrow scope — file-cited).
+- Repeat for every non-trivial claim. If you can't cite it, remove the claim.
 ```
 
 ## Rules
 
 - **Section names exact.** Phase 2 parser greps `## Problem`, `## Solution`, etc.
+- **Read the code, not just the README (HARD).** The README is the author's pitch. For a
+  repo, open the entry point + 3–7 core files and trace the real flow before writing this.
+  An analysis whose Evidence is all README quotes is rejected — re-read the source (SKILL §1.1).
+- **Cross-check the README against the code.** If the README claims "supports X" and no code
+  does X, drop it. Never repeat an unverified boast.
 - **Evidence is mandatory.** Empty Evidence = Gate 1 fails = regenerate.
-- **No invention.** If the README doesn't say "5000 users," don't write it.
+- **No invention.** Don't state a number or capability you didn't see in code or a cited source.
 - **No marketing words.** "revolutionary," "game-changer," "powerful" → strip.
 - **Concrete > abstract.** "Reads `index.ts` and dispatches to `handlers/`" beats "intelligent routing."
