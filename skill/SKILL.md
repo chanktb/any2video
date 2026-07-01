@@ -29,7 +29,7 @@ Before any clone / WebFetch, ask the user 4 questions in ONE message (AskUserQue
 
 1. **Input** — URL repo / URL article / paste raw text? (skill detects type from string)
 2. **Output folder** — default `workspace/runs/<slug>/` hay custom path?
-3. **Gửi Telegram** — gửi transcript preview + final.mp4 về DM? `[Y/n]` (default Y)
+3. **Gửi Telegram** — gửi 2 checkpoint duyệt (kịch bản trước TTS + hình scene trước render) và final.mp4 về DM? `[Y/n]` (default Y)
 4. **Caption** — (chỉ nếu Y ở câu 3) caption cho post final hay `auto` để skill tự gen từ tiêu đề source
 
 If args present on `/any2video <url>` invocation, skip Q1. Otherwise wait for answer.
@@ -411,7 +411,7 @@ meta:
   total_duration_sec: <int>         # 45-75 sec for 9:16 Reels feel
   voice: vi-VN-Chirp3-HD-Charon     # DEFAULT: MALE, Google TTS. Female ONLY if the user asks.
   voice_provider: google            # DEFAULT google (Chirp 3 HD); auto-falls back to edge-tts (also MALE) if no key
-  voice_rate: "+0%"                 # Chirp 3 sounds natural at +0%; edge-tts fallback uses +15%
+  voice_rate: "+5%"                 # default: Chirp 3 HD at +5%, edge-tts fallback at +20% (bumped +5 — old default read a bit slow)
   theme_hint: <free-form mood>
   aspect: "9:16"
   accent: { from: "#ff2d9b", to: "#22d3ee" }   # OPTIONAL video-wide accent colour —
@@ -474,31 +474,50 @@ Sonnet sub-agent reads `plan.md` + `analysis.md` and checks:
 
 Fail any → regenerate ONLY the failing scene's narration with the specific anti-pattern called out. Don't replan the whole video.
 
+### Phase 2.6 — CHECKPOINT 1: approve the SCRIPT before TTS (HARD)
+
+Voice is synthesized ONLY after the words + pronunciation are approved. Never TTS a script
+the reviewer hasn't seen — a wording edit after TTS wastes synthesis and adds a round-trip.
+
+```
+python -m lib.notify.telegram script workspace/runs/<slug>/plan.md
+```
+
+Per scene this sends the **on-screen display text** (📺 Hiển thị) and the **read-aloud
+narration** (🔊 Đọc) TTS will speak, with an estimated duration. The reviewer checks BOTH:
+- **Content** — wording, facts, tone right?
+- **Pronunciation** — will it READ correctly? Any repo/brand/English term that would be
+  spelled out or mangled ("README" read letter-by-letter, "any2video" → "any-two…") MUST
+  be rewritten PHONETICALLY in the `narration` (🔊 Đọc) field — "rít mi", "any to video"
+  (§2.2.6 d.2). The display `inputs` keep the exact spelling.
+
+Then PAUSE in Claude chat:
+> "Đã gửi kịch bản (chữ + cách đọc) về TG. Duyệt thì reply `ok`; sai chỗ nào nói scene đó."
+
+Wait for `ok`/`duyệt` → Phase 3. Specific feedback → edit that scene's `narration`/`inputs`,
+re-send `script`, loop. **Do NOT run TTS without approval.** (If `intake.telegram` is false,
+show the same script in chat and get a go-ahead.)
+
 ### Phase 3 — TTS first (timing source of truth)
 
-For each scene: call edge-tts (or configured TTS) on `narration` → save to `scenes/<id>.mp3`.
+Run ONLY after Checkpoint 1 is approved. For each scene: call the configured TTS on the
+approved `narration` → save to `scenes/<id>.mp3`.
 
 Run `ffprobe` on each mp3 → get **real duration**. Overwrite `duration_sec` in plan.md with measured value.
 
 Why TTS first: estimating duration then rendering then AV-syncing late causes drift. We measure first, render to fit.
 
-### Phase 3.5 — Transcript preview to Telegram (NEW, gated on `intake.telegram`, OPTIONAL)
+### Phase 3.5 — (optional) post-TTS transcript with MEASURED durations
 
-After TTS done + plan.md has measured durations, if `intake.telegram == true`:
+The script was already approved at Checkpoint 1, so this is NOT a required pause. If you
+want a quick length re-check now that real durations exist (a scene that ran long), send:
 
 ```
 python -m lib.notify.telegram preview workspace/runs/<slug>/plan.md
 ```
 
-This is an OPTIONAL step — configure it via env vars `ANY2VIDEO_TG_BOT_TOKEN` / `ANY2VIDEO_TG_CHAT_ID` (or a local `.env`). When configured, it sends the full transcript (per-scene narration + duration) to a Telegram DM. Then the skill PAUSES in Claude chat with:
-
-> "Đã gửi transcript về TG. Bạn duyệt thì reply `ok` để render, hoặc nói rõ scene nào cần sửa."
-
-Wait for one of:
-- `ok` / `duyệt` / `go` / `render đi` → proceed to Phase 4
-- Specific feedback (e.g. "scene 3 narration đổi…") → edit plan.md, re-TTS affected scene only, re-send preview, loop
-
-Do NOT proceed to Phase 4 without explicit approval. This is the key checkpoint — narration is cheap to fix, render+compose is expensive.
+A scene that came out too long → trim its `narration` and re-TTS **that scene only**
+(TTS is per-scene). Pronunciation was handled at Checkpoint 1; this is just pacing.
 
 ### Phase 4 — Per-scene visual generation
 
@@ -560,6 +579,23 @@ returns `pass:false` with a per-scene `issues[]` on ANY of:
 raise line-height, add top padding, or move the overlapping block), re-run
 `template_render` for it, and re-gate. **Never start Phase 5 while any scene fails** —
 each rendered scene costs real minutes and a clipped/overlapping frame throws that away.
+
+### Phase 4.6 — CHECKPOINT 2: approve the SCENE STILLS before render (HARD)
+
+The automated gate is strict, but it can't see everything (a mojibake glyph, an off-brand
+colour, a subtly wrong layout). After the gate passes (PNGs exist), get a human sign-off on
+the actual frames before the expensive video render:
+
+```
+python -m lib.notify.telegram scenes workspace/runs/<slug>/plan.md
+```
+
+This sends each rendered `scenes/<id>.png` to Telegram. Then PAUSE in Claude chat:
+> "Đã gửi hình từng scene về TG. Duyệt thì reply `ok` để render video; lỗi scene nào nói scene đó."
+
+Wait for `ok` → Phase 5. If a scene is wrong → fix that scene's `inputs`/template, re-run
+`template_render` + `scene_gate` for it, re-send `scenes`, loop. **Do NOT render video
+until the stills are approved.** (No Telegram? Open the PNGs locally and self-verify.)
 
 ### Phase 5 — Render + compose
 

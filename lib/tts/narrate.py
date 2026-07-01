@@ -43,9 +43,10 @@ _LANG_DEFAULT_VOICE = {
     "en": "en-US-GuyNeural",      # male, conversational tech
 }
 _FALLBACK_VOICE = _LANG_DEFAULT_VOICE["vi"]
-# Default +15% — a marketing/tech rate. Slow default sounds robotic;
-# Palmier Pro and similar VN explainers run +15% to +25% over base.
-_DEFAULT_RATE = "+15%"
+# Default +20% (edge-tts) — a marketing/tech rate. Slow default sounds robotic;
+# VN explainers run +15% to +25% over base. Bumped +5 over the old +15% — the
+# earlier default read a touch slow.
+_DEFAULT_RATE = "+20%"
 
 
 def _is_google_voice(voice: str) -> bool:
@@ -256,11 +257,11 @@ async def run(plan_path: Path) -> dict:
         voice = meta.get("voice") or "vi-VN-Chirp3-HD-Charon"
     else:
         voice = meta.get("voice") or _LANG_DEFAULT_VOICE.get(lang, _FALLBACK_VOICE)
-    # Provider-aware default rate: Chirp 3 HD sounds natural at +0%; edge-tts needs
-    # +15% or it drags. (DEFAULT provider is google → +0%.)
+    # Provider-aware default rate (bumped +5 — the old default read a bit slow):
+    # Chirp 3 HD at +5%; edge-tts at +20% or it drags. (DEFAULT provider is google → +5%.)
     rate = meta.get("voice_rate")
     if not rate:
-        rate = "+0%" if provider in ("google", "google-tts", "chirp") else _DEFAULT_RATE
+        rate = "+5%" if provider in ("google", "google-tts", "chirp") else _DEFAULT_RATE
     scenes = plan.get("scenes") or []
     if not scenes:
         return {"error": "no_scenes_in_plan", "plan_path": str(plan_path)}

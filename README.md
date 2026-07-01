@@ -35,12 +35,22 @@ repo-tour Shorts — see `skill/references/reference-video-teardown.md`):
 ## How it works (pipeline)
 
 ```
-input → 1. extract → 2. plan (+ narrative gate) → 3. TTS (measure duration)
-      → 4. fill scene templates → 4.5 GATE every scene → render → 5. compose → final.mp4
+input → 1. extract → 2. plan (+ narrative gate) → ✋ approve script → 3. TTS (measure)
+      → 4. fill templates → 4.5 GATE every scene → ✋ approve stills → render → 5. compose → mp4
 ```
 
 TTS runs **before** the visuals so every scene's layout is sized to the real
 audio duration (no drift). See `skill/SKILL.md` for the full agent spec.
+
+**Two human checkpoints** (optional, via Telegram) keep waste out of the loop:
+
+1. **Script — before TTS.** You see each scene's on-screen text **and the read-aloud
+   line**, so you fix both wording and *pronunciation* (e.g. "README" spoken as "rít mi",
+   not letter-by-letter) before any audio is synthesized.
+2. **Stills — after the gate, before render.** You get the rendered scene frames for a
+   final visual sign-off (catches what the automated checks can't — a mojibake glyph, an
+   off-brand colour) before the expensive video render. A wrong scene is fixed and
+   re-checked on its own.
 
 ## Quality gates — why the output is clean
 
@@ -118,6 +128,9 @@ token-heavy). Every phase is also a standalone CLI you can run from the repo roo
 python -m lib.cli init "https://github.com/<owner>/<repo>" --lang vi
 #    → the agent writes analysis.md + plan.md into workspace/runs/<slug>/
 
+# 2.6 CHECKPOINT 1 — approve the script (display + read-aloud) before TTS  [optional]
+python -m lib.notify.telegram script workspace/runs/<slug>/plan.md
+
 # 3. Synthesize the voiceover (measures real durations)
 python -m lib.tts.narrate workspace/runs/<slug>/plan.md
 
@@ -127,7 +140,10 @@ python -m lib.render.template_render all workspace/runs/<slug>/plan.md
 # 4.5 GATE — inspect every scene; must print pass:true before rendering
 python -m lib.critic.scene_gate all workspace/runs/<slug>/plan.md
 
-# 5. Render each scene (Playwright video) — only after the gate passes
+# 4.6 CHECKPOINT 2 — approve the rendered scene stills before render  [optional]
+python -m lib.notify.telegram scenes workspace/runs/<slug>/plan.md
+
+# 5. Render each scene (Playwright video) — only after gate + stills approved
 python -m lib.render.playwright_render all workspace/runs/<slug>/plan.md
 
 # 6. Compose the final mp4 (karaoke captions on by default)
