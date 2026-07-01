@@ -293,6 +293,10 @@ meta:
   voice_rate: "+0%"                 # Chirp 3 sounds natural at +0%; edge-tts fallback uses +15%
   theme_hint: <free-form mood>
   aspect: "9:16"
+  accent: { from: "#ff2d9b", to: "#22d3ee" }   # OPTIONAL video-wide accent colour —
+                                               # recolours the highlighted words across ALL
+                                               # scenes (pick a vibrant pair). Per-scene
+                                               # inputs.accent_from/to still override.
   brand: { name, avatar_url, tagline }
   footer: [ list of stat strings ]
 

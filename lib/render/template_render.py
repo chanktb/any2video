@@ -51,7 +51,30 @@ def list_templates() -> list[str]:
     return out
 
 
-def render_template(template_id: str, inputs: dict, out_html: Path) -> dict:
+def _accent_css(accent) -> str:
+    """Video-wide accent override. `accent` = {"from": "#hex", "to": "#hex"} (or a
+    single "color"). Recolours the main gradient-text accents across templates so a
+    whole video can be a chosen vibrant colour without editing each scene."""
+    if not isinstance(accent, dict):
+        return ""
+    a = accent.get("from") or accent.get("color")
+    b = accent.get("to") or a
+    if not a:
+        return ""
+    grad = f"linear-gradient(92deg,{a} 0%,{b} 100%)"
+    # `.grad` (comparison's two-colour labels) is intentionally left out.
+    return (
+        "<style>/* video-wide accent override (meta.accent) */"
+        ".accent,.figure,.hero .ch,.headline .accent,.headline-accent{"
+        f"background-image:{grad} !important;"
+        "-webkit-background-clip:text !important;background-clip:text !important;"
+        "-webkit-text-fill-color:transparent !important;color:transparent !important;}"
+        "</style>"
+    )
+
+
+def render_template(template_id: str, inputs: dict, out_html: Path,
+                    accent=None) -> dict:
     """Inject `inputs` into the template's portrait.html, write to out_html.
 
     The out_html is self-contained: any relative asset paths in the template
@@ -144,6 +167,14 @@ def render_template(template_id: str, inputs: dict, out_html: Path) -> dict:
     else:
         new_html = new_html + _space_fix
 
+    # Optional video-wide accent recolour (meta.accent in plan.md).
+    _acc = _accent_css(accent)
+    if _acc:
+        if "</head>" in new_html:
+            new_html = new_html.replace("</head>", _acc + "</head>", 1)
+        else:
+            new_html = _acc + new_html
+
     # Copy any template-local assets (fonts, images) into a sibling dir so
     # relative paths in the HTML still resolve. Most lifted templates only use
     # Google Fonts (CDN) — no local assets — so this is usually a no-op.
@@ -181,6 +212,10 @@ def render_all_from_plan(plan_path: Path) -> dict:
     scenes_dir = run_dir / "scenes"
     scenes_dir.mkdir(exist_ok=True)
 
+    # Video-wide accent (meta.accent = {from, to} or {color}). Per-scene
+    # inputs.accent_from/accent_to still win where a template reads them.
+    accent = (plan.get("meta") or {}).get("accent")
+
     results = []
     for s in scenes:
         sid = s["id"]
@@ -189,8 +224,10 @@ def render_all_from_plan(plan_path: Path) -> dict:
         if not template_id:
             results.append({"id": sid, "status": "skipped", "reason": "no templateId"})
             continue
+        # per-scene accent override beats the video-wide one
+        scene_accent = s.get("accent") or accent
         out_html = scenes_dir / f"{sid}.html"
-        r = render_template(template_id, inputs, out_html)
+        r = render_template(template_id, inputs, out_html, accent=scene_accent)
         r["id"] = sid
         results.append(r)
 
