@@ -25,6 +25,11 @@ repo-tour Shorts — see `skill/references/reference-video-teardown.md`):
   as the narrator names them, not all at once.
 - **AV-sync by design** — TTS is measured first; scenes are joined with a
   gap-hardcut so the picture never drifts ahead of the voice.
+- **Reads brand names right, shows them clean** — the voice speaks tricky names
+  phonetically ("README" → "ruýt my", "any2video" → "en ni tu vi đeo") while every
+  on-screen surface (title, karaoke caption, post) keeps the exact spelling.
+- **Ducked background music** — a bundled track sits ~−20 dB under the narration and
+  swells in the gaps (on by default; random from the pool or pick one).
 - **Reads the actual source, not just the README** — for a repo it clones and opens the
   entry point + core files, traces the real flow, and mines the non-obvious "weapon" and
   the honest caveat from the code. Every architecture/flow claim is cited to a file, not a
@@ -45,7 +50,7 @@ audio duration (no drift). See `skill/SKILL.md` for the full agent spec.
 **Two human checkpoints** (optional, via Telegram) keep waste out of the loop:
 
 1. **Script — before TTS.** You see each scene's on-screen text **and the read-aloud
-   line**, so you fix both wording and *pronunciation* (e.g. "README" spoken as "rít mi",
+   line**, so you fix both wording and *pronunciation* (e.g. "README" spoken as "ruýt my",
    not letter-by-letter) before any audio is synthesized.
 2. **Stills — after the gate, before render.** You get the rendered scene frames for a
    final visual sign-off (catches what the automated checks can't — a mojibake glyph, an
@@ -100,9 +105,9 @@ set the same names as environment variables.
 | **edge-tts** (default fallback) | Good, free | none |
 | **Google Cloud TTS** (Chirp 3 HD) | Best, natural | `GOOGLE_TTS_API_KEY` |
 
-If `GOOGLE_TTS_API_KEY` is set and the plan requests a Google voice
-(`meta.voice_provider: google`), it is used; otherwise the pipeline falls back to
-edge-tts automatically — so it works with **no key at all**.
+Default is a **male voice** via **Google Cloud TTS (Chirp 3 HD)** when `GOOGLE_TTS_API_KEY`
+is set; otherwise it falls back automatically to a male edge-tts voice — so it works with
+**no key at all**. (Pick a female or different voice per plan via `meta.voice`.)
 
 **Optional — Telegram delivery** (send the transcript / final video to a chat):
 
@@ -124,7 +129,7 @@ a normal agent session (Phase 4 injects data into templates, so it is not
 token-heavy). Every phase is also a standalone CLI you can run from the repo root:
 
 ```bash
-# 1. Extract + scaffold a run from any input
+# 1. Extract + scaffold a run from any input   (--duration 60 → target length, hit within ±10s)
 python -m lib.cli init "https://github.com/<owner>/<repo>" --lang vi
 #    → the agent writes analysis.md + plan.md into workspace/runs/<slug>/
 
@@ -162,7 +167,7 @@ include when you publish.
 lib/            the toolbox (sources, tts, render, compose, notify, critic)
 skill/          the Claude Code skill
   SKILL.md      agent workflow spec (the "brain")
-  templates/    scene templates, SFX, design tokens, schemas
+  templates/    scene templates, SFX, background music, design tokens, schemas
   references/   the reference-video craft teardown
 workspace/      generated runs (gitignored)
 ```
