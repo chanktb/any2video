@@ -1,17 +1,23 @@
 """Scene critic — Phase 4 Gate (per-scene HTML).
 
-For each scene HTML:
-  1. Render 1080×1920 screenshot via Playwright
-  2. Inspect DOM for:
-     - .inner content stays within INNER zone (x 90..990, y 345..1575)
-     - No element straddles the 4:5 cut lines (y=285 or y=1635)
-     - Body overflow = 0
-  3. Compare screenshot with previous 2 scenes — mean perceptual diff
-     above threshold (no template repetition)
+Structure-agnostic: the lifted templates share no `.inner`/`.outer` scaffold, so we
+render the scene and measure its actual TEXT elements. For each scene HTML:
+  1. Render 1080×1920 screenshot via Playwright (fonts loaded, animations settled)
+  2. Inspect the DOM for real, ship-blocking defects:
+     - Text overflowing the viewport edge (cut off)              → text_overflow_viewport
+     - Big primary text past the side safe margins (x 90..990)   → text_past_side_safezone
+     - Primary text straddling a 4:5 crop line (y=285 / y=1635)  → text_straddles_4x5_cut
+     - Text clipped by an overflow box, incl. VN tone marks Ậ/Ỗ  → text_clipped[_vn_diacritic]
+     - Two text blocks overlapping / stuck together             → text_elements_overlap
+     - Multi-line VN text with line-height < 1.15               → line_height_too_tight
+     - AI-slop palette / combos                                 → slop_banned_*
+  3. Compare screenshot with previous 2 scenes — perceptual diff (no template repetition)
 
-WCAG contrast is intentionally skipped from the MVP — pulling computed colors
-out of arbitrary CSS is complex; this is a TODO. Most contrast issues are
-caught by the design-tokens enforcement upstream.
+Faint "ghost echo" decoration (giant background numbers at opacity ~0.1 that bleed past
+the frame by design) is filtered out so it isn't judged as content.
+
+WCAG contrast is intentionally skipped from the MVP — pulling computed colors out of
+arbitrary CSS is complex; this is a TODO.
 """
 from __future__ import annotations
 
@@ -20,11 +26,15 @@ import json
 import sys
 from pathlib import Path
 
+# Force UTF-8 stdout for Windows cp1252 (Vietnamese diacritics in samples/hints)
+try:
+    sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
+    sys.stderr.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
+except (AttributeError, OSError):
+    pass
+
 from PIL import Image, ImageChops
 
-INNER = {"x_min": 90, "x_max": 990, "y_min": 345, "y_max": 1575}
-OUTER = {"x_min": 90, "x_max": 990, "y_min": 285, "y_max": 1635}
-CUT_TOP, CUT_BOT = 285, 1635
 NEIGHBOR_DIFF_MIN = 0.01  # mean pixel diff (normalized 0..1).
 # Tuned for dark themes with shared palette: actual template-identical scenes
 # diff ~0.001-0.005; visually-distinct scenes on same palette diff ~0.015-0.08.
@@ -55,37 +65,144 @@ def render_and_inspect(html_path: Path, png_path: Path) -> dict:
 
     inspect_js = r"""
     () => {
-      const inner = document.querySelector('.inner');
-      const outer = document.querySelector('.outer');
-      const top    = document.querySelector('.out-top');
-      const bottom = document.querySelector('.out-bottom');
-      const rectsFor = (el) => {
-        if (!el) return null;
-        const r = el.getBoundingClientRect();
-        return {x: r.x, y: r.y, w: r.width, h: r.height, right: r.right, bottom: r.bottom};
+      // Structure-agnostic: the lifted templates have NO shared .inner/.outer scaffold,
+      // so we measure the actual TEXT elements against the 9:16 safe zones directly.
+      const VW = 1080, VH = 1920;
+      const SAFE = { x0: 90, x1: 990, y0: 285, y1: 1635 };   // side margins + 4:5 crop-safe band
+
+      const sel = (el) => {
+        let s = el.tagName.toLowerCase();
+        if (el.id) s += '#' + el.id;
+        if (typeof el.className === 'string' && el.className.trim())
+          s += '.' + el.className.trim().split(/\s+/).slice(0, 3).join('.');
+        return s.slice(0, 80);
       };
+      const ownText = (el) => {
+        let t = '';
+        for (const n of el.childNodes)
+          if (n.nodeType === 3 && n.nodeValue) t += n.nodeValue;
+        return t.trim();
+      };
+      // Vietnamese chars carrying a STACKED diacritic (tone + circumflex/breve) that
+      // paints well above cap-height — Ậ Ầ Ấ Ẫ Ẩ Ộ Ổ Ỗ Ồ Ố Ề Ể Ễ … + lowercase.
+      const VN_STACK = /[ẬẦẤẪẨỘỔỖỒỐẶẰẮẴẲỆỂỄỀẾậầấẫẩộổỗồốặằắẵẳệểễềế]/;
+
       const allElems = Array.from(document.querySelectorAll('body *')).filter(e => {
         const r = e.getBoundingClientRect();
         return r.width > 0 && r.height > 0;
       });
+      const isFullBleed = (r) => r.y <= 6 && r.bottom >= VH - 6;
+      // Cumulative opacity up the ancestor chain. Faint "ghost echo" decoration —
+      // giant background numbers that settle at opacity ~0.1 and bleed past the frame
+      // by design (clipped by the stage) — must NOT be judged as readable content.
+      const effOpacity = (el) => {
+        let op = 1, n = el;
+        while (n && n !== document.body) {
+          const o = parseFloat(getComputedStyle(n).opacity);
+          if (!isNaN(o)) op *= o;
+          n = n.parentElement;
+        }
+        return op;
+      };
+
+      // Every visible, non-faint TEXT-bearing element (own text node, not a container).
+      const textEls = allElems
+        .filter(e => ownText(e).length > 0)
+        .map(e => ({ e, r: e.getBoundingClientRect(), t: ownText(e),
+                     fs: parseFloat(getComputedStyle(e).fontSize) || 0, op: effOpacity(e) }))
+        .filter(o => o.r.width > 0 && o.r.height > 0 && !isFullBleed(o.r) && o.op >= 0.25);
+
+      // (A) Text crossing a 4:5 crop line (feed crop slices primary content in half).
       const straddlers = [];
-      // Full-bleed = element nearly fills the viewport vertically (background art, starfield, vignette).
-      // Allow up to 6px slack for transforms / sub-pixel animation positioning.
-      const isFullBleed = (r) => r.y <= 6 && r.bottom >= 1914;
-      for (const e of allElems) {
-        const r = e.getBoundingClientRect();
-        if (isFullBleed(r)) continue;  // background art / canvas-spanning gradient — exempt
-        if (r.y < 285 && r.bottom > 285) straddlers.push({tag: e.tagName, cls: e.className, edge: 285, top: r.y, bottom: r.bottom});
-        if (r.y < 1635 && r.bottom > 1635) straddlers.push({tag: e.tagName, cls: e.className, edge: 1635, top: r.y, bottom: r.bottom});
+      for (const o of textEls) {
+        const r = o.r;
+        if (r.y < SAFE.y0 && r.bottom > SAFE.y0)
+          straddlers.push({ sel: sel(o.e), edge: SAFE.y0, top: Math.round(r.y), bottom: Math.round(r.bottom), sample: o.t.slice(0, 20) });
+        else if (r.y < SAFE.y1 && r.bottom > SAFE.y1)
+          straddlers.push({ sel: sel(o.e), edge: SAFE.y1, top: Math.round(r.y), bottom: Math.round(r.bottom), sample: o.t.slice(0, 20) });
       }
+
+      // (B) Text overflowing the VIEWPORT edge (cut off the screen) — unambiguous defect.
+      const viewport_overflow = [];
+      for (const o of textEls) {
+        const r = o.r; const edges = [];
+        if (r.x < -2) edges.push('left');
+        if (r.right > VW + 2) edges.push('right');
+        if (r.y < -2) edges.push('top');
+        if (r.bottom > VH + 2) edges.push('bottom');
+        if (edges.length)
+          viewport_overflow.push({ sel: sel(o.e), edges, sample: o.t.slice(0, 24),
+            box: { x: Math.round(r.x), right: Math.round(r.right), y: Math.round(r.y), bottom: Math.round(r.bottom) } });
+      }
+
+      // (C) BIG primary text past the side safe margins (x 90..990) — edge-cut risk.
+      // Small edge labels (kicker/footer/rotated side rails, fs<40) are exempt by design.
+      const side_overflow = [];
+      for (const o of textEls) {
+        if (o.fs < 40) continue;
+        const r = o.r;
+        if (r.x < SAFE.x0 - 2 || r.right > SAFE.x1 + 2)
+          side_overflow.push({ sel: sel(o.e), sample: o.t.slice(0, 24),
+            x: Math.round(r.x), right: Math.round(r.right), fs: Math.round(o.fs) });
+      }
+
+      // (D) Clipping: element clips overflow AND its content exceeds the box → text cut
+      // (word truncated, or a Vietnamese tone mark sliced at the top).
+      const clipped = [];
+      for (const e of allElems) {
+        if (effOpacity(e) < 0.25) continue;   // faint decoration — clip is intentional
+        const cs = getComputedStyle(e);
+        const clipX = cs.overflowX === 'hidden' || cs.overflowX === 'clip';
+        const clipY = cs.overflowY === 'hidden' || cs.overflowY === 'clip';
+        if (!clipX && !clipY) continue;
+        const overX = clipX ? (e.scrollWidth - e.clientWidth) : 0;
+        const overY = clipY ? (e.scrollHeight - e.clientHeight) : 0;
+        if (overX > 2 || overY > 2) {
+          const txt = ownText(e);
+          clipped.push({ sel: sel(e), overX, overY,
+            has_text: txt.length > 0, vn_stacked: VN_STACK.test(txt), sample: txt.slice(0, 24) });
+        }
+      }
+
+      // (E) Overlap: two text-bearing, non-nested elements whose boxes intersect.
+      const overlaps = [];
+      for (let i = 0; i < textEls.length; i++) {
+        for (let j = i + 1; j < textEls.length; j++) {
+          const A = textEls[i], B = textEls[j];
+          if (A.e.contains(B.e) || B.e.contains(A.e)) continue;   // parent/child, not a clash
+          const ix = Math.min(A.r.right, B.r.right) - Math.max(A.r.x, B.r.x);
+          const iy = Math.min(A.r.bottom, B.r.bottom) - Math.max(A.r.y, B.r.y);
+          if (ix <= 0 || iy <= 0) continue;
+          const inter = ix * iy;
+          const smaller = Math.min(A.r.width * A.r.height, B.r.width * B.r.height);
+          if (smaller > 0 && inter / smaller > 0.12) {
+            overlaps.push({ a: sel(A.e), b: sel(B.e), pct: Math.round(inter / smaller * 100),
+              a_text: A.t.slice(0, 20), b_text: B.t.slice(0, 20) });
+          }
+        }
+      }
+
+      // (F) Line-height too tight on multi-line body text (VN needs headroom).
+      const tight = [];
+      for (const o of textEls) {
+        const cs = getComputedStyle(o.e);
+        const lh = parseFloat(cs.lineHeight);
+        if (!o.fs || isNaN(lh)) continue;
+        const lines = Math.round(o.r.height / lh);
+        if (lines >= 2 && lh / o.fs < 1.15)
+          tight.push({ sel: sel(o.e), ratio: +(lh / o.fs).toFixed(2), lines, sample: o.t.slice(0, 24) });
+      }
+
       return {
-        inner: rectsFor(inner),
-        outer: rectsFor(outer),
-        out_top: rectsFor(top),
-        out_bottom: rectsFor(bottom),
         body: { scrollWidth: document.body.scrollWidth, scrollHeight: document.body.scrollHeight },
         element_count: allElems.length,
+        text_count: textEls.length,
         straddlers: straddlers.slice(0, 12),
+        viewport_overflow: viewport_overflow.slice(0, 12),
+        side_overflow: side_overflow.slice(0, 12),
+        clipped: clipped.slice(0, 12),
+        text_overlaps: overlaps.slice(0, 12),
+        tight_line_height: tight.slice(0, 12),
       };
     }
     """
@@ -95,6 +212,13 @@ def render_and_inspect(html_path: Path, png_path: Path) -> dict:
         page = ctx.new_page()
         page.goto("file:///" + str(html_path).replace("\\", "/"))
         page.wait_for_load_state("networkidle", timeout=5000)
+        # Wait for web fonts (autofit + diacritic metrics depend on real font) and let
+        # CSS entrance @keyframes settle, so clip/overlap rects are FINAL not mid-animation.
+        try:
+            page.evaluate("() => (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => true)")
+        except Exception:
+            pass
+        page.wait_for_timeout(1400)
         dom = page.evaluate(inspect_js)
         page.screenshot(path=str(png_path), full_page=False)
         browser.close()
@@ -132,50 +256,80 @@ def evaluate(html_path: Path, neighbor_pngs: list[Path]) -> dict:
 
     issues: list[dict] = []
 
-    # Body overflow check (tolerate 2px for border/sub-pixel rounding)
-    body = dom.get("body") or {}
-    if body.get("scrollWidth", 0) > 1082:
-        issues.append({"kind": "body_overflow_x", "got": body["scrollWidth"]})
-    if body.get("scrollHeight", 0) > 1922:
-        issues.append({"kind": "body_overflow_y", "got": body["scrollHeight"]})
+    # NOTE: no document.body scroll-size check — decorative "ghost echo" art legitimately
+    # bleeds past the frame (the stage clips it visually). Real cut-offs are caught
+    # precisely by text_overflow_viewport below (faint decoration already filtered out).
 
-    # Inner bounds check. Three valid configurations:
-    #   - Intro/outro full-card: y=285, h≈1350 — full OUTER safe (no caption-overlay slot)
-    #   - Standard compact:      y=345, h≈1015 — caption-overlay reserves bottom 215px
-    #   - Standard full:         y=345, h≈1230 — no caption-overlay slot
-    VALID_INNER = [
-        {"y": 285, "h_range": (1340, 1360), "tag": "intro_outro_full"},
-        {"y": 345, "h_range": (1005, 1025), "tag": "standard_compact"},
-        {"y": 345, "h_range": (1220, 1240), "tag": "standard_full"},
-    ]
-    inner = dom.get("inner")
-    if inner is None:
-        issues.append({"kind": "inner_div_missing"})
-    else:
-        if abs(inner["x"] - INNER["x_min"]) > 5 or abs(inner["w"] - (INNER["x_max"] - INNER["x_min"])) > 10:
-            issues.append({"kind": "inner_x_bounds_wrong", "got": [inner["x"], inner["w"]]})
-        matched = any(
-            abs(inner["y"] - cfg["y"]) <= 5 and cfg["h_range"][0] <= inner["h"] <= cfg["h_range"][1]
-            for cfg in VALID_INNER
-        )
-        if not matched:
-            issues.append({
-                "kind": "inner_bounds_wrong",
-                "got": {"y": inner["y"], "h": inner["h"]},
-                "valid_configs": [{"y": c["y"], "h": c["h_range"], "use": c["tag"]} for c in VALID_INNER],
-            })
+    # Text overflowing the VIEWPORT edge — the frame literally cuts the text off.
+    for v in dom.get("viewport_overflow") or []:
+        issues.append({
+            "kind": "text_overflow_viewport",
+            "selector": v["sel"],
+            "edges": v["edges"],
+            "sample": v.get("sample", ""),
+            "box": v.get("box"),
+            "fix": "Text is cut off at a screen edge — shorten the string / shrink the font "
+                   "/ move it inside the 1080×1920 frame. Re-do the HTML.",
+        })
 
-    # 4:5 cut line straddlers
+    # Big primary text pushed past the side safe margins (x 90..990) — edge-cut risk.
+    for s in dom.get("side_overflow") or []:
+        issues.append({
+            "kind": "text_past_side_safezone",
+            "selector": s["sel"],
+            "x": s["x"], "right": s["right"], "font_px": s["fs"],
+            "sample": s.get("sample", ""),
+            "fix": "Keep primary text within x 90..990 — shorten it or reduce the font so it "
+                   "doesn't run to the edge.",
+        })
+
+    # Primary TEXT straddling a 4:5 crop line (feed crop slices it in half).
     for s in dom.get("straddlers") or []:
-        issues.append({"kind": "element_straddles_4x5_cut", "edge_y": s["edge"], "tag": s["tag"], "cls": s["cls"]})
+        issues.append({
+            "kind": "text_straddles_4x5_cut",
+            "selector": s["sel"], "edge_y": s["edge"],
+            "top": s.get("top"), "bottom": s.get("bottom"), "sample": s.get("sample", ""),
+            "fix": "Move this text fully above y=285 or below y=1635 (or into the INNER zone) — "
+                   "the 4:5 feed crop would slice it.",
+        })
 
-    # Out-top / Out-bottom must not cross 4:5 boundary
-    ot = dom.get("out_top")
-    if ot and ot["bottom"] > CUT_TOP:
-        issues.append({"kind": "out_top_crosses_4x5_edge", "bottom": ot["bottom"]})
-    ob = dom.get("out_bottom")
-    if ob and ob["y"] < CUT_BOT:
-        issues.append({"kind": "out_bottom_crosses_4x5_edge", "top": ob["y"]})
+    # Text clipped by an overflow-hidden box (word cut off, or a Vietnamese tone
+    # mark sliced at the top edge — Ậ Ỗ Ồ). Each is a re-do-the-HTML defect.
+    # Only flag elements clipping their OWN text — a stage/root box clipping full-bleed
+    # background art (has_text=false) is intentional, not a defect.
+    for c in dom.get("clipped") or []:
+        if not c.get("has_text"):
+            continue
+        issues.append({
+            "kind": "text_clipped_vn_diacritic" if c.get("vn_stacked") else "text_clipped",
+            "selector": c["sel"],
+            "overflow_x_px": c["overX"],
+            "overflow_y_px": c["overY"],
+            "sample": c.get("sample", ""),
+            "fix": ("Add top padding / raise line-height / set overflow:visible so the "
+                    "Vietnamese stacked diacritic isn't sliced; or shorten the text."
+                    if c.get("vn_stacked") else
+                    "Text overflows its clipping box — shorten the string, shrink the font, "
+                    "or widen/heighten the container. Do NOT ship clipped text."),
+        })
+
+    # Two text elements physically overlapping (đè chữ lên nhau / dính vào nhau).
+    for o in dom.get("text_overlaps") or []:
+        issues.append({
+            "kind": "text_elements_overlap",
+            "a": o["a"], "b": o["b"], "overlap_pct": o["pct"],
+            "a_text": o.get("a_text", ""), "b_text": o.get("b_text", ""),
+            "fix": "Two text blocks overlap — add spacing/padding or move one; re-do the HTML.",
+        })
+
+    # Multi-line body text with too-tight leading (Vietnamese needs line-height ≥ 1.15).
+    for t in dom.get("tight_line_height") or []:
+        issues.append({
+            "kind": "line_height_too_tight",
+            "selector": t["sel"], "ratio": t["ratio"], "lines": t["lines"],
+            "sample": t.get("sample", ""),
+            "fix": "Raise line-height to ≥ 1.15 (VN diacritics need vertical room between lines).",
+        })
 
     # Anti-slop: scan the HTML source for banned palette + banned combos
     try:

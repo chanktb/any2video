@@ -143,6 +143,24 @@ def render_template(template_id: str, inputs: dict, out_html: Path,
     else:
         new_html = _kara_css + new_html
 
+    # VN diacritic headroom guard: Vietnamese stacked tone marks (Ậ Ỗ Ồ Ề Ế…) paint
+    # ABOVE cap-height. A tight line-height or a snug fixed-height box slices the top
+    # accent off. Give block display text a sliver of top room, and make inline accent
+    # spans never clip themselves. Conservative on purpose (additive padding + inline
+    # overflow only) so it can't break card layouts — the scene_critic gate catches any
+    # residual clip and forces a redo. See SKILL §2.2.7.
+    _vn_headroom = (
+        "<style>/* VN diacritic headroom (any2video guard) */"
+        ".hero,.headline,.figure,.number,.lbl,.title,.eyebrow,.kicker,.desc,.subtitle{"
+        "padding-top:0.06em;}"
+        ".accent,.kw,.hl,.ch,mark,.headline-accent{overflow:visible !important;}"
+        "</style>"
+    )
+    if "</head>" in new_html:
+        new_html = new_html.replace("</head>", _vn_headroom + "</head>", 1)
+    else:
+        new_html = _vn_headroom + new_html
+
     # Universal accent-spacing guard: after the template builds its DOM, ensure a
     # space sits around every highlighted phrase (.accent/.kw) so a coloured word
     # never sticks to its neighbour (e.g. "từ" + "GitHub" → "từGitHub"). Covers

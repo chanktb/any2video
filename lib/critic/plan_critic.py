@@ -108,6 +108,32 @@ def check(plan_path: Path, analysis_path: Path | None) -> dict:
             "tolerance_pct": DURATION_TOLERANCE * 100,
         })
 
+    # ──────────── OUTRO RULES (SKILL 2.2.7 — HARD) ────────────
+    # The white paper-card / red-text outro (frame-statement-outro) is banned: a repo
+    # tour closes on AUTHOR-PROFILE scroll footage, not a text card.
+    source_type = (meta.get("source_type") or "").lower()
+    for s in scenes:
+        tpl = (s.get("templateId") or s.get("template_id") or "").lower()
+        if tpl == "frame-statement-outro":
+            issues.append({
+                "kind": "banned_outro_template",
+                "scene_id": s.get("id"),
+                "hint": "frame-statement-outro (white card / red text) is banned. Close on "
+                        "author-profile scroll footage: set capture_url to https://github.com/<owner>.",
+            })
+    last = scenes[-1]
+    if source_type in ("github_repo", "github"):
+        cap = (last.get("capture_url") or "").strip()
+        # author profile = github.com/<owner> with NO repo path (that's the repo footage)
+        if not re.match(r"https?://github\.com/[^/\s]+/?$", cap):
+            issues.append({
+                "kind": "outro_not_author_profile",
+                "scene_id": last.get("id"),
+                "got": cap or None,
+                "hint": "GitHub repo tour MUST end on the author's profile scroll: set the last "
+                        "scene's capture_url to https://github.com/<owner> (profile root, NO /repo).",
+            })
+
     # Grounding: every data_props value present in Evidence
     if analysis_path and analysis_path.is_file():
         evidence = load_evidence(analysis_path).lower()

@@ -119,11 +119,10 @@ The TTS rules and some docs include Vietnamese examples.
 
 ## Credits
 
-- Scene templates under `skill/templates/scenes/` are vendored and adapted from
-  [nexu-io/html-video](https://github.com/nexu-io/html-video) (Apache-2.0) —
-  each keeps its `NOTICE.md` attribution.
-- The SFX-selector pattern is inspired by
-  [huytranvan2010/AI-auto-generate-video](https://github.com/huytranvan2010/AI-auto-generate-video).
+- Scene templates under `skill/templates/scenes/` each carry their own `NOTICE.md`
+  with the original author + license — the source of truth. Two (`frame-aicoding-*`)
+  are original (MIT); the rest are adapted from open-source template designs under
+  Apache-2.0. Keep the `NOTICE.md` files intact if you redistribute.
 - Bundled SFX are placeholder clips synthesized with FFmpeg; swap in curated CC0
   audio for production.
 

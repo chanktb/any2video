@@ -86,7 +86,7 @@ Real numbers, quotes, file references — proof for every claim above.
 
 Derived from the Palmier Pro reference + common templated-video anti-patterns. The 9 patterns:
 
-1. **Mid-conversation opening.** Open with "và …", "không chỉ …", a stat already-in-flight ("Repo này có 9 nghìn sao …"). Never "Đây là một công cụ …" or "Hôm nay chúng ta sẽ tìm hiểu …".
+1. **Pain-first / mid-conversation opening.** Open on the viewer's pain or a stat already-in-flight ("Nếu bạn hay phải …", "Repo này có 9 nghìn sao …"). NEVER a flat catalogue opener: "Đây là một công cụ …", "Hôm nay xem qua repo này …", "Hôm nay chúng ta sẽ tìm hiểu …". A "Hôm nay xem qua X, một công cụ …" opener has no hook, names no problem, and gives the viewer zero reason not to scroll — see §2.2.5.0 Intro pain-hook.
 2. **Contrast structures.** Use "không chỉ X mà còn Y", "cứ như X nhưng có Y", "không phải X mà là Y", "Nhưng lưu ý …". Contrast pulls attention.
 3. **2nd-person address.** "bạn thấy ngay", "Bạn có thể trim, replace", "Nếu bạn dựng video trên Mac dòng M". Brings the viewer in.
 4. **Demonstrative immediacy.** "ngay", "này", "trên đây", "ngay trên timeline", "ngay trong cùng editor này". Concrete and present.
@@ -116,8 +116,8 @@ Every any2video runs through **7 beats** in this order. NEVER skip intro or outr
 
 | # | Beat | Sec | What it does |
 |---|------|-----|--------------|
-| 1 | **intro** | 2-3 | Title card — viewer learns WHAT they are watching in the first 3 seconds. Avatar reveal + name + tagline. No narration yet OR a single quick line ("Hôm nay xem qua repo này, một công cụ làm video AI chạy local."). |
-| 2 | **hook** | 4-6 | Pull-in via contrast / surprise stat. Lands the value prop in one breath. |
+| 1 | **intro** | 3-5 | PAIN-FIRST opener (HARD, §2.2.5.0). Lead with the viewer's problem in 2nd person — "Nếu bạn hay phải [pain] mà lại [friction], thì xem [repo này] — [one-breath value prop]." The avatar + name + tagline reveal VISUALLY while this line plays, so no "Hôm nay xem qua…" narration is needed to name the thing. NEVER a flat "Hôm nay xem qua repo này, một công cụ…". |
+| 2 | **hook** | 4-6 | Sharpen the value prop the intro opened — via contrast / a surprise stat, still 2nd-person, one breath. If the intro already fully hooked, this beat deepens the "why now" instead of re-hooking. |
 | 3 | **problem** | 5-8 | Pain it solves. Name competitors / status quo concretely. |
 | 4 | **solution** | 8-12 | How it works at a high level. Pipeline / architecture diagram. |
 | 5 | **details** | 7-10 | One specific differentiator — the thing nobody else does (e.g. cast lock, channel auto-ideate). |
@@ -125,6 +125,41 @@ Every any2video runs through **7 beats** in this order. NEVER skip intro or outr
 | 7 | **outro** | 3-5 | Closing card — repo URL + license + soft sub icon. Narration MUST NOT spell URL char-by-char (rule below). |
 
 Total target: 50-75 sec. Intro and outro are NON-OPTIONAL — they are how the viewer figures out what they're watching and what to do next.
+
+##### 2.2.5.0 Intro pain-hook (HARD — the opening 5 seconds decide the scroll)
+
+The #1 reason a repo-tour Short dies is a flat opener: "Hôm nay xem qua repo này…" / "Đây là một công cụ…". It states no problem, carries no hook, and gives the viewer nothing to stay for. Open on THEIR pain instead — the intro is the front bookend of the SAME pain the outro closes (§ outro pain-CTA below); write them as one thought split across the video.
+
+**Pattern (HARD):**
+
+```
+Nếu bạn [hay phải / thường xuyên] [pain-task the audience does],
+[hay chỉ là / hoặc] [softer version of the same audience] nhưng lại [friction they hate],
+thì xem [repo này] — [one-breath value prop, "chỉ với một câu lệnh"].
+```
+
+Structure (mirrors the outro, reversed):
+1. **Name the pain-task** the target viewer does today ("hay phải làm video short giới thiệu repo", "thường xuyên audit SEO cho khách").
+2. **Widen to the audience + the friction** ("hay chỉ là thích review repo nhưng lại lười ngồi edit video").
+3. **Land the repo + value prop in ONE breath** ("thì xem repo này nhé — tự động làm video AI ngay trên máy, chỉ với một câu lệnh"). Naming the repo here is FINE (unlike the outro) — this is where the viewer learns what they're watching, but it comes AFTER the pain, never as the first words.
+
+**Reference (approved shape):**
+> "Nếu bạn thường xuyên phải làm video short giới thiệu repo, hay chỉ là thích review repo nhưng lại lười edit video, thì xem repo này nhé — một skill tự động làm video AI ngay trên máy tính của bạn, chỉ với một câu lệnh."
+
+That one sentence carries 2nd-person pain (`hay phải làm video short`), audience-widen (`hay chỉ là thích review repo`), friction (`lười edit video`), and the value prop in one breath (`tự động… chỉ với một câu lệnh`) — and never says "Hôm nay xem qua…".
+
+**Where the pain comes from:** `analysis.md > ## Problem` — the SAME source the outro uses. Intro opens the pain, outro closes it; keep them consistent (same audience, same pain), not two unrelated hooks.
+
+**Examples (per repo type — intro openers):**
+
+| Repo type | Example intro narration |
+|-----------|-------------------------|
+| Video generator | "Nếu bạn hay phải làm video giới thiệu repo mà lười ngồi edit, thì xem cái này — nó tự dựng video AI ngay trên máy, chỉ một câu lệnh." |
+| Google Ads plugin | "Nếu bạn đang chạy Google Ads mà không chắc tiền đang chảy đi đâu, thì xem skill này — nó tự soi tài khoản, chỉ ra chỗ đang lãng phí." |
+| Blog SEO auditor | "Nếu blog bạn đang tụt traffic mà không biết sửa từ đâu, thì xem cái này — nó tự audit rồi xếp việc cần làm theo thứ tự." |
+| CLI tool | "Nếu ngày nào bạn cũng phải làm [X] thủ công, thì xem một dòng lệnh này — nó làm hết trong vài giây." |
+
+**TTS-sanitize the repo name** in the intro line (rule 2.2.6d): write it as pronounced, not the raw slug (e.g. `any2video` → `any to video`).
 
 **Outro narration (HARD — contextual pain-CTA, NO URL / no repo name).** The video always ships with a caption/post that already contains the URL — the link goes there when posting to FB / TG / TikTok. So the video's outro must NOT waste 5 seconds mentioning URLs or repo names. Instead: use those 5 seconds to hook the SPECIFIC PERSON who'd install this.
 
@@ -169,6 +204,12 @@ These apply to EVERY `narration` field. Violation = re-TTS will sound wrong even
 
 **(b) Total scene count — 7 to 10.** The 7 beats stay, but high-density beats (solution/details/how-to) can split into 2 atomic scenes each. Don't pad to 12 — over-fragmentation creates flash-cut fatigue.
 
+**(b.2) Requested duration → hit it within ±10 sec (HARD).** When the user asks for a target length (e.g. "video 60 giây") or passes `any2video init --duration 60` (writes `meta.target_duration_sec`), the plan is NOT free to drift. Script it deliberately:
+- **Phase 2 budgets syllables.** VN TTS at `+15%` speaks ~4.0–4.5 syllables/sec. So a 60s target ≈ 250–270 VN syllables of `narration` total. Divide across scenes by beat weight; write each scene's `narration` to its syllable budget instead of free-writing then hoping.
+- **Phase 3 measures + reconciles (the gate).** After TTS, sum the ffprobe'd scene durations + the compose gaps (`gap_ms × (scenes−1)` + poster 0.1s). If `|measured_total − target| > 10s`, FIX before rendering: over → trim the wordiest scenes' narration (or drop a splittable scene); under → expand a thin beat or add one atomic scene. Re-TTS only the changed scenes, then re-measure. Loop until within ±10s.
+- No target requested → the default 50–75s window applies, no hard tolerance.
+Report the final measured length next to the target when notifying (e.g. "target 60s, thực tế 58.4s").
+
 **(c) Numbers → Vietnamese words in `narration`.** Microsoft Neural TTS reads "5.5" as "năm rưỡi" (wrong for version). Write everything out:
 
 | Form | WRONG (TTS misreads) | RIGHT (write out) |
@@ -198,8 +239,22 @@ Decimal mark: `chấm` (natural) or `phẩy` (formal) — pick one, stay consist
 - ❌ Slash commands like `/plugin install` — say `lệnh plugin install` or `gõ plugin install`
 - ❌ File extensions in middle of sentence (`.yaml`, `.json`) — say `file YAML` / `file JSON`
 - ❌ Camelcase identifiers (`accountContextYaml`) — split: `account context dot yaml` or rephrase
+- ❌ Ellipsis `…` / `...` and em-dash `—` / en-dash `–` ANYWHERE in `narration` (HARD) — TTS misreads them (weird long pause or reads the char). Break the clause into two short sentences with `.` instead, or use a plain comma. Display `inputs` may keep `…`/`—` freely (viewer reads, doesn't hear).
 
-End every sentence with `.` or `?` for natural pause. NEVER end with `:` or `,` or trailing dash.
+End every sentence with `.` or `?` for natural pause. NEVER end with `:` or `,` or a trailing dash. Keep punctuation in `narration` MINIMAL — a comma or a period, nothing fancier.
+
+**(d.2) English terms → phonetic in `narration`, EXACT spelling in display (HARD).** Any English/brand/repo/product name that TTS would mangle gets written PHONETICALLY in the `narration` field only, while the matching display slot in `inputs` keeps the original spelling verbatim. The two channels never have to match character-for-character — one is heard, one is read.
+
+| Term | `narration` (heard — phonetic) | display `inputs` (read — verbatim) |
+|---|---|---|
+| any2video | `any to video` (or `eni-tu-vi-đeo`) | `any2video` |
+| ffmpeg | `ép ép em peg` (or `f f m peg`) | `ffmpeg` |
+| PyTorch | `pai tọt` | `PyTorch` |
+| n8n | `en tám en` | `n8n` |
+| GitHub | `git hâb` | `GitHub` |
+| API / GPT | usually OK; if mangled → `ây pi ai` / `gí pi tí` | `API` / `GPT` |
+
+Pick the transliteration that a Vietnamese reader would pronounce closest to the real English — test by reading the `narration` aloud. If it still sounds wrong, rephrase to avoid the term. NEVER put the raw slug (`any2video`, `ffmpeg`) into `narration` and hope the voice guesses right.
 
 **(e) Visual `inputs` (template slots) — opposite rule.** Keep formatted display:
 - Numbers stay formatted: `5.5`, `82%`, `$0`, `D14`
@@ -251,9 +306,12 @@ misses items 1–4 is **unfinished, not "chưa tới"** — re-open the phase, d
      in the dark band below it, never over the page.
    - Scroll is speed-capped (`PAN_SPEED_PX_PER_SEC≈300`) — a tall page shows less,
      readably. Never blur past. Give the scene ≥7s.
-   - **Outro = author-profile footage**, not a text card. `capture_url:
-     https://github.com/<owner>` → shows the real person, bio, other repos,
-     contribution graph. A plain text outro reads as "vô giá trị."
+   - **Outro = author-profile footage (HARD), not a text card.** The LAST scene of a
+     repo tour MUST set `capture_url: https://github.com/<owner>` (profile root, NO
+     `/repo`) → shows the real person, bio, other repos, contribution graph. The white
+     paper-card / red-text `frame-statement-outro` is **BANNED** — `plan_critic` fails
+     any plan that uses it or that ends a GitHub tour without author-profile footage.
+     A plain text outro reads as "vô giá trị."
 
 3. **One honest-caveat scene** (retention feature, not filler). State a real
    limit or a "who should NOT use this". For claude-google-ads: *eCommerce-only,
@@ -280,6 +338,34 @@ misses items 1–4 is **unfinished, not "chưa tới"** — re-open the phase, d
 8. **Audio bed (when asset present):** lo-fi/synthwave BGM ~115–122 BPM ducked to
    ≈ −20 dB under voice + a soft reveal tick per beat. SFX assets already in
    `templates/sfx/`; BGM asset goes in `templates/bgm/` (do NOT ship unlicensed music).
+
+9. **Pre-render gate is MANDATORY — every scene HTML is measured before ANY video is
+   rendered (HARD).** After `template_render all`, run:
+   ```
+   python -m lib.critic.scene_gate all <plan.md>
+   ```
+   It renders each `scenes/<id>.html` at 1080×1920 (fonts loaded, entrance animations
+   settled) and FAILS the plan on any of:
+   - **Text clipped** by an overflow-hidden box — a word cut off, or a Vietnamese tone
+     mark (Ậ Ỗ Ồ Ề) sliced at the top edge (`text_clipped` / `text_clipped_vn_diacritic`).
+   - **Two text blocks overlapping** / stuck together (`text_elements_overlap`).
+   - **Line-height < 1.15** on multi-line VN text (`line_height_too_tight`).
+   - Content outside the safe zone, 4:5-cut straddle, body overflow, slop palette.
+   `pass:false` → **do NOT render.** Fix the offending scene's `inputs` (shorten the
+   string) or the template (raise line-height / add top padding / move the block), re-run
+   `template_render` for that scene, re-gate. Loop until `pass:true`. Rendering video on a
+   failing plan throws away minutes per scene — the gate exists so you never do that.
+   `template_render` already injects a VN-diacritic headroom guard, but tight custom
+   `inputs` can still overflow; the gate is the backstop.
+
+#### 2.2.8 Only ever reference the CURRENT repo (HARD)
+
+The video, its `narration`, its template `inputs`, `analysis.md`, and the post caption
+mention **only the repo being toured** — its name, its `github.com/<owner>/<repo>`, its
+author's profile. NEVER name, link, or pull facts from any OTHER repo (a repo the study
+templates came from, a "similar tool", a competitor's project). Doing so sends the viewer
+to someone else's project. If a source README links out to other repos, ignore those
+links — extract only what describes THIS repo.
 
 #### 2.3 Write `workspace/runs/<slug>/plan.md` (YAML)
 
@@ -346,6 +432,7 @@ Sonnet sub-agent reads `plan.md` + `analysis.md` and checks:
 | At least 2 scenes use a contrast structure ("không chỉ … mà còn", "không phải … mà là", "cứ như … nhưng có") | < 2 |
 | Each scene's narration contains ≥ 1 specific real name (file, command, brand, competitor) | any scene fails |
 | Stars/forks/commits NOT listed as separate scene fragments | violation |
+| Intro scene (id 1): opens PAIN-FIRST in 2nd person ("Nếu bạn…" / a problem the viewer feels). NOT a flat "Hôm nay xem qua…" / "Đây là một công cụ…" catalogue opener (§2.2.5.0) | any flat opener |
 | Hook scene: NOT 3 telegraphic fragments ("X. Y. Z.") | violation |
 | CTA scene: NOT "ghé repo xem thử" / "ghé link xem ngay" generic close | violation |
 | Each scene's `grounded_in` references a real line in `analysis.md > ## Evidence` | missing/fabricated |
@@ -418,15 +505,25 @@ over free-handing a one-off scene. Self-contained HTML: inline CSS/SVG, viewport
 - Caption overlay (`.caption-overlay`) shows the narration text — fades in across 400-600ms once the scene's main content has settled
 - Never write a scene whose only motion is < 500ms — the recording will look static
 
-**Gate 3 (Sonnet critic):** for each scene, render screenshot via Playwright → check (3-tier safe system, per `templates/design-tokens.md`):
-- **Primary content** (text, numbers, CTAs, labeled icons) inside **INNER** zone (y 345..1575, x 90..990, 900×1230)
-- **Background art / gradient** may extend to **OUTER** safe (y 285..1635, x 90..990) but not into the red unsafe bands
-- **Secondary elements** (channel name, source citation, watermark) either inside INNER OR fully outside 4:5 frame (`bottom ≤ 285` OR `top ≥ 1635`). HARD: never straddling y=285 / y=1635 — feed crop slices them in half.
-- WCAG AA contrast on all text
-- Viewport overflow = 0
-- Visual distinct from previous 2 scenes (perceptual diff > threshold)
+**Gate 3 — MANDATORY automated pre-render gate (HARD, blocks Phase 5).** Run once over
+the whole plan:
+```
+python -m lib.critic.scene_gate all <plan.md>
+```
+It renders every `scenes/<id>.html` at 1080×1920 (fonts loaded + animations settled) and
+returns `pass:false` with a per-scene `issues[]` on ANY of:
+- **Primary content** (text, numbers, CTAs, labeled icons) outside the **INNER** zone (y 345..1575, x 90..990, 900×1230).
+- **Background art / gradient** extending past **OUTER** safe (y 285..1635) into the red unsafe bands.
+- **Secondary elements** (channel name, source, watermark) straddling y=285 / y=1635 — feed crop slices them in half.
+- **Text clipped** — a word cut off, or a Vietnamese tone mark (Ậ Ỗ Ồ Ề) sliced at the top (`text_clipped` / `text_clipped_vn_diacritic`).
+- **Two text blocks overlapping** / stuck together (`text_elements_overlap`).
+- **Line-height < 1.15** on multi-line VN text (`line_height_too_tight`).
+- Viewport overflow ≠ 0; slop palette; scene identical to a neighbour.
 
-Fail → regenerate that scene's HTML only.
+`pass:false` → **regenerate ONLY the failing scene's HTML** (shorten the `inputs` string,
+raise line-height, add top padding, or move the overlapping block), re-run
+`template_render` for it, and re-gate. **Never start Phase 5 while any scene fails** —
+each rendered scene costs real minutes and a clipped/overlapping frame throws that away.
 
 ### Phase 5 — Render + compose
 

@@ -1,7 +1,7 @@
 # SFX library (any2video v5+)
 
-6 short SFX clips placed at scene boundaries based on a 3-tier semantic selector.
-Reference pattern: [ai-auto-generate-video](https://github.com/huytranvan2010/AI-auto-generate-video) `src/render/sfx-selector.ts`.
+6 short SFX clips placed at scene boundaries based on a 3-tier semantic selector
+(level-keyed: per-beat reveal ticks / boundary stings).
 
 ## What's bundled
 

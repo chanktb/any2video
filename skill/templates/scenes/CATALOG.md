@@ -1,6 +1,6 @@
 # Scene template catalog (any2video v5+)
 
-8 named templates lifted from [ai-auto-generate-video](https://github.com/huytranvan2010/AI-auto-generate-video) (MIT, © 2026 AI Coding — see each template's `NOTICE.md` for full attribution).
+Named 9:16 scene templates, each self-contained. Provenance lives in every template's own `NOTICE.md` (source of truth): the two `frame-aicoding-*` are original (© 2026 AI Coding, MIT); the rest are adapted from open-source template designs under Apache-2.0 / MIT.
 
 Each template is a self-contained 9:16 (1080×1920) HTML file at `<templateId>/compositions/portrait.html`. Variables are injected at load time via `data-composition-variables` JSON attribute → inline JS binds to DOM selectors.
 
@@ -14,7 +14,7 @@ Each template is a self-contained 9:16 (1080×1920) HTML file at `<templateId>/c
 | **solution** | `frame-aicoding-list` | Bullet list with gold #N markers — pipeline steps |
 | **details** | `frame-aicoding-comparison` | Head-to-head 2-card layout — before/after, vs alternative |
 | **review** | `frame-pentagram-stat` OR `frame-build-minimal` | One hero stat with glow, OR one-word bold statement |
-| **outro** | `frame-statement-outro` | Paper-card closing with red CTA + giant channel name |
+| **outro** | *author-profile footage — NO template* | Close on a real scroll of `https://github.com/<owner>` (author profile, bio, other repos) via the last scene's `capture_url`. The old `frame-statement-outro` white-card / red-text closing is **BANNED** (SKILL §2.2.7, plan_critic enforces). |
 
 ## Slot reference per template
 
@@ -64,10 +64,18 @@ Each template is a self-contained 9:16 (1080×1920) HTML file at `<templateId>/c
 - `desc` ≤90 (supporting sentence)
 - `side_left` ≤20, `side_right` ≤20 (rotated edge labels)
 
-### frame-statement-outro (outro)
-- `cta` ≤60 (uppercase call-to-action)
-- `channel` ≤24 (channel name, giant red)
-- `source` ≤40 (e.g. "Nguồn: <domain>" or "github.com/owner/repo")
+### frame-statement-outro — ⛔ DEPRECATED / BANNED as outro
+White paper-card + giant red channel name. Rejected as a closing (reads like a cheap
+text card). **Do not use it.** Close instead on author-profile scroll footage:
+```yaml
+- id: <last>
+  beat: outro
+  capture_url: https://github.com/<owner>   # profile root, NO /repo → author scroll
+  footage_label: github.com/<owner>
+  narration: "<pain-CTA per SKILL 2.2.7 — no URL spelled out>"
+  duration_sec: 5
+```
+plan_critic will FAIL the plan if the last scene of a repo tour isn't author-profile footage.
 
 ## How any2video Phase 4 uses these
 
@@ -78,7 +86,7 @@ scenes:
   - id: 1
     beat: intro
     duration_sec: 4
-    narration: "Hôm nay xem nhanh repo này..."
+    narration: "Nếu bạn hay phải làm video giới thiệu repo mà lười ngồi edit, thì xem cái này..."
     templateId: frame-liquid-bg-hero
     inputs:
       kicker: "REPO TOUR"
@@ -100,6 +108,9 @@ scenes:
 
 **Do NOT** invent new slot names — templates have inline JS that maps fixed selectors. Add slots only by editing the template's `<script>` block.
 
-## Attribution (MIT)
+## Attribution
 
-All 8 templates: © 2026 AI Coding (Huy Tran VN). MIT License. Original repo: <https://github.com/huytranvan2010/AI-auto-generate-video>. Each template directory has full `NOTICE.md` preserving sub-attribution chains (e.g. frontend-slides © Zara Zhang, huashu-design © alchaincyf).
+Per-template licenses live in each `<templateId>/NOTICE.md` — the source of truth. Keep those files intact when redistributing.
+
+- `frame-aicoding-list`, `frame-aicoding-comparison` — original, © 2026 AI Coding, MIT.
+- `frame-bold-poster`, `frame-build-minimal`, `frame-liquid-bg-hero`, `frame-pentagram-stat`, `frame-vignelli` — Apache-2.0, with upstream design lineage credited in each NOTICE (e.g. "Bold Poster" © Zara Zhang; "Build"/"Pentagram" © alchaincyf).

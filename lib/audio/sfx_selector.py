@@ -1,6 +1,6 @@
 """SFX selector — pick a sound effect per scene via 3-tier semantic rules.
 
-Reference pattern: AI-auto-generate-video src/render/sfx-selector.ts
+Pattern: a level-keyed SFX selector — per-beat reveal ticks / boundary stings.
 Bundled SFX: <repo>/skill/templates/sfx/*.mp3
 
 Tier 1: Explicit per-scene override (scene.sfx in plan.md)

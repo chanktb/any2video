@@ -8,7 +8,10 @@ meta:
   source_type: github_repo | article | image | text
   source: <url or path or hash>
   lang: vi                       # narration language: vi (default) or en
-  total_duration_sec: 60         # target, refined after TTS measurement
+  total_duration_sec: 60         # working estimate, refined after TTS measurement
+  target_duration_sec: 60        # OPTIONAL — set only when the user requested a length
+                                 # (or via `init --duration`). HARD: measured total must
+                                 # land within ±10s of this. See SKILL §2.2.6 b.2.
   voice: vi-VN-Chirp3-HD-Charon  # DEFAULT: MALE + Google TTS. Female only if the user asks.
   voice_provider: google         # DEFAULT google (Chirp 3 HD); auto-falls back to edge-tts MALE (NamMinh/Guy)
   theme_hint: "dark, technical, monospace accents"
@@ -73,7 +76,7 @@ scenes:
 
 ## Critic gate 2 (Sonnet) checks
 
-1. Sum of `duration_sec` ≈ `total_duration_sec` (±10%)
+1. Sum of `duration_sec` ≈ `total_duration_sec` (±10%). If `target_duration_sec` is set, the measured total (scenes + gaps + poster) MUST be within **±10 seconds** of it — absolute, not percentage (SKILL §2.2.6 b.2).
 2. Hook scene id 1, role=hook, duration_sec ≤ 4
 3. Every `data_props` value appears (verbatim or numerically) in analysis.md Evidence
 4. No two `visual_brief` fields share 5+ consecutive identical words (cheap "template repetition" check)
