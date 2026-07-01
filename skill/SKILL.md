@@ -675,6 +675,15 @@ The bot sends the mp4 as a streamable video to the configured Telegram DM with t
 
 If TG send fails: skill notifies the user in chat with error + still produced final.mp4 locally. Don't block local delivery on TG failure.
 
+### Optional — Facebook intro post (reuses `analysis.md`)
+
+The repo is already deeply understood from Phase 1, so a detailed repo-intro Facebook post is
+almost free. When the user asks ("viết fb post cho repo này" / "làm bài fb giới thiệu repo"),
+follow **`fb-post.md`** (in this skill dir): a ~200–350-word post, every paragraph ≤ 2 lines
+with a blank line between, no em-dash, humble tone, keep technical terms. **Voice is a GENERIC
+introducer — never the author's name / persona.** Save to `workspace/runs/<slug>/fb-post.md`.
+Pull every claim from `analysis.md` — don't re-analyze, don't invent.
+
 ## Output paths (workspace hygiene — HARD)
 
 All outputs go under:
