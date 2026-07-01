@@ -120,6 +120,28 @@ def render_template(template_id: str, inputs: dict, out_html: Path) -> dict:
     else:
         new_html = _kara_css + new_html
 
+    # Universal accent-spacing guard: after the template builds its DOM, ensure a
+    # space sits around every highlighted phrase (.accent/.kw) so a coloured word
+    # never sticks to its neighbour (e.g. "từ" + "GitHub" → "từGitHub"). Covers
+    # ALL templates + future ones. Runs once synchronously (before autofit measures
+    # width on fonts.ready) and again on fonts.ready; idempotent (won't double-space).
+    _space_fix = (
+        "<script>(function(){function fx(){"
+        "document.querySelectorAll('.accent,.kw').forEach(function(el){"
+        "var t=el.textContent||'';"
+        "var p=el.previousSibling;"
+        "if(p&&p.nodeType===3&&p.nodeValue&&!/\\s$/.test(p.nodeValue)&&!/^\\s/.test(t)){p.nodeValue+=' ';}"
+        "var n=el.nextSibling;"
+        "if(n&&n.nodeType===3&&n.nodeValue&&!/^\\s/.test(n.nodeValue)&&!/\\s$/.test(t)){n.nodeValue=' '+n.nodeValue;}"
+        "});}fx();"
+        "if(document.fonts&&document.fonts.ready){document.fonts.ready.then(fx);}"
+        "setTimeout(fx,300);})();</script>"
+    )
+    if "</body>" in new_html:
+        new_html = new_html.replace("</body>", _space_fix + "</body>", 1)
+    else:
+        new_html = new_html + _space_fix
+
     # Copy any template-local assets (fonts, images) into a sibling dir so
     # relative paths in the HTML still resolve. Most lifted templates only use
     # Google Fonts (CDN) — no local assets — so this is usually a no-op.
