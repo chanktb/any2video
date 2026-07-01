@@ -61,11 +61,33 @@ def _api(method: str, files=None, **data) -> dict:
         return {"error": "request_failed", "detail": str(e)}
 
 
+def _chunks(text: str, limit: int) -> list[str]:
+    """Split into ≤limit pieces at line boundaries so an HTML tag is never cut
+    mid-way (a long multi-scene script exceeds MAX_TEXT — truncating blindly can
+    slice an open <b> tag and make Telegram reject the whole message)."""
+    if len(text) <= limit:
+        return [text]
+    out: list[str] = []
+    cur = ""
+    for line in text.split("\n"):
+        add = line + "\n"
+        if cur and len(cur) + len(add) > limit:
+            out.append(cur.rstrip("\n"))
+            cur = ""
+        cur += add
+    if cur.strip():
+        out.append(cur.rstrip("\n"))
+    return out
+
+
 def send_text(text: str) -> dict:
-    if len(text) > MAX_TEXT:
-        text = text[:MAX_TEXT - 100] + "\n\n[...truncated]"
-    return _api("sendMessage", text=text, parse_mode="HTML",
-                disable_web_page_preview="true")
+    result: dict = {}
+    for part in _chunks(text, MAX_TEXT):
+        result = _api("sendMessage", text=part, parse_mode="HTML",
+                      disable_web_page_preview="true")
+        if not result.get("ok"):
+            return result
+    return result
 
 
 def send_video(path: Path, caption: str = "") -> dict:
