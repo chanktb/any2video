@@ -127,7 +127,9 @@ def render_template(template_id: str, inputs: dict, out_html: Path) -> dict:
     # width on fonts.ready) and again on fonts.ready; idempotent (won't double-space).
     _space_fix = (
         "<script>(function(){function fx(){"
-        "document.querySelectorAll('.accent,.kw').forEach(function(el){"
+        "document.querySelectorAll('.accent,.kw,b,strong,mark,[class*=\"accent\"],"
+        "[class*=\"grad\"],[class*=\"highlight\"],[class*=\"hl\"],[class*=\"label\"]')"
+        ".forEach(function(el){"
         "var t=el.textContent||'';"
         "var p=el.previousSibling;"
         "if(p&&p.nodeType===3&&p.nodeValue&&!/\\s$/.test(p.nodeValue)&&!/^\\s/.test(t)){p.nodeValue+=' ';}"
