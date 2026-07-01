@@ -330,6 +330,9 @@ Constraints (HARD):
 - Each scene's `narration` follows the 9 patterns above
 - Each scene's `grounded_in` cites at least one specific Evidence line — NOT "implied by README"
 - Reuse ≥2 different `templateId`s across the video (visual variety; per typography rule 6)
+- **Set `meta.accent` to a vibrant pair that fits the brand/topic** — dev-tool → cyan/blue,
+  creative → pink/purple, finance → green/gold, AI → violet/cyan. Don't ship every video on
+  the default orange; a distinctive accent is what makes each video pop.
 - Numeric/name values in `inputs` must also appear in `narration` AND `analysis.md > ## Evidence`
 
 #### 2.4 Gate 2 (narrative critic — Sonnet, mandatory)
