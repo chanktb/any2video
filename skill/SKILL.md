@@ -16,7 +16,10 @@ Claude is the planner + visual designer. Result: each video looks designed for i
 | Raw text → video, needs custom visual treatment | **any2video** |
 | Bulk video gen, API-shape, scale to many users | a fixed-template generator |
 
-any2video burns Opus tokens per run. Don't use for bulk. Use for "this one matters."
+Runs on any coding agent — Claude Code, **Antigravity**, etc. Phase 4 injects data
+into templates instead of hand-writing HTML per scene, so a run is a normal agent
+session, not a token-heavy job. Best for videos you want to look bespoke; a
+fixed-template generator is still the better fit for high-volume, uniform output.
 
 ## Workflow — 6 phases, 7 quality gates (Phase 0 + 3.5 + 6 added 2026-06-30)
 
@@ -224,6 +227,10 @@ misses items 1–4 is **unfinished, not "chưa tới"** — re-open the phase, d
    (karaoke replaces it). Rule of thumb: **push scene content UP toward the top of
    the INNER safe-zone whenever there's spare room**, leaving the bottom clear —
    never leave content floating low where the caption will overlap it.
+   **Accent spacing (HARD):** when a headline splits into `title`+`accent` or a
+   caption wraps a highlight in `<b>`/`.kw`, ALWAYS include the separating space —
+   `title: 'Ba '` (trailing space), or `'... <b>KEY</b> ...'` — so the coloured
+   phrase never sticks to its neighbours ("tự thiết kế<b>HTML CSS</b>cho" = wrong).
 
 2. **One real repo-footage scene** (authenticity beat). The best ref inserts a
    genuine scrolling capture of the live repo (file tree → README → screenshots)
@@ -553,10 +560,13 @@ Claude in Phase 2 generates `narration` in the chosen language. The planner writ
 
 ## Known limits (be honest with user)
 
-- Burns ~50-150k Opus tokens per run (depth-mode)
-- 2-5 min wall-clock per video (git clone + 4 critic gates + render)
-- Playwright `--rich` adds 30-90 sec for frame capture
-- Not a replacement for a quick templated generator at scale; this is depth-mode for important pieces
+- Cost is a normal agent session — Phase 4 injects data into templates (no
+  per-scene HTML generation), so it is NOT token-heavy. (The old hand-write-HTML
+  design was; this isn't. Runs economically on Claude Code AND Antigravity.)
+- 2-5 min wall-clock per video (source fetch + gates + Playwright render + compose)
+- Playwright rich render adds 30-90 sec for frame capture
+- Bespoke per-video design → slower per clip than a template API; for high-volume
+  uniform output a fixed-template generator is the better tool
 
 ## See also
 

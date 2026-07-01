@@ -77,8 +77,11 @@ too, so you can keep secrets outside the repo.
 
 ## Usage
 
-The primary interface is the **Claude Code skill** in `skill/SKILL.md`, but every
-phase is a standalone CLI you can run directly from the repo root:
+The primary interface is a **coding-agent skill** in `skill/SKILL.md`. It works
+great with **Claude Code** and with **Antigravity** — any agent that can run the
+CLIs below drives the same pipeline and produces the same quality videos. A run is
+a normal agent session (Phase 4 injects data into templates, so it is not
+token-heavy). Every phase is also a standalone CLI you can run from the repo root:
 
 ```bash
 # 1. Extract + scaffold a run from any input

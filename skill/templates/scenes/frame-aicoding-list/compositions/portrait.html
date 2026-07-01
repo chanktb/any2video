@@ -105,7 +105,10 @@
       var accent = v.accent != null ? String(v.accent) : "";
       if (titleEl) {
         titleEl.textContent = "";
-        titleEl.appendChild(document.createTextNode(title));
+        // Guarantee a space between title and the accent phrase so they never
+        // stick together (e.g. "tự thiết kế" + "HTML CSS" → "tự thiết kếHTML CSS").
+        var _needSp = title && accent && !/\s$/.test(title) && !/^\s/.test(accent);
+        titleEl.appendChild(document.createTextNode(_needSp ? title + " " : title));
         if (accent) {
           var s = document.createElement("span");
           s.className = "accent";
