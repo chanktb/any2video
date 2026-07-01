@@ -96,13 +96,22 @@ def render_scene(html_path: Path, duration_sec: float, out_mp4: Path) -> dict:
             page = ctx.new_page()
             # Step 1: install freeze BEFORE navigation so animations never start
             page.add_init_script(_FREEZE_SCRIPT)
-            # 'load' waits for all assets incl. images (GitHub avatar). If a future
-            # template has CORS-blocked cross-origin video that hangs, downgrade to
-            # 'domcontentloaded' + an explicit image-ready wait.
+            # Wait only for DOM parse, NOT 'load'. 'load' blocks on the Google
+            # Fonts stylesheet+faces, so the page sits on the WHITE about:blank
+            # until fonts finish (~1-2s of white lead — worst on Inter/build-minimal).
+            # domcontentloaded paints the dark bg immediately; _FONTS_READY_SCRIPT
+            # below then waits for fonts (page shows dark during the wait).
             page.goto("file:///" + str(html_path).replace("\\", "/"),
-                      wait_until="load", timeout=10000)
-            # Step 2: wait for stylesheets + fonts (capped at 8s)
+                      wait_until="domcontentloaded", timeout=10000)
+            # Step 2: wait for stylesheets + fonts + any <img> to decode (capped at 8s)
             page.evaluate(_FONTS_READY_SCRIPT)
+            try:
+                page.evaluate(
+                    "() => Promise.all(Array.from(document.images).map("
+                    "i => i.complete ? 0 : i.decode().catch(() => 0)))"
+                )
+            except Exception:
+                pass
             page.wait_for_timeout(_PRE_RECORD_PAD_MS)
             # Step 3: unfreeze — animations now play from t=0 with real font metrics
             page.evaluate("() => window.__a2vUnfreeze && window.__a2vUnfreeze()")

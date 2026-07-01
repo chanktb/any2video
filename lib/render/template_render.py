@@ -107,6 +107,19 @@ def render_template(template_id: str, inputs: dict, out_html: Path) -> dict:
     # in vars_json as backreferences (\1, \2, ...) or escape sequences.
     new_html = hf_pattern.sub(lambda _m: f"var v = {vars_json};", html, count=1)
 
+    # Karaoke captions (lib/compose/subtitles.py) are burned into the bottom band
+    # by default, so a template's OWN bottom `.caption` is redundant and collides
+    # with the burned line. Hide it, and reserve the bottom band for karaoke.
+    # (Content should already sit above it — see SKILL typography rule.)
+    _kara_css = (
+        "<style>/* karaoke owns the bottom caption band */"
+        ".caption,.caption-overlay{display:none !important;}</style>"
+    )
+    if "</head>" in new_html:
+        new_html = new_html.replace("</head>", _kara_css + "</head>", 1)
+    else:
+        new_html = _kara_css + new_html
+
     # Copy any template-local assets (fonts, images) into a sibling dir so
     # relative paths in the HTML still resolve. Most lifted templates only use
     # Google Fonts (CDN) — no local assets — so this is usually a no-op.

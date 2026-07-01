@@ -218,6 +218,12 @@ misses items 1–4 is **unfinished, not "chưa tới"** — re-open the phase, d
    automatically by `lib/compose/subtitles.py` (compose default ON). Beat-split
    scenes sync tight from `beat_timeline`. Nothing to author — just don't pass
    `--no-subtitles`.
+   **Reserve the caption band (HARD).** Karaoke burns into the bottom band
+   (~y1470–1700). No scene content may sit there or it collides with the line —
+   `template_render` auto-hides each template's own `.caption`/`.caption-overlay`
+   (karaoke replaces it). Rule of thumb: **push scene content UP toward the top of
+   the INNER safe-zone whenever there's spare room**, leaving the bottom clear —
+   never leave content floating low where the caption will overlap it.
 
 2. **One real repo-footage scene** (authenticity beat). The best ref inserts a
    genuine scrolling capture of the live repo (file tree → README → screenshots)
