@@ -36,7 +36,11 @@ scenes:
   - id: 1
     role: hook                   # hook | problem | solution | architecture | flow | demo | cta
     duration_sec: 4              # estimate; Phase 3 overwrites with measured TTS duration
-    narration: "Một dòng lệnh. Một video. Không tốn xu nào."   # lang vi → Vietnamese narration
+    narration: "Một dòng lệnh. Một video. Không tốn xu nào."   # lang vi → Vietnamese narration; may be PHONETIC (rề pô, ruýt my)
+    # caption_text: OPTIONAL — the CLEAN-spelling version of `narration` for the burned
+    # karaoke caption. Set it ONLY when narration contains phonetic spellings (rề pô,
+    # ruýt my, en ni tu vi đeo) so the on-screen caption shows "repo"/"README"/"any2video",
+    # not the phonetic form. If narration has no phonetics, omit it (caption uses narration).
     visual_brief: |
       Inside .inner: centered hero "$0" in monospace 360px, teal --accent.
       Hero scales 0.92→1 + opacity 0→1 over 800ms (sustained, not 200ms snap).

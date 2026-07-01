@@ -121,7 +121,8 @@ def _scene_segments(scene: dict, scene_dur: float) -> list[tuple[float, float, l
     timeline = scene.get("beat_timeline")
     if timeline:
         for b in timeline:
-            text = (b.get("text") or "").strip()
+            # prefer clean `caption` (display spelling) over phonetic beat `text`
+            text = (b.get("caption") or b.get("text") or "").strip()
             if not text:
                 continue
             start = float(b.get("start_sec", 0.0))
@@ -132,8 +133,10 @@ def _scene_segments(scene: dict, scene_dur: float) -> list[tuple[float, float, l
                 # if a beat wraps to >1 line, split its window evenly
         # even-split multi-line beats
         return _rebalance_multiline(timeline, scene_dur)
-    # legacy single narration
-    text = (scene.get("narration") or "").strip()
+    # legacy single narration. Prefer `caption_text` (clean display: repo, README,
+    # any2video) when set — the `narration` may be a phonetic spelling for the TTS
+    # (rề pô, ruýt my) that must NOT show on screen. Falls back to narration.
+    text = (scene.get("caption_text") or scene.get("narration") or "").strip()
     if not text:
         return segs
     tokens = _syllables(text)
@@ -156,7 +159,8 @@ def _rebalance_multiline(timeline: list[dict], scene_dur: float
     proportional to line token-weight."""
     segs: list[tuple[float, float, list[str]]] = []
     for b in timeline:
-        text = (b.get("text") or "").strip()
+        # prefer clean `caption` (display spelling) over phonetic beat `text`
+        text = (b.get("caption") or b.get("text") or "").strip()
         if not text:
             continue
         start = float(b.get("start_sec", 0.0))

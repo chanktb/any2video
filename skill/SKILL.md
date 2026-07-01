@@ -182,7 +182,7 @@ That one sentence carries 2nd-person pain (`hay phải làm video short`), audie
 | Blog SEO auditor | "Nếu blog bạn đang tụt traffic mà không biết sửa từ đâu, thì xem cái này — nó tự audit rồi xếp việc cần làm theo thứ tự." |
 | CLI tool | "Nếu ngày nào bạn cũng phải làm [X] thủ công, thì xem một dòng lệnh này — nó làm hết trong vài giây." |
 
-**TTS-sanitize the repo name** in the intro line (rule 2.2.6d): write it as pronounced, not the raw slug (e.g. `any2video` → `any to video`).
+**TTS-sanitize the repo name** in the intro line (rule 2.2.6d): write it as pronounced, not the raw slug (e.g. `any2video` → `en ni tu vi đeo`).
 
 **Outro narration (HARD — contextual pain-CTA, NO URL / no repo name).** The video always ships with a caption/post that already contains the URL — the link goes there when posting to FB / TG / TikTok. So the video's outro must NOT waste 5 seconds mentioning URLs or repo names. Instead: use those 5 seconds to hook the SPECIFIC PERSON who'd install this.
 
@@ -270,15 +270,23 @@ End every sentence with `.` or `?` for natural pause. NEVER end with `:` or `,` 
 
 | Term | `narration` (heard — phonetic) | display `inputs` (read — verbatim) |
 |---|---|---|
-| any2video | `any to video` (or `eni-tu-vi-đeo`) | `any2video` |
+| any2video | `en ni tu vi đeo` | `any2video` |
 | ffmpeg | `ép ép em peg` (or `f f m peg`) | `ffmpeg` |
 | PyTorch | `pai tọt` | `PyTorch` |
 | n8n | `en tám en` | `n8n` |
 | GitHub | `git hâb` | `GitHub` |
-| repo | `rê pô` | `repo` |
-| README | `rít my` | `README` |
+| repo | `rề pô` | `repo` |
+| README | `ruýt my` | `README` |
+| enter | `en tơ` | `enter` |
 | AI | `ây ai` | `AI` |
 | API / GPT | `ây pi ai` / `gí pi tí` | `API` / `GPT` |
+
+**The display side always stays the exact original spelling — only the `narration` (heard) is phonetic.** README shows "README" on screen but is READ "ruýt my"; any2video shows "any2video" but is read "en ni tu vi đeo".
+
+**Three display surfaces, one rule.** (1) template `inputs` (on-screen text), (2) the burned **karaoke caption**, (3) the post caption — ALL show the clean original spelling; only `narration` (the TTS text) is phonetic. The karaoke caption reads the clean field if set, else the phonetic one. So **whenever the spoken text contains a phonetic spelling, provide the clean version for the caption** (rề pô→repo, ruýt my→README, en ni tu vi đeo→any2video, en tơ→enter):
+- single-narration scene → add `caption_text: "<same sentence, clean spelling>"`
+- beat-split scene → add `caption: "<clean>"` next to each beat's phonetic `text`
+If the spoken text has no phonetics, omit these (the caption just uses narration/beat text).
 
 Pick the transliteration that a Vietnamese reader would pronounce closest to the real English — test by reading the `narration` aloud. If it still sounds wrong, rephrase to avoid the term. NEVER put the raw slug (`any2video`, `ffmpeg`) into `narration` and hope the voice guesses right.
 
@@ -361,9 +369,12 @@ misses items 1–4 is **unfinished, not "chưa tới"** — re-open the phase, d
    scene (v2 device). **Warning-red only on the problem/alert beat; mint/emerald
    once the solution lands.** One dark base + 1 accent + warn + success — no rainbow.
 
-8. **Audio bed (when asset present):** lo-fi/synthwave BGM ~115–122 BPM ducked to
-   ≈ −20 dB under voice + a soft reveal tick per beat. SFX assets already in
-   `templates/sfx/`; BGM asset goes in `templates/bgm/` (do NOT ship unlicensed music).
+8. **Audio bed (ON by default):** a ducked BGM track (~−20 dB under voice) + a soft
+   reveal tick per beat. `templates/bgm/` ships **3 CC-BY tracks** (Kevin MacLeod —
+   digital-lemonade / the-complex / ouroboros; see `templates/bgm/CREDITS.md`). Compose
+   picks one **at random** by default; `--bgm <name>` to specify, `--bgm off` to silence.
+   When you publish a video that used a track, include the CC-BY credit from CREDITS.md.
+   SFX assets are in `templates/sfx/`.
 
 9. **Pre-render gate is MANDATORY — every scene HTML is measured before ANY video is
    rendered (HARD).** After `template_render all`, run:
@@ -491,7 +502,7 @@ narration** (🔊 Đọc) TTS will speak, with an estimated duration. The review
 - **Content** — wording, facts, tone right?
 - **Pronunciation** — will it READ correctly? Any repo/brand/English term that would be
   spelled out or mangled ("README" read letter-by-letter, "any2video" → "any-two…") MUST
-  be rewritten PHONETICALLY in the `narration` (🔊 Đọc) field — "rít mi", "any to video"
+  be rewritten PHONETICALLY in the `narration` (🔊 Đọc) field — "ruýt my", "en ni tu vi đeo"
   (§2.2.6 d.2). The display `inputs` keep the exact spelling.
 
 Then PAUSE in Claude chat:
@@ -621,7 +632,8 @@ Final composite to `workspace/runs/<slug>/final.mp4` with:
 - Optional outro CTA
 
 Recommended compose call: `python -m any2video.lib.compose.ffmpeg_compose <plan> --gap 350`
-(add `--bgm auto` when a licensed loop exists at `templates/bgm/default.mp3`)
+(BGM is ON by default — a random bundled CC-BY track. `--bgm <name>` to pick one,
+`--bgm off` to silence.)
 
 ### Phase 6 — Final delivery to Telegram (NEW, gated on `intake.telegram`, OPTIONAL)
 

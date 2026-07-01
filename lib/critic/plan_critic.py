@@ -55,14 +55,15 @@ _GENERIC_CTA_PATTERNS = [
 # right (SKILL §2.2.6 d.2). (term_regex, flags, display_term, phonetic). AI is
 # case-SENSITIVE (uppercase only) — lowercase "ai" is the Vietnamese word "who".
 _PHONETIC_TERMS = [
-    (r"\brepo\b", re.IGNORECASE, "repo", "rê pô"),
-    (r"\breadme\b", re.IGNORECASE, "README", "rít my"),
+    (r"\brepo\b", re.IGNORECASE, "repo", "rề pô"),
+    (r"\breadme\b", re.IGNORECASE, "README", "ruýt my"),
+    (r"\benter\b", re.IGNORECASE, "enter", "en tơ"),
     (r"\bAI\b", 0, "AI", "ây ai"),  # case-sensitive: lowercase "ai" = VN word "who"
     (r"\bAPI\b", re.IGNORECASE, "API", "ây pi ai"),
     (r"\bGPT\b", re.IGNORECASE, "GPT", "gí pi tí"),
     (r"\bgithub\b", re.IGNORECASE, "GitHub", "git hâb"),
     (r"\bffmpeg\b", re.IGNORECASE, "ffmpeg", "ép ép em peg"),
-    (r"\bany2video\b", re.IGNORECASE, "any2video", "any to video"),
+    (r"\bany2video\b", re.IGNORECASE, "any2video", "en ni tu vi đeo"),
 ]
 
 

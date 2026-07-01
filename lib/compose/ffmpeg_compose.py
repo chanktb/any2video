@@ -542,9 +542,10 @@ def main() -> int:
     parser.add_argument("--no-subtitles", action="store_true",
                         help="Skip word-by-word karaoke caption burn (default: ON — "
                              "it's the #1 pro-signal per the reference-video teardown)")
-    parser.add_argument("--bgm", default=None,
-                        help="BGM bed: a path to a music file, or 'auto' to use "
-                             "templates/bgm/default.* if present. Default off (no unlicensed music).")
+    parser.add_argument("--bgm", default="random",
+                        help="BGM bed: 'random' (default) picks a random bundled track from "
+                             "templates/bgm/; '<name>' a specific track by filename stem; a path "
+                             "to a music file; or 'off' for none. Empty pool → silent.")
     parser.add_argument("--bgm-gain", type=float, default=0.22,
                         help="BGM volume multiplier before ducking (default 0.22)")
     args = parser.parse_args()

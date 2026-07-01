@@ -4,12 +4,15 @@ WHY (reference-video teardown §4, 2026-07-01): all three 9/10 reference videos
 run a lo-fi/synthwave bed (~115-122 BPM) ducked to ~-20 dB under the voice. Our
 videos were silent between words. This adds the bed.
 
-HONESTY RULE: we do NOT ship unlicensed music. Default is OFF. The bed is used
-only when:
-  - `--bgm <path>` is passed explicitly, OR
-  - `--bgm auto` and a curated file exists at templates/bgm/default.<ext>.
-A user-supplied licensed synthwave loop dropped at skill/templates/bgm/default.mp3
-is picked up automatically with zero code change.
+MUSIC RULE: only clearly-licensed music. The repo ships 3 CC-BY tracks (Kevin
+MacLeod / incompetech — see templates/bgm/CREDITS.md; attribution required when you
+publish). Default is ON with a RANDOM pick from templates/bgm/:
+  - `--bgm random` (default) → a random bundled track (empty pool → silent),
+  - `--bgm <name>`           → a specific track by filename stem,
+  - `--bgm <path>`           → an explicit file,
+  - `--bgm off`              → no music.
+Drop your own .mp3/.m4a/.wav/.ogg in templates/bgm/ (files starting with `_` are
+ignored) and they join the pool with zero code change.
 
 Ducking: the BGM is side-chain-compressed by the final's own audio (voice+SFX),
 so it dips whenever the narrator speaks and swells in the gaps. amix normalize=0
@@ -17,26 +20,49 @@ keeps the voice at full level.
 """
 from __future__ import annotations
 
+import random
 import subprocess
 from pathlib import Path
 
 from .. import paths
 BGM_DIR = paths.TEMPLATES_DIR / "bgm"
-_AUTO_NAMES = ["default.mp3", "default.m4a", "default.wav", "default.ogg"]
+_POOL_EXTS = (".mp3", ".m4a", ".wav", ".ogg")
+
+
+def bgm_pool() -> list[Path]:
+    """All bundled BGM tracks in templates/bgm/ (files starting with `_` are ignored —
+    e.g. work files / non-shippable synth beds)."""
+    if not BGM_DIR.is_dir():
+        return []
+    return sorted(p for p in BGM_DIR.iterdir()
+                  if p.suffix.lower() in _POOL_EXTS and not p.name.startswith("_"))
 
 
 def resolve_bgm(spec: str | None) -> Path | None:
-    """spec: explicit path | 'auto' | None. Return a usable BGM file or None."""
-    if not spec:
+    """Resolve a BGM track.
+      - None / '' / 'off' / 'none' → no music.
+      - 'auto' / 'random'          → a RANDOM track from templates/bgm/ (empty pool → None).
+      - '<name>'                   → the pool track whose filename stem matches (exact, then
+                                     substring, case-insensitive); else treated as a file path.
+      - an explicit path           → that file if it exists.
+    """
+    if spec is None or spec in ("", "off", "none"):
         return None
-    if spec == "auto":
-        for name in _AUTO_NAMES:
-            p = BGM_DIR / name
-            if p.is_file():
-                return p
-        return None
+    if spec in ("auto", "random"):
+        pool = bgm_pool()
+        return random.choice(pool) if pool else None
     p = Path(spec)
-    return p if p.is_file() else None
+    if p.is_file():
+        return p
+    pool = bgm_pool()
+    s = spec.lower()
+    for track in pool:                       # exact stem match
+        if track.stem.lower() == s:
+            return track
+    for track in pool:                       # substring match ("complex" → the-complex)
+        if s in track.stem.lower():
+            return track
+    return None
 
 
 def mix_bgm(final_in: Path, bgm: Path, final_out: Path,

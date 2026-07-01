@@ -163,6 +163,10 @@ async def _synth_beat_split_scene(scene, sid, beats, voice, rate, lang,
             "dur_sec": beat_durations[i],
             "text": beat.get("text") if isinstance(beat, dict) else str(beat),
         }
+        # carry a clean-spelling caption (when beat text is phonetic for TTS) so the
+        # burned karaoke shows "repo"/"README", not "rề pô"/"ruýt my".
+        if isinstance(beat, dict) and beat.get("caption"):
+            entry["caption"] = beat["caption"]
         reveal = beat.get("reveal") if isinstance(beat, dict) else None
         if isinstance(reveal, list):
             entry["reveal"] = list(reveal)

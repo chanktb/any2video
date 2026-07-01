@@ -150,8 +150,11 @@ python -m lib.render.playwright_render all workspace/runs/<slug>/plan.md
 python -m lib.compose.ffmpeg_compose workspace/runs/<slug>/plan.md --gap 350
 ```
 
-Add `--bgm auto` to the compose step once you drop a licensed background loop at
-`skill/templates/bgm/default.mp3` (no music ships with the repo).
+**Background music is ON by default** — compose picks a random bundled CC-BY track
+(`skill/templates/bgm/`, ducked ~−20 dB under the voice). Use `--bgm the-complex` to pick
+a specific one, or `--bgm off` for none. Drop your own `.mp3`/`.wav` in that folder to add
+to the pool. See `skill/templates/bgm/CREDITS.md` for the tracks + the CC-BY attribution to
+include when you publish.
 
 ## Repo layout
 
@@ -184,4 +187,5 @@ Built by **Khue Tran** — [khuetran.com](https://khuetran.com).
 
 ## License
 
-[MIT](LICENSE) © 2026 Khue Tran. (Vendored templates remain under Apache-2.0.)
+[MIT](LICENSE) © 2026 Khue Tran. (Vendored templates remain under Apache-2.0; bundled
+background music is CC-BY 4.0 — see `skill/templates/bgm/CREDITS.md`.)
