@@ -112,9 +112,10 @@
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                justify-content: center;
+                /* top-anchored (was justify-content:center → floated the hero low); spare space to the bottom */
+                justify-content: flex-start;
                 z-index: 1;
-                padding: 0 110px;
+                padding: 360px 110px 60px;
             }
             .eyebrow {
                 font-weight: 600;

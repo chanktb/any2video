@@ -18,7 +18,8 @@
   html, body { width: 1080px; height: 1920px; overflow: hidden; }
   #root { position: relative; width: 1080px; height: 1920px; background: #070d12; color: #eef3f4;
     font-family: 'Be Vietnam Pro', sans-serif; overflow: hidden;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 96px; }
+    /* top-anchored (was justify-content:center → floated content low); spare space goes to the bottom */
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 340px 96px 60px; }
 
   .bg { position: absolute; inset: 0; z-index: 0; pointer-events: none;
     background:

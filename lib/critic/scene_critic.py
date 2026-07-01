@@ -112,6 +112,17 @@ def render_and_inspect(html_path: Path, png_path: Path) -> dict:
                      fs: parseFloat(getComputedStyle(e).fontSize) || 0, op: effOpacity(e) }))
         .filter(o => o.r.width > 0 && o.r.height > 0 && !isFullBleed(o.r) && o.op >= 0.25);
 
+      // Body content bbox EXCLUDING the top brand-bar band (y<320) and bottom footer/
+      // caption band (bottom>1600) — for the "content floated low" (top-anchor) check.
+      let bTop = Infinity, bBot = -Infinity, bCount = 0;
+      for (const o of textEls) {
+        if (o.r.y < 320 || o.r.bottom > 1600) continue;
+        if (o.r.y < bTop) bTop = o.r.y;
+        if (o.r.bottom > bBot) bBot = o.r.bottom;
+        bCount++;
+      }
+      const content_body = bCount ? { top: Math.round(bTop), bottom: Math.round(bBot), count: bCount } : null;
+
       // (A) Text crossing a 4:5 crop line (feed crop slices primary content in half).
       const straddlers = [];
       for (const o of textEls) {
@@ -245,6 +256,7 @@ def render_and_inspect(html_path: Path, png_path: Path) -> dict:
         tight_line_height: tight.slice(0, 12),
         empty_blocks: empty_blocks.slice(0, 12),
         broken_images: broken_images.slice(0, 12),
+        content_body: content_body,
       };
     }
     """
@@ -391,6 +403,20 @@ def evaluate(html_path: Path, neighbor_pngs: list[Path]) -> dict:
             "selector": im["sel"], "src": im.get("src", ""),
             "fix": "Image failed to load (naturalWidth=0) — fix the src / use a reachable asset "
                    "or a different visual. Never ship a broken image frame.",
+        })
+
+    # Content floated LOW — a big empty band above while content sits near the bottom.
+    # Top-anchor it (spare space belongs at the bottom, not the top). Body bbox excludes
+    # the top brand-bar + bottom footer/caption bands. Conservative thresholds so genuine
+    # center-compositions (hero-stat over ghost echo, radial diagram) don't trip.
+    cb = dom.get("content_body")
+    if cb and cb.get("count", 0) >= 2 and cb["top"] > 620 and cb["bottom"] > 1350:
+        issues.append({
+            "kind": "content_bottom_heavy",
+            "body_top": cb["top"], "body_bottom": cb["bottom"],
+            "fix": "Content starts low (big empty band above) and runs to the bottom. Top-anchor "
+                   "it — `justify-content: flex-start` + top padding, or a fixed `top:` near the "
+                   "safe-zone top instead of `top:50%`. Spare space belongs at the BOTTOM (SKILL 5b).",
         })
 
     # Anti-slop: scan the HTML source for banned palette + banned combos
