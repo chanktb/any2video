@@ -113,7 +113,7 @@ Derived from the Palmier Pro reference + common templated-video anti-patterns. T
 2. **Contrast structures.** Use "không chỉ X mà còn Y", "cứ như X nhưng có Y", "không phải X mà là Y", "Nhưng lưu ý …". Contrast pulls attention.
 3. **2nd-person address.** "bạn thấy ngay", "Bạn có thể trim, replace", "Nếu bạn dựng video trên Mac dòng M". Brings the viewer in.
 4. **Demonstrative immediacy.** "ngay", "này", "trên đây", "ngay trên timeline", "ngay trong cùng editor này". Concrete and present.
-5. **Specific real names.** Name actual files, commands, competitors, brands — "Final Cut", "Cursor", "Claude Code", "FLUX", "Edge TTS", "ffmpeg". Generic terms ("AI tool", "the framework") are forbidden.
+5. **Specific real names + keep the jargon.** Name actual files, commands, competitors, brands — "Final Cut", "Cursor", "Claude Code", "FLUX", "Edge TTS", "ffmpeg". Generic terms ("AI tool", "the framework") are forbidden. And keep the STANDARD technical term — don't force-translate jargon into awkward Vietnamese ("phrase match" NOT "khớp câu", "keyword" NOT "từ chìa khoá"). Write it in a natural, spoken register (see §2.2.6 f).
 6. **Quantified social proof** — but ONCE, not as a sidebar dump. Frame with hedge: "hơn 9 nghìn sao", "khoảng 600 fork". Never list stars + forks + issues + license back-to-back.
 7. **Short clauses, comma-flowed.** "Bạn có thể trim, replace, hay regenerate phần đó." One breath. Not bullet fragments.
 8. **Caveat-as-feature.** "Nhưng lưu ý, editor và MCP server miễn phí, còn AI generation cần mua thêm credit." Honest framing > marketing fluff.
@@ -296,7 +296,29 @@ Pick the transliteration that a Vietnamese reader would pronounce closest to the
 - URLs stay clickable-looking: `github.com/<owner>/<repo>`
 - The viewer READS these, doesn't hear them — separate channel.
 
-**Quick mental check before writing a scene:** would a Vietnamese friend reading the narration ALOUD pause at the right places, say all numbers naturally, and not stumble on symbols? If yes → ship. If no → rewrite.
+**(f) Natural spoken register — but DON'T translate technical terms (HARD).** Write the
+`narration` the way a knowledgeable friend would SAY it out loud — relaxed, flowing, easy to
+follow — NOT a stiff word-for-word translation of the docs. At the same time, **keep the
+standard technical term; do NOT force it into Vietnamese** just because a literal translation
+exists. The audience knows the jargon in its usual form, and a hard translation sounds wrong
+and loses meaning.
+
+| Term (keep) | ❌ Hard/awkward translation | ✅ Natural VN sentence keeping the term |
+|---|---|---|
+| phrase (match) | "câu" / "khớp câu" | "bạn để **phrase match** thì Google mới siết lại đúng cụm bạn muốn" |
+| keyword | "từ chìa khoá" | "gom mấy **keyword** rác đó vào negative là xong" |
+| commit / push | "cam kết" / "đẩy" (mơ hồ) | "sửa xong **commit** rồi **push** lên là nó tự chạy" |
+| endpoint | "điểm cuối" | "nó gọi thẳng **endpoint** này để lấy dữ liệu" |
+| repo / branch / merge | "kho" / "nhánh" (nếu khán giả quen tiếng Anh) | "tạo **branch** mới, xong **merge** vào main" |
+| deploy, build, cache, token, prompt, query… | (đừng dịch) | giữ nguyên, đặt trong câu nói tự nhiên |
+
+Rule of thumb: if a Vietnamese dev would SAY the English word in conversation, keep the
+English word — just wrap it in a natural, spoken sentence. Only translate a term when the
+Vietnamese word is the one people actually use (e.g. "máy chủ" for server is fine if that fits
+the audience). The phonetic rule (d.2) still applies for pronunciation — display keeps the
+term's spelling, the read-aloud may spell it phonetically so TTS says it right.
+
+**Quick mental check before writing a scene:** would a Vietnamese friend reading the narration ALOUD pause at the right places, say all numbers naturally, keep the tech terms in their usual form (not force-translated), and not stumble on symbols? If yes → ship. If no → rewrite.
 
 #### 2.2.7 Reference-video craft standard (HARD — read `references/reference-video-teardown.md`)
 

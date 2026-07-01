@@ -33,17 +33,21 @@
   @keyframes fadeDown { from { opacity: 0; transform: translateY(-18px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes wave { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
 
-  /* header */
-  .head { position: absolute; left: 96px; right: 96px; top: 380px; z-index: 4; text-align: center; }
+  /* header + list flow in one top-anchored stack, so a 2-line title pushes the
+     list DOWN instead of overlapping it (absolute head/list overlapped when the
+     title wrapped). */
+  .stack { position: absolute; left: 96px; right: 96px; top: 360px; z-index: 4; }
+  .head { text-align: center; }
   .title { font-weight: 800; font-size: 92px; line-height: 1.22; letter-spacing: -2px;
     opacity: 0; animation: fadeDown 0.8s cubic-bezier(0.16,1,0.3,1) 0.15s both; }
-  .title .accent { background: linear-gradient(92deg, #ff9a3d 0%, #ff5a2c 45%, #ff2d55 100%);
+  /* Accent word/phrase always drops to its OWN centered line (clean "TITLE\nACCENT"). */
+  .title .accent { display: block; background: linear-gradient(92deg, #ff9a3d 0%, #ff5a2c 45%, #ff2d55 100%);
     -webkit-background-clip: text; background-clip: text; color: transparent; }
   .subtitle { margin-top: 22px; font-size: 32px; font-weight: 500; color: rgba(244,245,251,0.55);
     opacity: 0; animation: fadeDown 0.8s ease-out 0.4s both; }
 
   /* list */
-  .list { position: absolute; left: 96px; right: 96px; top: 660px; z-index: 4; display: flex; flex-direction: column; gap: 22px; }
+  .list { margin-top: 56px; display: flex; flex-direction: column; gap: 22px; }
   .item { position: relative; display: flex; align-items: center; gap: 28px; padding: 30px 36px;
     border-radius: 30px; background: rgba(255,255,255,0.045); border: 1px solid rgba(255,255,255,0.09);
     box-shadow: 0 24px 60px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
@@ -85,12 +89,13 @@
     <div class="bg"></div>
     <div class="grid"></div>
 
-    <div class="head">
-      <h1 class="title"></h1>
-      <div class="subtitle"></div>
+    <div class="stack">
+      <div class="head">
+        <h1 class="title"></h1>
+        <div class="subtitle"></div>
+      </div>
+      <div class="list"></div>
     </div>
-
-    <div class="list"></div>
   </div>
 
   <script>
