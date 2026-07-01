@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1080, height=1920" />
+<title>Terminal Mock · Portrait 9:16</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  /*
+   * frame-terminal-mock — original to any2video. Renders a fake terminal window
+   * (chrome bar + monospace command + output lines) for repos with no demo
+   * screenshots. Content-true: only show what's in README, never fabricate output.
+   * 9:16 portrait 1080×1920. Respects 96/60 safezone.
+   */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #0a0e14; }
+  #root { position: relative; width: 1080px; height: 1920px;
+    background: #0a0e14; color: #e7eaf0;
+    font-family: 'Be Vietnam Pro', sans-serif; }
+
+  .bg { position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(800px 700px at 18% 12%, rgba(56,189,248,0.08) 0%, transparent 55%),
+      radial-gradient(700px 600px at 86% 88%, rgba(168,85,247,0.07) 0%, transparent 55%); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes lineIn { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes caret { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
+
+  /* Eyebrow above terminal */
+  .eyebrow { position: absolute; top: 220px; left: 96px; right: 96px;
+    text-align: center; font-size: 28px; font-weight: 700; letter-spacing: 8px;
+    text-transform: uppercase; color: #38bdf8;
+    text-shadow: 0 0 24px rgba(56,189,248,0.4); z-index: 2;
+    opacity: 0; animation: fadeUp 0.7s ease-out 0.2s forwards; }
+
+  /* Terminal window */
+  .term {
+    position: absolute; top: 340px; left: 96px; right: 96px;
+    border-radius: 18px; overflow: hidden;
+    background: #0d1117; border: 1px solid #21262d;
+    box-shadow: 0 36px 90px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04) inset;
+    z-index: 2;
+    opacity: 0; transform: translateY(28px);
+    animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.5s forwards;
+  }
+
+  /* macOS-style chrome bar */
+  .chrome { display: flex; align-items: center; gap: 14px;
+    padding: 18px 24px; background: #161b22;
+    border-bottom: 1px solid #21262d; }
+  .dot { width: 16px; height: 16px; border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.18); }
+  .dot.r { background: #ff5f57; }
+  .dot.y { background: #febc2e; }
+  .dot.g { background: #28c840; }
+  .chrome .ttl { flex: 1; text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px; color: #6e7681; letter-spacing: 1px; }
+
+  /* Body content */
+  .body { padding: 36px 38px 48px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px; line-height: 1.55; color: #c9d1d9; }
+
+  .row { display: flex; align-items: baseline; gap: 16px;
+    opacity: 0; animation: lineIn 0.45s ease-out both; }
+  .row + .row { margin-top: 6px; }
+  .row .prompt { color: #58a6ff; font-weight: 700; flex-shrink: 0; }
+  .row .cmd { color: #f0f6fc; word-break: break-word; }
+  .row.section { margin-top: 28px; }
+
+  .out { color: #c9d1d9; padding-left: 4px; margin-top: 4px;
+    opacity: 0; animation: lineIn 0.4s ease-out both; }
+  .out.step { color: #79c0ff; }
+  .out.ok   { color: #56d364; font-weight: 700;
+    text-shadow: 0 0 18px rgba(86,211,100,0.35); }
+  .out.err  { color: #f85149; font-weight: 700; }
+  .out.dim  { color: #6e7681; }
+
+  /* Blinking caret at end */
+  .caret { display: inline-block; width: 14px; height: 28px;
+    background: #58a6ff; vertical-align: -4px; margin-left: 8px;
+    animation: caret 1s steps(1) infinite; animation-delay: 2.6s;
+    opacity: 0; }
+  .caret.show { opacity: 1; }
+
+  /* Caption below terminal */
+  .caption { position: absolute; left: 96px; right: 96px;
+    bottom: 220px; text-align: center;
+    font-size: 30px; font-weight: 500; color: #94a3b8;
+    line-height: 1.5; z-index: 2;
+    opacity: 0; animation: fadeUp 0.7s ease-out 2.8s forwards; }
+  .caption b { color: #f0f6fc; font-weight: 700; }
+</style>
+</head>
+<body>
+  <div
+    id="root"
+    data-composition-id="main"
+    data-start="0"
+    data-duration="10"
+    data-width="1080"
+    data-height="1920"
+    data-composition-variables='{"eyebrow":"TRY IT","title":"mytool · cli","commands":[{"prompt":"$","command":"mytool \"5 study habits\"","output":["→ Drafting script","→ Narrating (TTS)","→ Rendering visuals","✓ video.mp4 (54 sec)"]}],"caption":"~3 min end to end"}'
+  >
+    <div class="bg"></div>
+
+    <div class="eyebrow"></div>
+
+    <div class="term">
+      <div class="chrome">
+        <span class="dot r"></span>
+        <span class="dot y"></span>
+        <span class="dot g"></span>
+        <span class="ttl"></span>
+      </div>
+      <div class="body"></div>
+    </div>
+
+    <div class="caption"></div>
+  </div>
+
+  <script>
+    (function () {
+      var v = (window.__hyperframes &&
+               typeof window.__hyperframes.getVariables === "function")
+        ? window.__hyperframes.getVariables() : {};
+
+      var set = function (sel, t) {
+        var el = document.querySelector(sel);
+        if (el && t != null) el.textContent = String(t);
+      };
+
+      set(".eyebrow", v.eyebrow);
+      set(".chrome .ttl", v.title || "terminal");
+
+      // Caption may contain <b>...</b> emphasis — render as HTML if it does
+      var cap = document.querySelector(".caption");
+      if (cap && v.caption != null) {
+        var c = String(v.caption);
+        if (c.indexOf("<b>") >= 0) cap.innerHTML = c;
+        else cap.textContent = c;
+      }
+
+      var body = document.querySelector(".term .body");
+      var cmds = Array.isArray(v.commands) ? v.commands : [];
+      var t = 0.8; // fallback autoclock — used only when command.reveal_at_sec absent
+
+      cmds.forEach(function (c, ci) {
+        var promptStr = c.prompt != null ? String(c.prompt) : "$";
+        var cmdStr = c.command != null ? String(c.command) : "";
+        // Reveal timing (beat-split): c.reveal_at_sec if present, else autoclock
+        var cmdReveal = (c.reveal_at_sec != null) ? Number(c.reveal_at_sec) : t;
+
+        var row = document.createElement("div");
+        row.className = "row" + (ci > 0 ? " section" : "");
+        row.style.animationDelay = cmdReveal.toFixed(2) + "s";
+        row.setAttribute("data-reveal-at", cmdReveal.toFixed(2));
+
+        var p = document.createElement("span");
+        p.className = "prompt";
+        p.textContent = promptStr;
+        var cmd = document.createElement("span");
+        cmd.className = "cmd";
+        cmd.textContent = cmdStr;
+        row.appendChild(p);
+        row.appendChild(cmd);
+        body.appendChild(row);
+        t = cmdReveal + 0.55;
+
+        var outs = Array.isArray(c.output) ? c.output : [];
+        outs.forEach(function (o, oi) {
+          var line = document.createElement("div");
+          line.className = "out";
+          // Each output line can carry its own reveal_at_sec (advanced beat-split)
+          var outReveal;
+          if (typeof o === "object" && o !== null && o.reveal_at_sec != null) {
+            outReveal = Number(o.reveal_at_sec);
+          } else {
+            outReveal = t;
+          }
+          line.style.animationDelay = outReveal.toFixed(2) + "s";
+          line.setAttribute("data-reveal-at", outReveal.toFixed(2));
+          var s = (typeof o === "object" && o !== null && o.text != null)
+                    ? String(o.text) : String(o);
+          // Classify by prefix → color
+          if (s.indexOf("✓") === 0) line.classList.add("ok");
+          else if (s.indexOf("✗") === 0) line.classList.add("err");
+          else if (s.indexOf("→") === 0) line.classList.add("step");
+          else if (s.indexOf("#") === 0) line.classList.add("dim");
+          line.textContent = s;
+          body.appendChild(line);
+          t = outReveal + 0.22;
+        });
+        t += 0.35;
+      });
+
+      // Blinking caret at end
+      var caretRow = document.createElement("div");
+      caretRow.className = "row";
+      caretRow.style.animationDelay = (t + 0.1).toFixed(2) + "s";
+      var pp = document.createElement("span");
+      pp.className = "prompt";
+      pp.textContent = (cmds[cmds.length - 1] && cmds[cmds.length - 1].prompt) || "$";
+      var cc = document.createElement("span");
+      cc.className = "caret show";
+      caretRow.appendChild(pp);
+      caretRow.appendChild(cc);
+      body.appendChild(caretRow);
+    })();
+
+    window.__timelines = window.__timelines || {};
+    window.__timelines["main"] = { pause: function () {}, seek: function () {}, paused: function () { return true; } };
+  </script>
+</body>
+</html>

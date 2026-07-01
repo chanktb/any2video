@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1080, height=1920" />
+<title>Bar Benchmark · Portrait 9:16</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+  /*
+   * frame-bar-benchmark — original to any2video v6.
+   * Pattern: Donnie Chu Blog Reels (2026-06-30) — headline + 3-5 horizontal bars
+   * with delta values, color-coded by metric semantic, persistent metadata strip.
+   * High-density: 3 zones active (badge+headline / bars / footer strip) + counter.
+   */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #050a12; }
+  #root {
+    position: relative; width: 1080px; height: 1920px;
+    background: radial-gradient(ellipse 1200px 900px at 50% 30%, rgba(15,30,50,0.6) 0%, transparent 60%), #050a12;
+    color: #e8f0fa;
+    font-family: 'Be Vietnam Pro', sans-serif;
+  }
+
+  /* Subtle grid background */
+  .grid { position: absolute; inset: 0; z-index: 0; opacity: 0.4;
+    background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+                       linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(circle at 50% 40%, #000 0%, transparent 80%); }
+
+  /* Top counter pill (carousel 03/12 style) */
+  .counter { position: absolute; top: 90px; right: 96px; z-index: 5;
+    font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 600;
+    color: #7aa3c8; letter-spacing: 3px;
+    opacity: 0; animation: fadeUp 0.6s ease-out 0.1s forwards; }
+
+  .brand-tag { position: absolute; top: 90px; left: 96px; z-index: 5;
+    font-size: 22px; font-weight: 700; letter-spacing: 5px;
+    text-transform: uppercase; color: #38bdf8;
+    opacity: 0; animation: fadeUp 0.6s ease-out 0.1s forwards; }
+
+  /* Badge — pushed below 4:5 top cut (y=285) so headline stays inside INNER 900×1230 */
+  .badge { position: absolute; top: 360px; left: 50%; transform: translateX(-50%); z-index: 2;
+    padding: 12px 28px; border-radius: 999px;
+    border: 1.5px solid rgba(52,224,192,0.5);
+    background: rgba(52,224,192,0.08);
+    font-size: 20px; font-weight: 700; letter-spacing: 5px;
+    text-transform: uppercase; color: #7fe9d6; white-space: nowrap;
+    opacity: 0; animation: fadeUp 0.7s ease-out 0.25s forwards; }
+
+  /* Headline — top:440 keeps it inside INNER (y=345..1575) */
+  .headline { position: absolute; top: 440px; left: 96px; right: 96px; z-index: 2;
+    font-size: 76px; font-weight: 900; letter-spacing: -2px;
+    text-align: center; line-height: 1.22;
+    opacity: 0; animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.4s forwards; }
+  .headline .accent { color: #38bdf8;
+    text-shadow: 0 0 32px rgba(56,189,248,0.4); }
+
+  /* Subtitle metadata line */
+  .submeta { position: absolute; top: 640px; left: 96px; right: 96px; z-index: 2;
+    text-align: center; font-size: 24px; font-weight: 500;
+    color: rgba(232,240,250,0.55); letter-spacing: 0.5px;
+    opacity: 0; animation: fadeUp 0.6s ease-out 0.6s forwards; }
+
+  /* Bars container */
+  .bars { position: absolute; top: 740px; left: 96px; right: 96px; z-index: 2;
+    display: flex; flex-direction: column; gap: 30px; }
+
+  .bar-row { display: flex; flex-direction: column; gap: 10px;
+    opacity: 0; animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+  .bar-row .lbl { font-size: 30px; font-weight: 600; color: rgba(232,240,250,0.85);
+    letter-spacing: 0.3px; }
+  .bar-row .track { position: relative; height: 64px; border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.06);
+    overflow: hidden; }
+  .bar-row .fill { position: absolute; left: 0; top: 0; bottom: 0;
+    border-radius: 8px;
+    transform-origin: left center; transform: scaleX(0);
+    animation: barGrow 1s cubic-bezier(0.16,1,0.3,1) forwards; }
+  .bar-row .val { position: absolute; right: 18px; top: 50%;
+    transform: translateY(-50%); font-family: 'JetBrains Mono', monospace;
+    font-size: 30px; font-weight: 700; color: #f0f6fc;
+    text-shadow: 0 0 12px rgba(0,0,0,0.6); }
+
+  /* Color semantic by level */
+  .bar-row.lv-good .fill   { background: linear-gradient(90deg, #34e0c0 0%, #22d3ee 100%); }
+  .bar-row.lv-bad .fill    { background: linear-gradient(90deg, #ff7a3d 0%, #ef4444 100%); }
+  .bar-row.lv-safe .fill   { background: linear-gradient(90deg, #56d364 0%, #10b981 100%); }
+  .bar-row.lv-warn .fill   { background: linear-gradient(90deg, #ffb020 0%, #f59e0b 100%); }
+  .bar-row.lv-info .fill   { background: linear-gradient(90deg, #818cf8 0%, #6366f1 100%); }
+
+  @keyframes barGrow { to { transform: scaleX(var(--w, 0.5)); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Persistent metadata footer strip */
+  .meta-strip { position: absolute; bottom: 130px; left: 96px; right: 96px; z-index: 3;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px; font-weight: 500; color: rgba(232,240,250,0.5);
+    letter-spacing: 0.5px; padding: 16px 0;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    opacity: 0; animation: fadeUp 0.6s ease-out 1.6s forwards; }
+  .meta-strip .item { display: inline-flex; gap: 8px; align-items: center;
+    white-space: nowrap; }
+  .meta-strip .item.star { color: #ffd700; }
+  .meta-strip .sep { opacity: 0.3; }
+</style>
+</head>
+<body>
+  <div
+    id="root"
+    data-composition-id="main"
+    data-start="0"
+    data-duration="8"
+    data-width="1080"
+    data-height="1920"
+    data-composition-variables='{"brand_tag":"BENCHMARK","counter":"03 / 12","badge":"v0.1.0 · 12 RUNS","headline":"AGENT + PLUGIN ","headline_accent":"VS BASELINE","submeta":"Real account · Haiku 4.5 · n=4 runs","bars":[{"label":"Spend leak","value":"-54%","width":0.54,"level":"good"},{"label":"Wasted tokens","value":"-22%","width":0.22,"level":"good"},{"label":"Time to fix","value":"-27%","width":0.27,"level":"good"},{"label":"Manual ops","value":"-94%","width":0.94,"level":"bad"},{"label":"Safety (no auto-write)","value":"100%","width":1.0,"level":"safe"}],"metadata":["v0.1.0","2026-06-27","15 skills","MIT","ecom-only"]}'
+  >
+    <div class="grid"></div>
+
+    <div class="brand-tag"></div>
+    <div class="counter"></div>
+    <div class="badge"></div>
+    <div class="headline"></div>
+    <div class="submeta"></div>
+
+    <div class="bars"></div>
+
+    <div class="meta-strip"></div>
+  </div>
+
+  <script>
+    (function () {
+      var v = (window.__hyperframes &&
+               typeof window.__hyperframes.getVariables === "function")
+        ? window.__hyperframes.getVariables() : {};
+
+      var set = function (sel, t) {
+        var el = document.querySelector(sel);
+        if (el && t != null) el.textContent = String(t);
+      };
+
+      set(".brand-tag", v.brand_tag);
+      set(".counter", v.counter);
+      set(".badge", v.badge);
+      set(".submeta", v.submeta);
+
+      // Headline with accent span
+      var h = document.querySelector(".headline");
+      if (h) {
+        h.textContent = "";
+        if (v.headline != null) h.appendChild(document.createTextNode(String(v.headline)));
+        if (v.headline_accent) {
+          var sp = document.createElement("span");
+          sp.className = "accent";
+          sp.textContent = String(v.headline_accent);
+          h.appendChild(sp);
+        }
+      }
+
+      // Bars
+      var barsEl = document.querySelector(".bars");
+      var bars = Array.isArray(v.bars) ? v.bars : [];
+      var validLvl = { good: 1, bad: 1, safe: 1, warn: 1, info: 1 };
+      bars.slice(0, 5).forEach(function (b, i) {
+        var lvl = b.level && validLvl[b.level] ? b.level : "info";
+        var row = document.createElement("div");
+        row.className = "bar-row lv-" + lvl;
+        // Reveal timing (beat-split): b.reveal_at_sec if present, else CSS stagger
+        var revealAt = (b.reveal_at_sec != null) ? Number(b.reveal_at_sec) : (0.8 + i * 0.13);
+        row.style.animationDelay = revealAt.toFixed(2) + "s";
+        row.setAttribute("data-reveal-at", revealAt.toFixed(2));
+
+        var lbl = document.createElement("div");
+        lbl.className = "lbl";
+        lbl.textContent = b.label != null ? String(b.label) : "";
+
+        var track = document.createElement("div");
+        track.className = "track";
+        var fill = document.createElement("div");
+        fill.className = "fill";
+        var w = Math.max(0, Math.min(1, parseFloat(b.width) || 0.5));
+        fill.style.setProperty("--w", String(w));
+        fill.style.width = "100%";
+        fill.style.animationDelay = (1.0 + i * 0.13).toFixed(2) + "s";
+        var val = document.createElement("div");
+        val.className = "val";
+        val.textContent = b.value != null ? String(b.value) : "";
+        track.appendChild(fill);
+        track.appendChild(val);
+
+        row.appendChild(lbl);
+        row.appendChild(track);
+        barsEl.appendChild(row);
+      });
+
+      // Metadata strip
+      var strip = document.querySelector(".meta-strip");
+      var md = Array.isArray(v.metadata) ? v.metadata : [];
+      md.forEach(function (m, i) {
+        if (i > 0) {
+          var sep = document.createElement("span");
+          sep.className = "sep";
+          sep.textContent = "·";
+          strip.appendChild(sep);
+        }
+        var it = document.createElement("span");
+        it.className = "item";
+        if (String(m).indexOf("★") === 0 || String(m).indexOf("stars") >= 0) it.classList.add("star");
+        it.textContent = String(m);
+        strip.appendChild(it);
+      });
+    })();
+
+    window.__timelines = window.__timelines || {};
+    window.__timelines["main"] = { pause: function () {}, seek: function () {}, paused: function () { return true; } };
+  </script>
+</body>
+</html>

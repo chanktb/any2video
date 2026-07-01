@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1080, height=1920" />
+<title>Hub & Spoke · Portrait 9:16</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+  /*
+   * frame-hub-spoke — original to any2video v6.
+   * Pattern: Trạm AI Reels (2026-06-30) — 1 central focus + 4 corner chips +
+   * neon "X" lines connecting chips → central panel. High-density: 6 active
+   * elements + 4 connecting lines + persistent overlays (brand + counter).
+   * Visualizes "convergence / multiple inputs → one output".
+   */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #050a14; }
+  #root {
+    position: relative; width: 1080px; height: 1920px;
+    background:
+      radial-gradient(ellipse 900px 800px at 50% 50%, rgba(20,40,70,0.5) 0%, transparent 60%),
+      #050a14;
+    color: #e8f0fa;
+    font-family: 'Be Vietnam Pro', sans-serif;
+  }
+
+  /* Subtle grid */
+  .grid { position: absolute; inset: 0; z-index: 0; opacity: 0.4;
+    background-image: linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+                       linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+    background-size: 70px 70px;
+    mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 75%); }
+
+  /* Persistent top: brand tag + counter */
+  .brand-tag { position: absolute; top: 90px; left: 96px; z-index: 5;
+    font-size: 22px; font-weight: 700; letter-spacing: 5px;
+    text-transform: uppercase; color: #38bdf8;
+    opacity: 0; animation: fadeUp 0.6s ease-out 0.1s forwards; }
+  .counter { position: absolute; top: 90px; right: 96px; z-index: 5;
+    font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 600;
+    color: #7aa3c8; letter-spacing: 3px;
+    opacity: 0; animation: fadeUp 0.6s ease-out 0.1s forwards; }
+
+  /* SVG layer for connecting lines (full stage; z-index 1 below chips, above grid) */
+  .lines { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+  .lines line { stroke-dasharray: 1000; stroke-dashoffset: 1000;
+    stroke-width: 2.5; filter: drop-shadow(0 0 8px currentColor);
+    animation: lineDraw 1.0s cubic-bezier(0.4,0,0.2,1) forwards; }
+  .lines line.l1 { color: #38bdf8; stroke: #38bdf8; animation-delay: 0.8s; }
+  .lines line.l2 { color: #fbbf24; stroke: #fbbf24; animation-delay: 0.95s; }
+  .lines line.l3 { color: #10b981; stroke: #10b981; animation-delay: 1.1s; }
+  .lines line.l4 { color: #ef4444; stroke: #ef4444; animation-delay: 1.25s; }
+  @keyframes lineDraw { to { stroke-dashoffset: 0; } }
+
+  /* Central panel */
+  .hub { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 700px; padding: 60px 50px; z-index: 3;
+    border-radius: 24px;
+    border: 2px solid rgba(56,189,248,0.55);
+    background: rgba(10,20,35,0.85);
+    box-shadow:
+      0 0 0 3px rgba(5,10,20,0.95),
+      0 0 60px rgba(56,189,248,0.25),
+      inset 0 0 30px rgba(56,189,248,0.08);
+    text-align: center;
+    opacity: 0; transform-origin: center;
+    animation: hubIn 0.7s cubic-bezier(0.16,1,0.3,1) 0.5s forwards; }
+  .hub .eyebrow { font-size: 24px; font-weight: 600; letter-spacing: 6px;
+    text-transform: uppercase; color: rgba(232,240,250,0.6);
+    margin-bottom: 18px; }
+  .hub .headline { font-size: 76px; font-weight: 900; line-height: 1.22;
+    letter-spacing: -1.5px; color: #f0f6fc;
+    text-shadow: 0 0 24px rgba(56,189,248,0.25); }
+  @keyframes hubIn {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.85); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
+
+  /* 4 corner chips */
+  .chip { position: absolute; z-index: 4;
+    padding: 16px 28px; border-radius: 14px;
+    border: 2px solid var(--c, #38bdf8);
+    background: rgba(10,20,35,0.8);
+    backdrop-filter: blur(4px);
+    font-size: 26px; font-weight: 700; letter-spacing: 1.5px;
+    color: var(--c, #38bdf8);
+    box-shadow: 0 0 20px rgba(0,0,0,0.5), inset 0 0 12px rgba(0,0,0,0.4);
+    display: inline-flex; gap: 12px; align-items: center;
+    white-space: nowrap;
+    opacity: 0; }
+  .chip .ic { font-size: 22px; opacity: 0.95; }
+  /* Chip corners repositioned inside INNER 900×1230 (y=345..1575) — top chips
+   * ≥ y=360, bottom chips ≥ y=1320 (so glyph descender stays above y=1575). */
+  .chip.tl { top: 400px; left: 96px;
+    transform: translate(-30px, -20px);
+    animation: chipIn 0.6s cubic-bezier(0.16,1,0.3,1) 0.6s forwards; }
+  .chip.tr { top: 460px; right: 96px;
+    transform: translate(30px, -20px);
+    animation: chipIn 0.6s cubic-bezier(0.16,1,0.3,1) 0.7s forwards; }
+  .chip.bl { bottom: 600px; left: 96px;
+    transform: translate(-30px, 20px);
+    animation: chipIn 0.6s cubic-bezier(0.16,1,0.3,1) 0.8s forwards; }
+  .chip.br { bottom: 540px; right: 96px;
+    transform: translate(30px, 20px);
+    animation: chipIn 0.6s cubic-bezier(0.16,1,0.3,1) 0.9s forwards; }
+  @keyframes chipIn { to { opacity: 1; transform: translate(0, 0); } }
+
+  /* Sub-pill + caption pushed UP into INNER (y=345..1575). Previous positions
+   * (bottom:280 → y=1640, bottom:160 → y=1760) straddled y=1635 4:5 cut. */
+  .sub-pill { position: absolute; left: 96px; right: 96px; bottom: 440px;
+    z-index: 3; margin: 0 auto; max-width: 880px; width: fit-content;
+    padding: 14px 32px; border-radius: 999px;
+    border: 1.5px solid rgba(56,189,248,0.4);
+    background: rgba(56,189,248,0.12);
+    font-size: 26px; font-weight: 600; color: #38bdf8;
+    text-align: center; line-height: 1.3;
+    opacity: 0; animation: fadeUp 0.6s ease-out 1.4s forwards; }
+
+  /* Karaoke caption above the 4:5 bottom cut (y=1635) */
+  .caption { position: absolute; left: 96px; right: 96px; bottom: 360px;
+    z-index: 5; text-align: center;
+    font-size: 36px; font-weight: 600; color: rgba(232,240,250,0.6);
+    line-height: 1.4;
+    opacity: 0; animation: fadeUp 0.6s ease-out 1.7s forwards; }
+  .caption b { color: #38bdf8; font-weight: 700;
+    text-shadow: 0 0 20px rgba(56,189,248,0.5); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+  <div
+    id="root"
+    data-composition-id="main"
+    data-start="0"
+    data-duration="6"
+    data-width="1080"
+    data-height="1920"
+    data-composition-variables='{"brand_tag":"REPO TOUR","counter":"04 / 12","eyebrow":"BACKBONE","headline":"1 FILE\nYAML","chips":[{"text":"PARALLEL","icon":"⚡","color":"#38bdf8"},{"text":"SAFE","icon":"🛡️","color":"#fbbf24"},{"text":"GENERIC","icon":"🧩","color":"#10b981"},{"text":"CITED","icon":"📎","color":"#ef4444"}],"sub_pill":"Đổi store, viết file mới — không sửa code","caption":"Toàn bộ <b>business truth</b> trong một file."}'
+  >
+    <div class="grid"></div>
+
+    <div class="brand-tag"></div>
+    <div class="counter"></div>
+
+    <svg class="lines" viewBox="0 0 1080 1920" preserveAspectRatio="none">
+      <line class="l1" x1="180" y1="440"  x2="540" y2="900" />
+      <line class="l2" x1="900" y1="500"  x2="540" y2="900" />
+      <line class="l3" x1="180" y1="1320" x2="540" y2="1020" />
+      <line class="l4" x1="900" y1="1380" x2="540" y2="1020" />
+    </svg>
+
+    <div class="hub">
+      <div class="eyebrow"></div>
+      <div class="headline"></div>
+    </div>
+
+    <div class="chip tl"></div>
+    <div class="chip tr"></div>
+    <div class="chip bl"></div>
+    <div class="chip br"></div>
+
+    <div class="sub-pill"></div>
+    <div class="caption"></div>
+  </div>
+
+  <script>
+    (function () {
+      var v = (window.__hyperframes &&
+               typeof window.__hyperframes.getVariables === "function")
+        ? window.__hyperframes.getVariables() : {};
+
+      var set = function (sel, t) {
+        var el = document.querySelector(sel);
+        if (el && t != null) el.textContent = String(t);
+      };
+
+      set(".brand-tag", v.brand_tag);
+      set(".counter", v.counter);
+      set(".hub .eyebrow", v.eyebrow);
+      set(".sub-pill", v.sub_pill);
+
+      // Headline supports \n for line breaks
+      var h = document.querySelector(".hub .headline");
+      if (h && v.headline != null) {
+        h.textContent = "";
+        String(v.headline).split(/\n/).forEach(function (line, i) {
+          if (i > 0) h.appendChild(document.createElement("br"));
+          h.appendChild(document.createTextNode(line));
+        });
+      }
+
+      // Caption supports <b>...</b>
+      var c = document.querySelector(".caption");
+      if (c && v.caption != null) {
+        var cap = String(v.caption);
+        if (cap.indexOf("<b>") >= 0) c.innerHTML = cap;
+        else c.textContent = cap;
+      }
+
+      // Chips
+      var positions = ["tl", "tr", "bl", "br"];
+      var chips = Array.isArray(v.chips) ? v.chips : [];
+      chips.slice(0, 4).forEach(function (ch, i) {
+        var el = document.querySelector(".chip." + positions[i]);
+        if (!el) return;
+        el.style.setProperty("--c", ch.color || "#38bdf8");
+        var ic = document.createElement("span");
+        ic.className = "ic";
+        ic.textContent = ch.icon != null ? String(ch.icon) : "";
+        var tx = document.createElement("span");
+        tx.textContent = ch.text != null ? String(ch.text) : "";
+        el.appendChild(ic);
+        el.appendChild(tx);
+        // Reveal timing (beat-split): override CSS default animation-delay
+        if (ch.reveal_at_sec != null) {
+          var t = Number(ch.reveal_at_sec).toFixed(2);
+          el.style.animation = "chipIn 0.6s cubic-bezier(0.16,1,0.3,1) " + t + "s forwards";
+          el.setAttribute("data-reveal-at", t);
+        }
+      });
+
+      // Color SVG lines from chip colors + retime lines to match chip reveal
+      var lines = document.querySelectorAll(".lines line");
+      chips.slice(0, 4).forEach(function (ch, i) {
+        if (lines[i] && ch.color) {
+          lines[i].setAttribute("stroke", ch.color);
+          lines[i].style.color = ch.color;
+        }
+        if (lines[i] && ch.reveal_at_sec != null) {
+          // Line draws 0.1s after chip appears
+          var lineT = (Number(ch.reveal_at_sec) + 0.1).toFixed(2);
+          lines[i].style.animationDelay = lineT + "s";
+        }
+      });
+    })();
+
+    window.__timelines = window.__timelines || {};
+    window.__timelines["main"] = { pause: function () {}, seek: function () {}, paused: function () { return true; } };
+  </script>
+</body>
+</html>

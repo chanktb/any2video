@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Secrets / environment (NEVER commit — code reads these from local .env pointers)
+*.env
+.env
+secrets/
+
+# Generated outputs — per-run videos, audio, screenshots, plans
+workspace/
+*.mp4
+*.webm
+
+# Third-party reference material (vendored study repos + curated sample videos —
+# not ours to redistribute)
+references/
+
+# OS cruft
+.DS_Store
+Thumbs.db
