@@ -233,6 +233,34 @@
           lines[i].style.animationDelay = lineT + "s";
         }
       });
+
+      // Clip each connector so it STOPS at the hub's edge instead of hiding under the
+      // central block. The hub height is content-dependent (1-3 line headline), so compute
+      // the intersection of each chip→center segment with the hub's LIVE border box.
+      // (offsetLeft/Top/Width/Height = unscaled layout, unaffected by the hubIn scale anim;
+      //  SVG viewBox is 1:1 with the 1080×1920 stage, so px == SVG units.)
+      function clipLines() {
+        var hub = document.querySelector(".hub");
+        var svgLines = document.querySelectorAll(".lines line");
+        if (!hub || !svgLines.length) return;
+        var cx = hub.offsetLeft, cy = hub.offsetTop;      // translate(-50%,-50%) → center = offset
+        var pad = 6;                                       // stop a few px OUTSIDE the border
+        var L = cx - hub.offsetWidth / 2 - pad, R = cx + hub.offsetWidth / 2 + pad;
+        var T = cy - hub.offsetHeight / 2 - pad, B = cy + hub.offsetHeight / 2 + pad;
+        svgLines.forEach(function (ln) {
+          var x1 = +ln.getAttribute("x1"), y1 = +ln.getAttribute("y1");
+          var dx = cx - x1, dy = cy - y1, ts = [];
+          if (dx) [L, R].forEach(function (xe) { var t = (xe - x1) / dx, y = y1 + t * dy; if (t > 0 && t < 1 && y >= T && y <= B) ts.push(t); });
+          if (dy) [T, B].forEach(function (ye) { var t = (ye - y1) / dy, x = x1 + t * dx; if (t > 0 && t < 1 && x >= L && x <= R) ts.push(t); });
+          if (!ts.length) return;                          // segment misses the box — leave as-is
+          var t = Math.min.apply(null, ts);                // first crossing = the border touch point
+          ln.setAttribute("x2", Math.round(x1 + t * dx));
+          ln.setAttribute("y2", Math.round(y1 + t * dy));
+        });
+      }
+      clipLines();
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(clipLines);
+      setTimeout(clipLines, 600);   // re-clip once the real font settles the hub height
     })();
 
     window.__timelines = window.__timelines || {};
