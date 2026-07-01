@@ -250,7 +250,7 @@
             data-duration="5"
             data-width="1080"
             data-height="1920"
-            data-composition-variables='{"kicker":"AI Coding","brand":"https://aicodingvn.vercel.app/","headline":"GPT 5.5 ra mắt","subheadline":"Mô hình AI mạnh nhất từ trước tới nay vừa được công bố.","cta":"Theo dõi ngay"}'
+            data-composition-variables='{"kicker":"REPO TOUR","brand":"owner / repo","role":"","channel_label":"OPEN SOURCE","headline":"reponame","subheadline":"Mô tả ngắn một dòng về repo.","cta":""}'
         >
             <div class="blob b1"></div>
             <div class="blob b2"></div>
@@ -264,8 +264,8 @@
             </div>
 
             <div class="brand-bar">
-                <img class="logo-img" src="../assets/logo.svg" />
-                <span class="brand-label">Senior AI Engineer</span>
+                <img class="logo-img" alt="" />
+                <span class="brand-label"></span>
             </div>
 
             <div class="main">
@@ -274,7 +274,7 @@
             </div>
 
             <div class="chip bot">
-                <span class="brand"></span><span>Bản tin</span>
+                <span class="brand"></span><span class="channel-label"></span>
             </div>
         </div>
 
@@ -293,6 +293,20 @@
                 set(".brand", v.brand);
                 set(".headline", v.headline);
                 set(".subheadline", v.subheadline);
+                // Branding is INPUT-DRIVEN — no hardcoded channel identity. Bind the
+                // avatar/logo, the role/tagline label, and the bottom category label;
+                // hide whatever the caller didn't supply so no foreign default shows.
+                set(".brand-label", v.role);
+                set(".channel-label", v.channel_label);
+                var _logo = document.querySelector(".logo-img");
+                if (_logo) {
+                    var _src = v.logo || v.avatar_url;
+                    if (_src) { _logo.src = _src; } else { _logo.style.display = "none"; }
+                }
+                [".brand-label", ".channel-label", ".brand", ".kicker"].forEach(function (s) {
+                    var el = document.querySelector(s);
+                    if (el && !(el.textContent || "").trim()) el.style.display = "none";
+                });
                 // Optional caller-chosen headline gradient (else the vivid default).
                 // Always use 3-stop so any 2-color pair stays vivid (hot-pink midpoint).
                 if (v.headline_from && v.headline_to) {

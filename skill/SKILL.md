@@ -252,7 +252,7 @@ Report the final measured length next to the target when notifying (e.g. "target
 | Ratio | `3:1` | `ba trên một` |
 | Code range | `D1 đến D14` | `mười bốn loại lỗi` (paraphrase) or `D một đến D mười bốn` |
 
-Decimal mark: `chấm` (natural) or `phẩy` (formal) — pick one, stay consistent. English acronyms (AI / GPT / API) usually OK; if TTS mangles, spell phonetically (`ây ai` / `gí pi tí` / `ây pi ai`).
+Decimal mark: `chấm` (natural) or `phẩy` (formal) — pick one, stay consistent. Spell common acronyms phonetically: AI → `ây ai`, GPT → `gí pi tí`, API → `ây pi ai` (see the table in (d.2)).
 
 **(d) Sanitize `narration` — strip ALL of these:**
 
@@ -275,7 +275,10 @@ End every sentence with `.` or `?` for natural pause. NEVER end with `:` or `,` 
 | PyTorch | `pai tọt` | `PyTorch` |
 | n8n | `en tám en` | `n8n` |
 | GitHub | `git hâb` | `GitHub` |
-| API / GPT | usually OK; if mangled → `ây pi ai` / `gí pi tí` | `API` / `GPT` |
+| repo | `rê pô` | `repo` |
+| README | `rít my` | `README` |
+| AI | `ây ai` | `AI` |
+| API / GPT | `ây pi ai` / `gí pi tí` | `API` / `GPT` |
 
 Pick the transliteration that a Vietnamese reader would pronounce closest to the real English — test by reading the `narration` aloud. If it still sounds wrong, rephrase to avoid the term. NEVER put the raw slug (`any2video`, `ffmpeg`) into `narration` and hope the voice guesses right.
 

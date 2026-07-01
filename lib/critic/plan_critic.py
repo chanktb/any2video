@@ -51,6 +51,20 @@ _GENERIC_CTA_PATTERNS = [
     r"check out the repo", r"visit the repo", r"give it a star and",
 ]
 
+# English/brand terms that MUST be written PHONETICALLY in narration so TTS reads them
+# right (SKILL §2.2.6 d.2). (term_regex, flags, display_term, phonetic). AI is
+# case-SENSITIVE (uppercase only) — lowercase "ai" is the Vietnamese word "who".
+_PHONETIC_TERMS = [
+    (r"\brepo\b", re.IGNORECASE, "repo", "rê pô"),
+    (r"\breadme\b", re.IGNORECASE, "README", "rít my"),
+    (r"\bAI\b", 0, "AI", "ây ai"),  # case-sensitive: lowercase "ai" = VN word "who"
+    (r"\bAPI\b", re.IGNORECASE, "API", "ây pi ai"),
+    (r"\bGPT\b", re.IGNORECASE, "GPT", "gí pi tí"),
+    (r"\bgithub\b", re.IGNORECASE, "GitHub", "git hâb"),
+    (r"\bffmpeg\b", re.IGNORECASE, "ffmpeg", "ép ép em peg"),
+    (r"\bany2video\b", re.IGNORECASE, "any2video", "any to video"),
+]
+
 
 def load_plan(path: Path) -> dict:
     return plan_yaml.load_plan(path)
@@ -209,8 +223,24 @@ def check(plan_path: Path, analysis_path: Path | None) -> dict:
     for s in scenes:
         sid = s.get("id")
         n = (s.get("narration") or "")
+        # include beat texts so beat-split scenes are checked too
+        _beats = s.get("beats")
+        if isinstance(_beats, list):
+            n = n + " " + " ".join((b.get("text") if isinstance(b, dict) else str(b)) or "" for b in _beats)
         n_lower = n.lower()
         words = re.findall(r"\S+", n)
+
+        # Raw English/brand terms that TTS will mispronounce → must be phonetic.
+        for pat, flags, term, phon in _PHONETIC_TERMS:
+            if re.search(pat, n, flags):
+                issues.append({
+                    "kind": "narration_needs_phonetic",
+                    "scene_id": sid,
+                    "term": term,
+                    "suggest": phon,
+                    "hint": f"Write '{term}' phonetically in the READ narration so TTS says it "
+                            f"right: '{phon}' (the display inputs keep '{term}'). SKILL §2.2.6 d.2.",
+                })
 
         # Telegraphic fragments: ≥3 sentences AND avg sentence length < 5 words
         sentences = [seg.strip() for seg in re.split(r"[.!?]", n) if seg.strip()]

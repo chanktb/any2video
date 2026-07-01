@@ -19,11 +19,15 @@ Each template is a self-contained 9:16 (1080×1920) HTML file at `<templateId>/c
 ## Slot reference per template
 
 ### frame-liquid-bg-hero (intro)
-- `kicker` — small uppercase label (≤24 chars)
-- `headline` — main brand/title (≤24 chars)
-- `subheadline` — tagline (≤80 chars)
+Branding is 100% input-driven — NO hardcoded channel identity. Anything you don't pass is hidden (no stray default shows).
+- `kicker` — small uppercase label, top-left (e.g. "REPO TOUR", "MÃ NGUỒN MỞ")
+- `headline` — main brand/title, e.g. the repo name (≤24 chars)
+- `subheadline` — one-line description (≤80 chars)
 - `cta` — call-to-action pill text (≤40 chars)
-- `brand` — channel handle (≤24 chars)
+- `brand` — owner handle shown bottom-left (e.g. "chanktb")
+- `role` — gradient label next to the avatar (e.g. owner name / "chanktb"); omit → hidden
+- `channel_label` — bottom category label (e.g. "MIT", "OPEN SOURCE"); omit → hidden
+- `avatar_url` (or `logo`) — the avatar/logo image URL (e.g. `https://github.com/<owner>.png?size=128`); omit → the image is hidden. A URL that fails to load is caught by the gate (`broken_image`).
 
 ### frame-bold-poster (hook)
 - `kicker` ≤24 (top-left label)
