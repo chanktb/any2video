@@ -3,10 +3,12 @@
 Turn **any input** — a GitHub repo, a URL, an article, or raw text — into a
 **9:16 vertical narrated video** (Reels / Shorts / TikTok format).
 
-Unlike fixed-template video generators, an agent (Claude Code) does the deep
-extraction itself, writes the plan, designs **per-scene HTML/CSS** (no layout
-pool), then the toolbox here measures the voiceover, renders each scene, and
-composes the final `mp4`.
+Unlike fixed-template video generators, an agent (Claude Code or Antigravity) does
+the deep extraction itself and writes the narrative plan, then assembles each scene by
+picking a template from a catalog and filling it with real data — a **guarded** path,
+not free-hand HTML, so the safe-zones / brand bars / caption band are always correct.
+The toolbox measures the voiceover, **gates every scene**, renders, and composes the
+final `mp4`.
 
 ## What makes the output feel professional
 
@@ -23,17 +25,41 @@ repo-tour Shorts — see `skill/references/reference-video-teardown.md`):
   as the narrator names them, not all at once.
 - **AV-sync by design** — TTS is measured first; scenes are joined with a
   gap-hardcut so the picture never drifts ahead of the voice.
-- **Per-scene visual design** with 3-tier safe-zone enforcement for 9:16.
+- **Template-driven scenes** with 3-tier safe-zone enforcement for 9:16 — every scene
+  is measured and gated before render (see below), so broken frames never ship.
 
 ## How it works (pipeline)
 
 ```
-input → 1. extract  → 2. plan (narrative)  → 3. TTS (measure duration)
-      → 4. per-scene HTML → render → 5. compose (mux + captions + join) → final.mp4
+input → 1. extract → 2. plan (+ narrative gate) → 3. TTS (measure duration)
+      → 4. fill scene templates → 4.5 GATE every scene → render → 5. compose → final.mp4
 ```
 
 TTS runs **before** the visuals so every scene's layout is sized to the real
 audio duration (no drift). See `skill/SKILL.md` for the full agent spec.
+
+## Quality gates — why the output is clean
+
+Every run passes gates before a single frame is rendered, so a broken scene never
+reaches the final video. This is the difference from a fixed-template generator:
+layouts are template-driven (guards always on) **and** every filled scene is measured.
+
+- **Plan gate** (`python -m lib.critic.plan_critic`) — structure + narrative craft: a
+  pain-first hook (never "today we look at…"), 2nd-person address, contrast phrasing,
+  no generic "check out the repo" close, and durations within ±10s of a requested
+  length. It also enforces the closing: a repo tour ends on real author-profile
+  footage, never a plain text card.
+- **Scene gate** (`python -m lib.critic.scene_gate all <plan>`) — the blocking one.
+  It renders every scene at 1080×1920 (fonts loaded, animations settled) and fails on:
+  - text cut at the frame edge, past the side safe margins, or straddling the 4:5 crop
+  - text clipped by its box — including a **Vietnamese tone mark** (Ậ Ỗ Ồ) sliced at the top
+  - two text blocks overlapping / stuck together, or line-height below 1.15
+  - an **empty box** — a bordered card that rendered hollow (icon/font/child failed)
+  - a **broken image**, an AI-slop palette, or a scene identical to its neighbour
+
+  `pass:false` ⇒ the scene is fixed and re-checked; **video is never rendered on a
+  failing plan.** Faint "ghost echo" decoration is filtered out so the gate doesn't
+  cry wolf.
 
 ## Prerequisites
 
@@ -91,10 +117,16 @@ python -m lib.cli init "https://github.com/<owner>/<repo>" --lang vi
 # 3. Synthesize the voiceover (measures real durations)
 python -m lib.tts.narrate workspace/runs/<slug>/plan.md
 
-# 4. Render each scene (Playwright video)
+# 4. Fill scene templates from the plan
+python -m lib.render.template_render all workspace/runs/<slug>/plan.md
+
+# 4.5 GATE — inspect every scene; must print pass:true before rendering
+python -m lib.critic.scene_gate all workspace/runs/<slug>/plan.md
+
+# 5. Render each scene (Playwright video) — only after the gate passes
 python -m lib.render.playwright_render all workspace/runs/<slug>/plan.md
 
-# 5. Compose the final mp4 (karaoke captions on by default)
+# 6. Compose the final mp4 (karaoke captions on by default)
 python -m lib.compose.ffmpeg_compose workspace/runs/<slug>/plan.md --gap 350
 ```
 
