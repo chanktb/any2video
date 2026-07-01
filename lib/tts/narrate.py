@@ -256,7 +256,11 @@ async def run(plan_path: Path) -> dict:
         voice = meta.get("voice") or "vi-VN-Chirp3-HD-Charon"
     else:
         voice = meta.get("voice") or _LANG_DEFAULT_VOICE.get(lang, _FALLBACK_VOICE)
-    rate = meta.get("voice_rate") or _DEFAULT_RATE
+    # Provider-aware default rate: Chirp 3 HD sounds natural at +0%; edge-tts needs
+    # +15% or it drags. (DEFAULT provider is google → +0%.)
+    rate = meta.get("voice_rate")
+    if not rate:
+        rate = "+0%" if provider in ("google", "google-tts", "chirp") else _DEFAULT_RATE
     scenes = plan.get("scenes") or []
     if not scenes:
         return {"error": "no_scenes_in_plan", "plan_path": str(plan_path)}

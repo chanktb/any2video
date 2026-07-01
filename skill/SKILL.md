@@ -288,8 +288,9 @@ meta:
   slug: <slug>
   lang: vi                          # vi (default) or en — drives narration language
   total_duration_sec: <int>         # 45-75 sec for 9:16 Reels feel
-  voice: vi-VN-HoaiMyNeural         # default per lang
-  voice_rate: "+15%"                # default +15% — see Phase 3 rate guidance
+  voice: vi-VN-Chirp3-HD-Charon     # DEFAULT: MALE, Google TTS. Female ONLY if the user asks.
+  voice_provider: google            # DEFAULT google (Chirp 3 HD); auto-falls back to edge-tts (also MALE) if no key
+  voice_rate: "+0%"                 # Chirp 3 sounds natural at +0%; edge-tts fallback uses +15%
   theme_hint: <free-form mood>
   aspect: "9:16"
   brand: { name, avatar_url, tagline }
@@ -551,10 +552,16 @@ These rules apply to **every** template HTML in `templates/scenes/` and to any p
 
 | Aspect | `vi` (default) | `en` |
 |--------|----------------|------|
-| Narration text | Claude drafts in Vietnamese | English |
-| TTS voice | `vi-VN-HoaiMyNeural` (female warm) | `en-US-AriaNeural` (female professional) |
-| Caption overlay text | Vietnamese, with `<span class="kw">`-wrapped keywords highlighted (matches Palmier Pro / Vietnamese-explainer convention) | English equivalent |
+| Narration text | drafted in Vietnamese | English |
+| TTS voice (default) | `vi-VN-Chirp3-HD-Charon` (**male**, Google) | `en-US-Chirp3-HD-Charon` (**male**, Google) |
+| Caption overlay text | Vietnamese, with `<span class="kw">`-wrapped keywords highlighted | English equivalent |
 | Visual labels (numbers, code, badges) | Stay readable across both (no localization needed) | Same |
+
+**TTS defaults (HARD):** **male voice + Google TTS (Chirp 3 HD)** by default. Set
+`meta.voice_provider: google` + a Chirp 3 HD voice; `narrate.py` auto-falls back to
+edge-tts (`vi-VN-NamMinhNeural` / `en-US-GuyNeural`, both **male**) only when Google
+is unavailable (no `GOOGLE_TTS_API_KEY`). Use a **female** voice ONLY when the user
+explicitly asks. Never default to edge-tts when a Google key is present.
 
 Claude in Phase 2 generates `narration` in the chosen language. The planner writes `meta.lang: vi` / `en` in `plan.md`. `narrate.py` selects voice from `meta.voice` if set, else falls back to a language-default.
 
