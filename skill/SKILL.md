@@ -29,8 +29,11 @@ Before any clone / WebFetch, ask the user 4 questions in ONE message (AskUserQue
 
 1. **Input** — URL repo / URL article / paste raw text? (skill detects type from string)
 2. **Output folder** — default `workspace/runs/<slug>/` hay custom path?
-3. **Gửi Telegram** — gửi 2 checkpoint duyệt (kịch bản trước TTS + hình scene trước render) và final.mp4 về DM? `[Y/n]` (default Y)
-4. **Caption** — (chỉ nếu Y ở câu 3) caption cho post final hay `auto` để skill tự gen từ tiêu đề source
+3. **Media riêng?** — user có ảnh/clip muốn chèn (screenshot, b-roll, clip output…)? Nếu có → bảo họ bỏ file vào `runs/<slug>/assets/`; Phase 2 đặt vào đúng beat qua `frame-media-full` (full-bleed, b-roll/clip output) hoặc `frame-media-card` (khung, screenshot/ảnh). Xem CATALOG.
+4. **Gửi Telegram** — gửi 2 checkpoint duyệt (kịch bản trước TTS + hình scene trước render) và final.mp4 về DM? `[Y/n]` (default Y)
+5. **Caption** — (chỉ nếu Y ở câu 4) caption cho post final hay `auto` để skill tự gen từ tiêu đề source
+
+**User media (ảnh/clip):** `frame-media-full` (phủ khung — b-roll/screen-record/clip output; video tự phát, ảnh có Ken Burns) và `frame-media-card` (khung bo góc — screenshot/ảnh/logo). Slot `media` nhận URL `https://` hoặc `file:///…assets/x`; tự nhận ảnh vs video theo đuôi. Chèn vào **body** (sau scroll / cạnh claim để làm proof), KHÔNG để media sáng-trắng làm scene 1 (ship-gate chặn thumb trắng). Karaoke + nền + ship-gate dùng chung, không cần chỉnh.
 
 If args present on `/any2video <url>` invocation, skip Q1. Otherwise wait for answer.
 
