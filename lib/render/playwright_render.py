@@ -115,6 +115,11 @@ def render_scene(html_path: Path, duration_sec: float, out_mp4: Path) -> dict:
             page.wait_for_timeout(_PRE_RECORD_PAD_MS)
             # Step 3: unfreeze — animations now play from t=0 with real font metrics
             page.evaluate("() => window.__a2vUnfreeze && window.__a2vUnfreeze()")
+            # Kick stat count-ups (template_render injects __a2vCountup). This is the
+            # motion-mode signal: only the video render calls it, so the still gate
+            # keeps the final numbers (non-destructive). It self-times off each
+            # number's fade-in, so the roll plays in the recorded window.
+            page.evaluate("() => window.__a2vCountup && window.__a2vCountup()")
             # Step 4: let the scene run + a little headroom so trim has slack
             page.wait_for_timeout(int((duration_sec + _SKIP_LEAD_SEC) * 1000))
             ctx.close()

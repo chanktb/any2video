@@ -186,6 +186,47 @@ def render_template(template_id: str, inputs: dict, out_html: Path,
     else:
         new_html = new_html + _space_fix
 
+    # Count-up for stat numbers: a big number should roll 0 → target then stop
+    # (SKILL §2.2.7 "counter roll"). Targets any `.countup / [data-countup] / .number /
+    # .num` whose text starts with a number; the numeric part tweens (easeOutCubic,
+    # ~1s) while the prefix/suffix ("k", "%", " triệu", "$") stay. NON-DESTRUCTIVE:
+    # it only resets to 0 and animates when playwright_render calls __a2vUnfreeze
+    # (rich video mode). In the still gate / static render there is no unfreeze, so
+    # the final number stays put — no risk of capturing a mid-roll "0". No `//` line
+    # comments inside (the script is emitted on one line).
+    _countup_js = (
+        "<script>(function(){"
+        "function parse(t){var m=/^(\\D*?)([0-9][0-9.,]*)(.*)$/.exec(String(t));"
+        "if(!m)return null;var raw=m[2];var dec=(raw.split('.')[1]||'').length;"
+        "var val=parseFloat(raw.replace(/,/g,''));if(isNaN(val))return null;"
+        "return{pre:m[1],suf:m[3],val:val,dec:dec,grp:raw.indexOf(',')>-1};}"
+        "function fmt(n,d,grp){var s=n.toFixed(d);if(grp){var p=s.split('.');"
+        "p[0]=p[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,',');s=p.join('.');}return s;}"
+        "var nodes=[];document.querySelectorAll('.countup,[data-countup],.number,.num')"
+        ".forEach(function(el){var info=parse(el.textContent);if(info)nodes.push({el:el,info:info});});"
+        "if(!nodes.length)return;"
+        "function roll(n){if(n.done)return;n.done=true;var dur=900,t0=null;"
+        "function step(ts){if(t0===null)t0=ts;var p=Math.min(1,(ts-t0)/dur),e=1-Math.pow(1-p,3);"
+        "n.el.textContent=n.info.pre+fmt(n.info.val*e,n.info.dec,n.info.grp)+n.info.suf;"
+        "if(p<1)requestAnimationFrame(step);}requestAnimationFrame(step);}"
+        "function effOp(el){var o=1;while(el&&el.nodeType===1){var s=getComputedStyle(el);"
+        "if(s.display==='none'||s.visibility==='hidden')return 0;o*=parseFloat(s.opacity||'1');el=el.parentElement;}return o;}"
+        "function begin(){nodes.forEach(function(n){n.el.textContent=n.info.pre+fmt(0,n.info.dec,n.info.grp)+n.info.suf;});"
+        "var start=null;function tick(ts){if(start===null)start=ts;"
+        "nodes.forEach(function(n){if(!n.done&&effOp(n.el)>0.6)roll(n);});"
+        "if((ts-start)>3000){nodes.forEach(roll);return;}"
+        "if(nodes.some(function(n){return !n.done;}))requestAnimationFrame(tick);}"
+        "requestAnimationFrame(tick);}"
+        "window.__a2vCountup=begin;"
+        "var orig=window.__a2vUnfreeze;"
+        "if(typeof orig==='function'){window.__a2vUnfreeze=function(){orig();begin();};}"
+        "})();</script>"
+    )
+    if "</body>" in new_html:
+        new_html = new_html.replace("</body>", _countup_js + "</body>", 1)
+    else:
+        new_html = new_html + _countup_js
+
     # Optional video-wide accent recolour (meta.accent in plan.md).
     _acc = _accent_css(accent)
     if _acc:
