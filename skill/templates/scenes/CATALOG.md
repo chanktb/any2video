@@ -79,17 +79,11 @@ Branding is 100% input-driven — NO hardcoded channel identity. Anything you do
 - `channel_label` — bottom category label (e.g. "MIT", "OPEN SOURCE"); omit → hidden
 - `avatar_url` (or `logo`) — the avatar/logo image URL (e.g. `https://github.com/<owner>.png?size=128`); omit → the image is hidden. A URL that fails to load is caught by the gate (`broken_image`).
 
-### frame-media-full (USER media, full-bleed) — VERIFIED ✓
-A user-provided image or video shown FULL-BLEED (fills the frame, `object-fit: cover`) with top/bottom scrims so the eyebrow + burned karaoke stay legible. Good for b-roll, a screen-recording, or a demo OUTPUT clip. Does NOT obey the card safe-zone (real footage). The `media` slot auto-detects image vs video by extension: a **video autoplays muted + loops** (Playwright records it playing); a **still gets a slow Ken Burns push**.
+### frame-media-full (USER media — image OR video, full-width) — VERIFIED ✓
+A user-provided image or video shown FULL-WIDTH (spans the full 1080px, edge-to-edge, NO safe-zone margins, NO frame). `object-fit: contain` so the WHOLE asset is visible — a 9:16 clip fills the frame exactly, a portrait screenshot fills the width with slim dark bands (carrying the theme dots) top/bottom, never cropping. A **video autoplays muted + loops** (Playwright records it playing). Top/bottom scrims keep the eyebrow + burned karaoke from blending into the media. Good for a screenshot, b-roll, screen-recording, or a demo OUTPUT clip. Use for BOTH image and video — full-width, no framed card.
 - `media` — image/video: an `https://` URL or an absolute `file:///…` path (drop assets in `runs/<slug>/assets/`). `.mp4/.webm/.mov` → video; else image. `media_type: video` forces video.
-- `eyebrow` — top-left label over a red dot (e.g. "OUTPUT THẬT · LINGORA"); omit → hidden
-- `label` — one-line caption above the karaoke band; omit → hidden
-
-### frame-media-card (USER media, framed) — VERIFIED ✓
-A user-provided image or video shown INSIDE a designed dark card (rounded, border + glow), top-anchored, whole asset visible (`object-fit: contain`). Good for a screenshot / product photo / diagram / logo. Same `media` auto-detect (image or video) as frame-media-full.
-- `media` — image/video URL or `file:///…` path (same rules as above)
-- `eyebrow` — top label (e.g. "Chọn ngay trên web")
-- `label` — caption under the card; `category` — optional bottom tag
+- `eyebrow` — top-left label over a red dot (e.g. "OUTPUT THẬT · LINGORA", "CHỌN NGAY TRÊN WEB"); omit → hidden
+- No caption/label slot on purpose — the eyebrow labels the media and the burned karaoke narrates.
 
 ### frame-bold-poster (hook)
 - `kicker` ≤24 (top-left label)
