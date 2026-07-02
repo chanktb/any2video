@@ -6,21 +6,22 @@ Each template is a self-contained 9:16 (1080×1920) HTML file at `<templateId>/c
 
 ## Opening arc for a GitHub tour (HARD — SKILL §2.2.5, plan_critic enforces)
 
-The first 2 seconds decide retention, so the opening is fixed:
+The first seconds decide retention, so the opening is fixed (PA1): **open on the biggest pain, NOT a title card.**
 
-1. **intro** — `frame-repo-identity`, **≤ 2s**. Circular owner avatar + GitHub mark + `owner/repo`. That's it — the viewer learns whose repo this is, then move on.
-2. **pain blocks** — **4–6** short scenes, one felt pain each, highlight-as-spoken. Any card template works (`frame-vignelli`, `frame-bold-poster`, `frame-aicoding-list`…). This is what makes the opening dynamic.
-3. **repo-scroll pivot** — the instant the narration turns to the repo ("…thì repo này giúp bạn"), cut to a **full-bleed** repo-scroll scene: `capture_url: https://github.com/<owner>/<repo>`. Full-width, no safe-zone (real footage); the caption rides the dark bottom band automatically. Its `duration_sec` = the intro narration length so the scroll finishes as the scene ends.
-4. **problem → …** — now go into detail with the card templates below.
-5. **author outro** — author-profile scroll (see outro row).
-6. **promo** — `frame-made-with` (default ON, always the FINAL scene).
+1. **pain hero** — `frame-pain-hero`, the viewer's BIGGEST pain, full-bleed + top-anchored. Carries a subtle github context chip (owner avatar + GitHub mark + `owner/repo`). This IS the hook.
+2. **pain blocks** — more `frame-pain-hero` scenes, one felt pain each, highlight-as-spoken. Rows 1–2 total **4–6 pains**, all `frame-pain-hero` so each carries the chip.
+3. **reveal / overview** — `frame-repo-identity`, the pivot ("…thì repo này giúp bạn"): avatar + `owner/repo` + tagline. **Conditional:** popular repo → stars/forks/language row; new repo → a quiet "mới ra mắt" tag (omit stars). Sits DIRECTLY before the scroll.
+4. **repo-scroll pivot** — cut to a **full-bleed** repo-scroll scene: `capture_url: https://github.com/<owner>/<repo>`. Full-width, no safe-zone (real footage); the caption rides the dark bottom band automatically. Its `duration_sec` = the narration length so the scroll finishes as the scene ends.
+5. **problem → …** — now go into detail with the card templates below.
+6. **author outro** — author-profile scroll (see outro row).
+7. **promo** — `frame-made-with` (default ON, always the FINAL scene).
 
 ## Pick by beat (Phase 2 plan.md)
 
 | Beat | Recommended templateIds | Why |
 |------|--------------------------|-----|
-| **intro** | `frame-repo-identity` | Circular owner avatar + GitHub mark + `owner/repo` — ≤2s, says whose repo |
-| **pain block** | `frame-vignelli` / `frame-bold-poster` / `frame-aicoding-list` | One felt pain, highlighted as spoken — 4-6 of them |
+| **pain hero / pain block** | `frame-pain-hero` | Biggest pain full-bleed + github context chip — scene 1 AND every pain block (4-6 total) |
+| **reveal / overview** | `frame-repo-identity` | Avatar + `owner/repo` + tagline + CONDITIONAL stars/forks (popular) or "mới ra mắt" tag (new) — the pivot, directly before the scroll |
 | **repo scroll** | *full-bleed footage — NO template* | Real full-width scroll of `https://github.com/<owner>/<repo>` (`capture_url`) |
 | **problem** | `frame-vignelli` | Swiss-grid dark canvas + one stark stat — names the pain in 1 number |
 | **solution** | `frame-aicoding-list` | Bullet list with gold #N markers — pipeline steps |
@@ -29,7 +30,7 @@ The first 2 seconds decide retention, so the opening is fixed:
 | **outro** | *author-profile footage — NO template* | Close on a real scroll of `https://github.com/<owner>` (author profile, bio, other repos) via `capture_url`. Narration ends with a star nudge (see below). The old `frame-statement-outro` white-card / red-text closing is **BANNED** (SKILL §2.2.7). |
 | **promo** | `frame-made-with` | "Made with any2video" bumper — FINAL scene, default ON |
 
-> `frame-liquid-bg-hero` (headline-first hero) still ships for non-repo intros / raw-text videos, but a GitHub tour opens on `frame-repo-identity`.
+> `frame-liquid-bg-hero` (headline-first hero) still ships for non-repo intros / raw-text videos, but a GitHub tour opens on `frame-pain-hero`.
 
 ## Respect the author's name casing (HARD)
 
@@ -37,14 +38,25 @@ Show `owner` and `repo` **exactly as the author wrote them** — never uppercase
 
 ## Slot reference per template
 
-### frame-repo-identity (intro — GitHub tour, ≤2s) — VERIFIED ✓
-Circular owner avatar (spinning gradient ring) + GitHub mark + `owner/repo` handle. Owner + repo are shown EXACTLY as the author wrote them (never uppercased).
-- `owner` — GitHub username, author's casing (e.g. `chanktb`)
-- `repo` — repo name, author's casing (e.g. `any2video`)
-- `sep` — separator between owner and repo (default `/`; `:` also works)
+### frame-pain-hero (pain opener + pain blocks — GitHub tour scene 1..k) — VERIFIED ✓
+The BIGGEST pain, full-bleed + top-anchored, with a subtle github context chip (owner avatar + GitHub mark + `owner/repo`, author's casing). Use for scene 1 AND every pain block (so each carries the chip). Karaoke caption is burned at compose — no caption band here.
+- `owner` / `repo` / `sep` — chip handle, author's casing (never uppercased)
+- `avatar_url` — owner photo for the chip (e.g. `https://github.com/<owner>.png`); omit → chip avatar hidden
+- `pain_no` — pain index label, top-right (e.g. "NỖI ĐAU 01")
+- `eyebrow` — small uppercase line above the hero (e.g. "Nếu bạn làm content dạy ngoại ngữ")
+- `hero` — array of white headline lines (e.g. `["Ngày nào cũng", "phải ra"]`); a string also works
+- `hero_accent` — the punchline on its own line, gradient (themed by `meta.accent`); omit → no accent line
+- `sub` — one-line elaboration of the pain (≤2 lines); omit → hidden
+
+### frame-repo-identity (reveal / overview — the pivot, directly before the scroll) — VERIFIED ✓
+Circular owner avatar (spinning gradient ring) + GitHub mark + `owner/repo` handle + tagline, then ONE conditional social-proof row. Owner + repo shown EXACTLY as the author wrote them (never uppercased). Top-anchored; no caption band (karaoke burned at compose).
+- `owner` / `repo` / `sep` — handle, author's casing
 - `avatar_url` — owner photo (e.g. `https://github.com/<owner>.png`); omit → a neutral gradient face shows (no broken image)
-- `tagline` — one-line repo description (≤80 chars); omit → hidden
-- `kicker` — top-left label (default "REPO TOUR"); `category` — bottom-left label (e.g. "OPEN SOURCE")
+- `eyebrow` — the pivot line, top-center (e.g. "Thì repo này giúp bạn"); `kicker` is accepted as a fallback
+- `tagline` — one-line repo description; omit → hidden
+- **Conditional overview** — pass EITHER (popular repo) or the tag (new repo):
+  - `stars` / `forks` / `language` — social-proof pills (any subset; e.g. `stars: "9.2k"`, `forks: "640"`, `language: "TypeScript"`)
+  - `new_tag` — a quiet "mới ra mắt" pill for a new/low-star repo (shown only when no stars/forks/language passed)
 
 ### frame-made-with (promo bumper — FINAL scene, default ON) — VERIFIED ✓
 "Video này được tạo bởi **any2video**" — credits the tool, optionally the author. Author name is NEVER hardcoded: it comes from the operator's config (`ANY2VIDEO_PROMO_AUTHOR`) and is empty by default → the author pill hides and only the tool credit shows. cli surfaces the resolved values in `source_pack.json` → `promo_config`.
@@ -125,15 +137,19 @@ Phase 4 generates `plan.md` scenes with `templateId` + `inputs` instead of writi
 ```yaml
 scenes:
   - id: 1
-    beat: intro
-    duration_sec: 2                      # ≤2s — identity flash only
-    narration: "Đây là repo của <owner>."   # short or empty; the pain blocks carry the hook
-    templateId: frame-repo-identity
+    beat: hook
+    duration_sec: 6                      # pain hero — open on the BIGGEST pain, no title card
+    narration: "Nếu bạn hay phải <biggest pain-task>, chắc bạn quen cảnh <felt friction>."
+    templateId: frame-pain-hero
     inputs:
-      owner: "chanktb"                   # author's casing, never uppercased
+      owner: "chanktb"                   # author's casing, never uppercased (chip)
       repo: "any2video"
       avatar_url: "https://github.com/chanktb.png"
-      tagline: "Biến một repo thành video dọc có lồng tiếng."
+      pain_no: "NỖI ĐAU 01"
+      eyebrow: "Nếu bạn <audience>"
+      hero: ["<pain line 1>", "<pain line 2>"]
+      hero_accent: "<punchline>"
+      sub: "<one-line elaboration of the pain>"
 ```
 
 `lib/render/template_render.py` then:

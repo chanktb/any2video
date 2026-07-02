@@ -135,37 +135,39 @@ That single sentence has: contrast (`không phải … mà là`), specific name 
 
 #### 2.2.5 The narrative arc (HARD — the opening decides retention)
 
-A GitHub tour runs this arc **in this order**. The first 2 seconds decide whether the viewer stays, so the opening is FIXED (feedback 2026-07-02).
+A GitHub tour runs this arc **in this order**. The first seconds decide whether the viewer stays, so the opening is FIXED (PA1, feedback 2026-07-02): **open on the biggest pain, NOT a title card.** A repo slug means nothing to a stranger; a pain they feel does.
 
 | # | Beat | Sec | What it does |
 |---|------|-----|--------------|
-| 1 | **intro (identity)** | **≤2** | `frame-repo-identity`: circular owner avatar + GitHub mark + `owner/repo` (author's casing, never uppercased). Little or NO narration — it just says whose repo this is. Get off it fast; it is NOT where you hook. |
-| 2..k | **pain blocks** | 3-6 each | **4-6** short scenes, ONE felt pain each, **highlighted as it's spoken**. This IS the hook — dramatize the viewer's pains as separate blocks so the opening is dynamic, not one static sentence. Lead with THEIR problem (2nd person), name it concretely. |
-| pivot | **repo scroll** | = its narration | The instant the narration turns to the repo ("…thì repo này giúp bạn / thì cái này giúp bạn"), CUT to a **full-bleed repo-scroll** scene (`capture_url: https://github.com/<owner>/<repo>`). Describe what the repo solves; tune its `duration_sec` so the intro description finishes exactly as the scroll ends. |
-| k+2 | **problem** | 5-8 | NOW go into detail on the specific problem the repo tackles. |
-| k+3 | **details** | 7-10 | One differentiator — the thing nobody else does. |
-| k+4 | **review** | 5-8 | Honest caveat-as-feature. "What to know before installing." |
-| k+5 | **author outro** | 6 | Author-profile scroll (`capture_url: https://github.com/<owner>`) — ends with a **star nudge** (§2.2.5.0). |
-| k+6 | **promo** | 4 | `frame-made-with` "made with any2video" bumper — the FINAL scene, default ON (§2.2.7 item 10). |
+| 1 | **pain hero (biggest)** | 5-7 | `frame-pain-hero`: open on the viewer's BIGGEST pain — full-bleed, top-anchored, beautiful. Carries a **subtle github context chip** (owner avatar + GitHub mark + `owner/repo`, author's casing) so viewers sense it's a real tool without a title card. This IS the hook. |
+| 2..k | **pain blocks** | 4-6 each | more `frame-pain-hero` scenes, ONE felt pain each, **highlighted as it's spoken**. Rows 1..k = **4-6 pains total**, 2nd-person, each named concretely, so the opening is dynamic. |
+| k+1 | **reveal / overview** | 3-5 | `frame-repo-identity`: the pivot "…thì repo này giúp bạn" — cut to avatar + `owner/repo` + tagline. **Conditional social proof:** popular repo → a stars/forks/language row; new repo → a quiet "mới ra mắt" tag (omit stars). Sits DIRECTLY before the scroll. |
+| pivot | **repo scroll** | = its narration | full-bleed repo-scroll (`capture_url: https://github.com/<owner>/<repo>`). Describe what the repo solves; tune its `duration_sec` so the description finishes exactly as the scroll ends. |
+| k+3 | **problem** | 5-8 | NOW go into detail on the specific problem the repo tackles. |
+| k+4 | **details** | 7-10 | One differentiator — the thing nobody else does. |
+| k+5 | **review** | 5-8 | Honest caveat-as-feature. "What to know before installing." |
+| k+6 | **author outro** | 6 | Author-profile scroll (`capture_url: https://github.com/<owner>`) — ends with a **star nudge** (§2.2.5.0). |
+| k+7 | **promo** | 4 | `frame-made-with` "made with any2video" bumper — the FINAL scene, default ON (§2.2.7 item 10). |
 
-Total target: 50-80 sec. `plan_critic` enforces: intro ≤2s + `frame-repo-identity`; ≥4 pain blocks before the scroll; a repo-scroll scene exists; the closing content scene is author-profile footage with a star line; promo (if present) is last.
+Total target: 50-80 sec. `plan_critic` enforces: scene 1 = `frame-pain-hero`; ≥4 pain scenes (all `frame-pain-hero`, so each carries the chip); the reveal card `frame-repo-identity` sits DIRECTLY before the repo-scroll; a repo-scroll scene exists; the closing content scene is author-profile footage with a star line; promo (if present) is last.
 
-##### 2.2.5.0 Opening pains + closing star (HARD — the opening 2s decide the scroll)
+##### 2.2.5.0 Opening pains + closing star (HARD — the opening seconds decide the scroll)
 
-The intro is a **≤2s identity flash** (avatar + `owner/repo`) — it does NOT carry the hook. The hook lives in the **pain blocks** that follow: 4-6 short scenes, each naming ONE pain the viewer feels, highlighted as it's spoken. The OLD flat opener ("Hôm nay xem qua repo này…" / "Đây là một công cụ…") is still banned — but so is cramming the whole hook into one intro sentence. Break the pain into blocks.
+There is **NO title-card intro**. Open on the viewer's BIGGEST pain (`frame-pain-hero`) — full-bleed, top-anchored, beautiful, with a subtle github chip. The remaining pains follow as more `frame-pain-hero` blocks (**4-6 pains total**), each naming ONE felt pain, highlighted as it's spoken. The repo's identity is a **REVEAL, not an intro**: only after the pains land on the pivot does it appear. The OLD flat opener ("Hôm nay xem qua repo này…" / "Đây là một công cụ…") stays banned.
 
-**Pain-blocks pattern (HARD):** lead the FIRST block with the target viewer's pain-task, then let each following block add one more felt frustration, all 2nd-person:
+**Pain-blocks pattern (HARD):** lead the FIRST block with the target viewer's biggest pain-task, then let each following block add one more felt frustration, all 2nd-person:
 
 ```
-[block 1] "Bạn hay phải [pain-task the audience does] đúng không."
+[block 1 = hero] "Bạn hay phải [BIGGEST pain-task the audience does] đúng không."
 [block 2] "Rồi lại [second friction they hate]."
 [block 3] "Mà [third friction]…"
 [block 4] "Và [fourth friction]."
-→ pivot: "…thì repo này giúp bạn [one-breath value prop]."   → CUT to repo scroll
+→ pivot: reveal card (frame-repo-identity) "…thì repo này giúp bạn [one-breath value prop]"
+→ CUT to repo scroll
 ```
 
 - Each pain block is atomic (one idea), 2nd-person, and **highlights the key phrase as spoken** (the karaoke caption + a visual accent land together).
-- The pivot line is the LAST pain block's tail or its own tiny scene — the moment it names the repo, the repo-scroll scene starts.
+- **Conditional reveal (HARD):** the reveal card is always present at the pivot, but its overview is conditional — popular repo (many stars/forks) shows a stars/forks/language row; a new/low-star repo skips stats and shows a quiet "mới ra mắt" tag, then cuts straight to the scroll.
 - **Where the pains come from:** `analysis.md > ## Problem` ("Who has it? Why does it matter?"). Same audience, same pains the outro will call back to.
 - **TTS-sanitize the repo name** in narration (rule 2.2.6 d.2): write it as pronounced (`any2video` → `en ni tu vi đeo`, `repo` → `rề pô`), display stays correct.
 
@@ -344,8 +346,8 @@ misses items 1–4 is **unfinished, not "chưa tới"** — re-open the phase, d
      narration: "Đây là repo <name> trên GitHub..."     # narrate over the scroll
      duration_sec: 10
    ```
-   Place it at the **pivot** — right after the 4-6 pain blocks, the moment the
-   narration turns to the repo (§2.2.5). Render auto-dispatches to `repo_footage.py`.
+   Place it at the **pivot** — right after the reveal card (`frame-repo-identity`)
+   that follows the 4-6 pain blocks (§2.2.5). Render auto-dispatches to `repo_footage.py`.
    **Repo-footage rules (HARD):**
    - **Full-bleed (feedback 2026-07-02):** the scroll fills the FULL width and runs
      edge-to-edge — it does NOT obey the card safe-zone (it's real footage, not a
@@ -368,10 +370,11 @@ misses items 1–4 is **unfinished, not "chưa tới"** — re-open the phase, d
    not LeadGen/Local/SaaS; needs ≥15 conv/week*. Every ref de-hypes on purpose
    ("benchmark đẹp không biến model thành nút mua bán").
 
-4. **Hook = 4-6 pain blocks (§2.2.5), not one sentence.** After the ≤2s identity
-   intro, dramatize the viewer's pains as 4-6 short highlight-as-spoken blocks, then
-   pivot to the repo scroll. Each block is one 2nd-person pain — never "X. Y. Z."
-   fragments crammed together. Name real competitors + numbers.
+4. **Hook = 4-6 pain blocks (§2.2.5), not one sentence.** OPEN on the biggest pain
+   (`frame-pain-hero`, no title card), then dramatize the rest as 4-6 short
+   highlight-as-spoken blocks, pivot to the reveal card, then the repo scroll. Each
+   block is one 2nd-person pain — never "X. Y. Z." fragments crammed together. Name
+   real competitors + numbers.
 
 5. **Named + numbered "weapons".** Give each differentiator a title and a number
    (v3: "Vũ khí 01/02"). Mine any analysis.md / NotebookLM review for the 2–3
@@ -465,48 +468,73 @@ meta:
   footer: [ list of stat strings ]
 
 scenes:
-  # 1) INTRO IDENTITY — ≤2s, owner+repo in the author's casing (never uppercased).
+  # 1) PAIN HERO — open on the BIGGEST pain (no title card). owner/repo in the
+  #    author's casing feed the subtle github context chip (never uppercased).
   - id: 1
-    beat: intro
-    templateId: frame-repo-identity   # REQUIRED for a GitHub tour (CATALOG.md)
-    duration_sec: 2
-    narration: "Đây là repo của <owner>."   # short/empty — pain blocks carry the hook
+    beat: hook
+    templateId: frame-pain-hero       # REQUIRED scene 1 of a GitHub tour (CATALOG.md)
+    duration_sec: 6
+    narration: "Nếu bạn hay phải <BIGGEST pain-task>, chắc bạn quen cảnh <felt friction>."
     inputs:
-      owner: "<owner>"                # exact casing from the source URL
+      owner: "<owner>"                # exact casing from the source URL (chip)
       repo: "<repo>"
       avatar_url: "https://github.com/<owner>.png"
-      tagline: "<one-line repo description>"
-    grounded_in: [ "<repo identity from analysis.md>" ]
+      pain_no: "NỖI ĐAU 01"
+      eyebrow: "Nếu bạn <audience>"
+      hero: ["<pain line 1>", "<pain line 2>"]   # white lines
+      hero_accent: "<punchline>"                  # gradient, own line (meta.accent themed)
+      sub: "<one-line elaboration of the pain>"
+    grounded_in: [ "<biggest pain from analysis.md ## Problem>" ]
 
-  # 2..k) PAIN BLOCKS — 4-6 short scenes, one felt pain each, highlight-as-spoken.
+  # 2..k) PAIN BLOCKS — 3-5 more frame-pain-hero scenes (4-6 pains total).
   - id: 2
-    beat: pain
-    templateId: frame-vignelli
-    duration_sec: 4
-    narration: "Bạn hay phải <pain-task> đúng không."
-    inputs: { number: "...", label: "..." }
+    beat: problem
+    templateId: frame-pain-hero
+    duration_sec: 5
+    narration: "Rồi lại <second friction they hate>."
+    inputs: { owner: "<owner>", repo: "<repo>", avatar_url: "https://github.com/<owner>.png",
+              pain_no: "NỖI ĐAU 02", eyebrow: "...", hero: ["..."], hero_accent: "...", sub: "..." }
     grounded_in: [ "<pain from analysis.md ## Problem>" ]
-  # ... id 3,4,5 (more pains) ...
+  # ... id 3,4 (more pains) ...
 
-  # k+1) REPO-SCROLL PIVOT — full-bleed footage, NO templateId; duration = its narration.
-  - id: 6
+  # k+1) REVEAL / OVERVIEW — the pivot. Conditional: pass stars/forks/language for a
+  #      popular repo, OR new_tag for a new/low-star repo (omit stars).
+  - id: 5
     beat: framing
+    templateId: frame-repo-identity
+    duration_sec: 4
+    narration: "Thì <dự án này> giúp bạn <one-breath value prop>."
+    inputs:
+      owner: "<owner>"
+      repo: "<repo>"
+      avatar_url: "https://github.com/<owner>.png"
+      eyebrow: "Thì repo này giúp bạn"
+      tagline: "<one-line repo description>"
+      stars: "9.2k"          # popular branch — OR omit and set new_tag instead
+      forks: "640"
+      language: "TypeScript"
+      # new_tag: "Mới ra mắt · Open Source"   # new-repo branch (omit stars/forks)
+    grounded_in: [ "<repo identity + stars/forks from analysis.md ## Evidence>" ]
+
+  # k+2) REPO-SCROLL — full-bleed footage, NO templateId; duration = its narration.
+  - id: 6
+    beat: demo
     capture_url: https://github.com/<owner>/<repo>
     duration_sec: 10
-    narration: "Thì repo này giúp bạn <one-breath value prop>..."
+    narration: "Bạn thấy ngay trên trang dự án, <what the scroll shows>..."
 
   # ... problem / details / review scenes ...
 
   # AUTHOR OUTRO — profile scroll, star nudge; then the promo bumper is appended last.
   - id: 9
-    beat: outro
+    beat: use-case-landing
     capture_url: https://github.com/<owner>     # profile root, NO /repo
     duration_sec: 6
     narration: "<pain-CTA> … nếu thấy hay thì tặng tác giả một sao làm động lực nhé."
 ```
 
 Constraints (HARD):
-- A GitHub tour is ~11-14 scenes: 1 intro (≤2s) + 4-6 pain blocks + 1 repo scroll +
+- A GitHub tour is ~11-14 scenes: 4-6 pain-hero scenes + 1 reveal card + 1 repo scroll +
   problem/details/review + author outro + promo. Non-github videos: 7-10 atomic scenes.
 - Total duration target: 50-80 sec (Reels/Short feel)
 - Every non-footage scene has a `templateId` from `templates/scenes/CATALOG.md` + an
@@ -531,7 +559,7 @@ Sonnet sub-agent reads `plan.md` + `analysis.md` and checks:
 | At least 2 scenes use a contrast structure ("không chỉ … mà còn", "không phải … mà là", "cứ như … nhưng có") | < 2 |
 | Each scene's narration contains ≥ 1 specific real name (file, command, brand, competitor) | any scene fails |
 | Stars/forks/commits NOT listed as separate scene fragments | violation |
-| Intro scene (id 1): opens PAIN-FIRST in 2nd person ("Nếu bạn…" / a problem the viewer feels). NOT a flat "Hôm nay xem qua…" / "Đây là một công cụ…" catalogue opener (§2.2.5.0) | any flat opener |
+| Opening scene (id 1) = `frame-pain-hero`: opens PAIN-FIRST in 2nd person ("Nếu bạn…" / a problem the viewer feels), NOT a title card or a flat "Hôm nay xem qua…" / "Đây là một công cụ…" catalogue opener (§2.2.5.0) | title card or any flat opener |
 | Hook scene: NOT 3 telegraphic fragments ("X. Y. Z.") | violation |
 | CTA scene: NOT "ghé repo xem thử" / "ghé link xem ngay" generic close | violation |
 | Each scene's `grounded_in` references a real line in `analysis.md > ## Evidence` | missing/fabricated |

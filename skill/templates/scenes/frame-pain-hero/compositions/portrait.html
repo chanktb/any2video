@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1080, height=1920" />
+<title>Pain Hero · Portrait 9:16</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+  /*
+   * frame-pain-hero — the OPENING-ARC pain scene (PA1). The video opens NOT on a
+   * title card but on the biggest pain, full-bleed and beautiful, so the first
+   * seconds earn attention. Subsequent pain scenes reuse this template with a new
+   * pain_no + hero text. Carries a SUBTLE github context chip (owner avatar +
+   * octocat + owner/repo, NOT uppercased) top-left — signals "real tool" without
+   * stealing the stage. TOP-ANCHORED near the top safe edge (never centered/low).
+   * Karaoke caption is burned at compose — this template has no caption band.
+   * INPUT-DRIVEN: owner / repo / sep / avatar_url / pain_no / eyebrow / hero[] /
+   * hero_accent / sub / category. Portrait 9:16 (1080×1920).
+   */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #020c1a; }
+  #root {
+    position: relative; width: 1080px; height: 1920px; overflow: hidden;
+    background: #020c1a; color: #f4f7fb;
+    font-family: "Be Vietnam Pro", system-ui, sans-serif;
+  }
+  /* soft depth blobs */
+  .blob { position:absolute; border-radius:50%; mix-blend-mode:screen; filter:blur(130px); z-index:0; opacity:0.5; }
+  @keyframes fl1 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(70px,-50px) scale(1.12);} }
+  @keyframes fl2 { 0%,100%{transform:translate(0,0) scale(1.08);} 50%{transform:translate(-80px,40px) scale(0.92);} }
+  .b1 { width:520px; height:520px; background:#0e7490; top:-120px; right:-140px; animation:fl1 13s ease-in-out infinite; }
+  .b2 { width:460px; height:460px; background:#9f1239; bottom:-140px; left:-120px; animation:fl2 15s ease-in-out infinite; }
+
+  /* subtle github context chip — a real-tool watermark, kept on every pain scene */
+  .ctx {
+    position:absolute; top:104px; left:96px; z-index:10;
+    display:flex; align-items:center; gap:16px; opacity:0.62;
+    animation: fadeIn 0.6s ease-out 0.15s both;
+  }
+  .ctx .av { width:52px; height:52px; border-radius:50%; object-fit:cover;
+    box-shadow:0 0 0 2px rgba(255,255,255,0.14); background:radial-gradient(circle at 50% 38%,#1f6feb,#0d2a52); }
+  .ctx .gh { width:30px; height:30px; fill:#cbd5e1; flex:none; }
+  /* chip handle — NEVER text-transform: owner/repo keep the author's casing */
+  .ctx .handle { font-family:"JetBrains Mono",monospace; font-size:30px; font-weight:500;
+    letter-spacing:-0.5px; color:#cbd5e1; white-space:nowrap; }
+  .ctx .handle .sep { color:#5ce1e6; margin:0 4px; }
+  .ctx .handle .repo { color:#5ce1e6; }
+
+  /* pain index (top-right) */
+  .painNo {
+    position:absolute; top:104px; right:96px; z-index:10;
+    font-size:26px; font-weight:700; letter-spacing:6px; color:#fb7185; opacity:0.85;
+    text-transform:uppercase; white-space:nowrap;
+    animation: fadeIn 0.6s ease-out 0.3s both;
+  }
+
+  /* pain hero — TOP-ANCHORED under the chip (padding, never touch edge); do NOT
+   * center/float low. Caption is burned at the bottom band → the middle stays open. */
+  .stage { position:absolute; left:90px; right:90px; top:300px; z-index:8; }
+  .accentBar {
+    width:96px; height:10px; border-radius:6px;
+    background:linear-gradient(90deg,#22d3ee,#fb7185);
+    margin-bottom:52px; transform-origin:left;
+    animation: growX 0.7s cubic-bezier(0.16,1,0.3,1) 0.35s both;
+  }
+  @keyframes growX { from{transform:scaleX(0);} to{transform:scaleX(1);} }
+  .eyebrow {
+    font-size:30px; font-weight:700; letter-spacing:8px; text-transform:uppercase;
+    color:#7ec8e3; margin-bottom:34px;
+    animation: fadeUp 0.7s ease-out 0.45s both;
+  }
+  .hero {
+    font-size:126px; font-weight:800; line-height:1.36; letter-spacing:-2px;
+    overflow:visible; padding-top:0.12em;
+    animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.6s both;
+  }
+  .hero .hl-line { display:block; overflow:visible; }
+  /* punchline block: .accent → recoloured by meta.accent (template_render._accent_css) */
+  .hero .accent {
+    display:block; overflow:visible;
+    background:linear-gradient(120deg,#22d3ee 0%,#fb7185 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .sub {
+    margin-top:48px; font-size:40px; font-weight:500; line-height:1.5; color:#a9c3d6;
+    max-width:860px; overflow:visible; animation: fadeUp 0.8s ease-out 0.85s both;
+  }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(26px);} to{opacity:1;transform:translateY(0);} }
+  @keyframes fadeIn { from{opacity:0;} to{opacity:0.62;} }
+</style>
+</head>
+<body>
+  <div
+    id="root"
+    data-composition-id="main"
+    data-start="0"
+    data-duration="6"
+    data-width="1080"
+    data-height="1920"
+    data-composition-variables='{"owner":"owner","repo":"repo","sep":"/","avatar_url":"","pain_no":"NỖI ĐAU 01","eyebrow":"Nếu bạn gặp vấn đề này","hero":["Ngày nào cũng","phải ra"],"hero_accent":"bài mới.","sub":"Mô tả ngắn nỗi đau — cụ thể, chạm đúng người xem đang gặp phải.","category":"OPEN SOURCE"}'
+  >
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+
+    <div class="ctx">
+      <img class="av" alt="" />
+      <svg class="gh" viewBox="0 0 98 96" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"/></svg>
+      <span class="handle"><span class="owner"></span><span class="sep"></span><span class="repo"></span></span>
+    </div>
+    <div class="painNo"></div>
+
+    <div class="stage">
+      <div class="accentBar"></div>
+      <div class="eyebrow"></div>
+      <div class="hero" id="hero"></div>
+      <div class="sub"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var v =
+        window.__hyperframes &&
+        typeof window.__hyperframes.getVariables === "function"
+          ? window.__hyperframes.getVariables()
+          : {};
+      var nfc = function (s) { return String(s == null ? "" : s).normalize("NFC"); };
+      var set = function (sel, text) {
+        var el = document.querySelector(sel);
+        if (el && text != null) el.textContent = nfc(text);
+      };
+      set(".ctx .owner", v.owner);
+      set(".ctx .sep", v.sep != null ? v.sep : "/");
+      set(".ctx .repo", v.repo);
+      set(".painNo", v.pain_no);
+      set(".eyebrow", v.eyebrow);
+      set(".sub", v.sub);
+
+      // hero: array of white lines + an optional accent punchline block (own line).
+      var hero = document.getElementById("hero");
+      if (hero) {
+        var lines = Array.isArray(v.hero) ? v.hero : (v.hero != null ? [v.hero] : []);
+        lines.forEach(function (ln) {
+          var d = document.createElement("div");
+          d.className = "hl-line";
+          d.textContent = nfc(ln);
+          hero.appendChild(d);
+        });
+        if (v.hero_accent != null && String(v.hero_accent).trim()) {
+          var a = document.createElement("div");
+          a.className = "hl-line accent";
+          a.textContent = nfc(v.hero_accent);
+          hero.appendChild(a);
+        }
+      }
+
+      // chip avatar: owner photo; hide <img> if none / broken (no broken-image icon).
+      var img = document.querySelector(".ctx .av");
+      var src = v.avatar_url || v.avatar || v.logo;
+      if (img) {
+        if (src) { img.src = src; img.onerror = function () { img.style.display = "none"; }; }
+        else { img.style.display = "none"; }
+      }
+      // hide empty text slots so no placeholder shows
+      [".ctx .owner", ".ctx .repo", ".painNo", ".eyebrow", ".sub"].forEach(function (s) {
+        var el = document.querySelector(s);
+        if (el && !(el.textContent || "").trim()) el.style.display = "none";
+      });
+    })();
+
+    window.__timelines = window.__timelines || {};
+    window.__timelines["main"] = { pause: function () {}, seek: function () {}, paused: function () { return true; } };
+  </script>
+</body>
+</html>

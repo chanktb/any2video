@@ -3,7 +3,11 @@
 Validates plan.md against the schema + grounding rule:
   - Required fields present
   - duration_sec sums match meta.total_duration_sec (±10%)
-  - Hook scene: id=1, role='hook', duration_sec ≤ 4
+  - Scene id=1 present
+  - PA1 opening arc (GitHub tours): scene 1 = frame-pain-hero (biggest pain, not a
+    title card); ≥4 pain scenes; the reveal card frame-repo-identity sits directly
+    before the full-bleed repo-scroll; author-profile scroll + star nudge closes;
+    frame-made-with promo (if any) is last
   - Every scene's data_props values appear (verbatim or numerically) in
     analysis.md's "## Evidence" section
   - visual_brief uniqueness: no two scenes share a 5+ consecutive word run
@@ -79,6 +83,10 @@ _RE_REPO_SCROLL = re.compile(r"https?://github\.com/[^/\s]+/[^/\s]+/?$", re.IGNO
 _RE_PROFILE_SCROLL = re.compile(r"https?://github\.com/[^/\s]+/?$", re.IGNORECASE)
 
 
+def _template_of(scene: dict) -> str:
+    return (scene.get("templateId") or scene.get("template_id") or "").lower()
+
+
 def load_plan(path: Path) -> dict:
     return plan_yaml.load_plan(path)
 
@@ -121,11 +129,7 @@ def check(plan_path: Path, analysis_path: Path | None) -> dict:
         if not beat_or_role:
             issues.append({"kind": "scene_missing_field", "scene_id": sid, "field": "beat"})
         d = s.get("duration_sec") or 0
-        # The intro identity card is a fast ≤2s flash (retention) — allow a lower
-        # floor than the normal 2s minimum so d=1.5 isn't wrongly flagged.
-        _tpl = (s.get("templateId") or s.get("template_id") or "").lower()
-        dmin = 1.2 if (idx == 0 and _tpl == "frame-repo-identity") else 2
-        if not (dmin <= d <= 14):
+        if not (2 <= d <= 14):
             issues.append({"kind": "duration_out_of_range", "scene_id": sid, "got": d})
 
     # Total duration vs target
@@ -170,22 +174,17 @@ def check(plan_path: Path, analysis_path: Path | None) -> dict:
     closing = scenes[content_idxs[-1]] if content_idxs else scenes[-1]
 
     if is_github:
-        # Scene 1 = intro identity card, ≤2s (first 2s decide retention).
-        s1_tpl = (s1.get("templateId") or s1.get("template_id") or "").lower()
-        if s1_tpl != "frame-repo-identity":
+        # PA1 opening arc — open on the BIGGEST PAIN (frame-pain-hero), NOT a title
+        # card. The first seconds decide retention: a pain the viewer feels beats a
+        # repo slug they can't parse. The identity card is the REVEAL later, not the intro.
+        s1_tpl = _template_of(s1)
+        if s1_tpl != "frame-pain-hero":
             issues.append({
-                "kind": "intro_not_identity",
+                "kind": "opening_not_pain_hero",
                 "scene_id": s1.get("id"),
                 "got": s1_tpl or None,
-                "hint": "Scene 1 of a GitHub tour must be the identity card templateId "
-                        "frame-repo-identity (circular owner avatar + GitHub mark + owner/repo).",
-            })
-        if (s1.get("duration_sec") or 0) > 2:
-            issues.append({
-                "kind": "intro_too_long",
-                "scene_id": s1.get("id"),
-                "got": s1.get("duration_sec"),
-                "hint": "Intro identity scene must be ≤ 2s — get to the pain fast, it decides retention.",
+                "hint": "Scene 1 of a GitHub tour must be the pain opener templateId frame-pain-hero "
+                        "(biggest pain, full-bleed, subtle github context chip). SKILL §2.2.5.",
             })
 
         # First FULL repo-scroll scene (capture_url = github.com/<owner>/<repo>).
@@ -194,19 +193,44 @@ def check(plan_path: Path, analysis_path: Path | None) -> dict:
         if scroll_idx is None:
             issues.append({
                 "kind": "missing_repo_scroll",
-                "hint": "After the pain blocks, add a FULL-BLEED repo-scroll scene right when the "
-                        "narration pivots to the repo: capture_url = https://github.com/<owner>/<repo>.",
+                "hint": "After the pain scenes + the reveal card, add a FULL-BLEED repo-scroll scene: "
+                        "capture_url = https://github.com/<owner>/<repo>.",
             })
         else:
-            pain_count = scroll_idx - 1  # scenes between intro(idx 0) and the scroll
-            if pain_count < 4:
+            # The REVEAL/overview (frame-repo-identity) sits DIRECTLY before the scroll —
+            # the pivot 'thì repo này giúp bạn'. Its social-proof row is CONDITIONAL
+            # (popular repo → stars/forks; new repo → 'mới ra mắt' tag), so stats are
+            # never required — only the identity card's presence at the pivot is.
+            reveal_idx = scroll_idx - 1
+            reveal_tpl = _template_of(scenes[reveal_idx]) if reveal_idx >= 0 else ""
+            if reveal_tpl != "frame-repo-identity":
+                issues.append({
+                    "kind": "reveal_not_before_scroll",
+                    "scene_id": scenes[reveal_idx].get("id") if reveal_idx >= 0 else None,
+                    "got": reveal_tpl or None,
+                    "hint": "The scene immediately BEFORE the repo-scroll must be the reveal card "
+                            "frame-repo-identity (avatar + owner/repo + conditional stars/forks). PA1 pivot.",
+                })
+            # Pain scenes = everything before the reveal. Need ≥4, all frame-pain-hero
+            # so every pain scene carries the github context chip (real-tool watermark).
+            pain_scenes = scenes[0:reveal_idx] if reveal_idx > 0 else []
+            if len(pain_scenes) < 4:
                 issues.append({
                     "kind": "too_few_pain_blocks",
-                    "found": max(0, pain_count),
+                    "found": len(pain_scenes),
                     "minimum": 4,
-                    "hint": "List ≥4 pain-point block scenes between the intro and the repo-scroll "
-                            "pivot (highlight-as-spoken) so the opening is dynamic. SKILL §2.2.5.",
+                    "hint": "List ≥4 pain-scene blocks before the reveal (highlight-as-spoken) so the "
+                            "opening is dynamic. SKILL §2.2.5.",
                 })
+            for ps in pain_scenes:
+                if _template_of(ps) != "frame-pain-hero":
+                    issues.append({
+                        "kind": "pain_scene_wrong_template",
+                        "scene_id": ps.get("id"),
+                        "got": _template_of(ps) or None,
+                        "hint": "Every pain scene before the reveal must use frame-pain-hero so it carries "
+                                "the github context chip (owner avatar + owner/repo). PA1.",
+                    })
 
         # Closing content scene = author profile scroll (github.com/<owner>, NO /repo).
         cap = (closing.get("capture_url") or "").strip()

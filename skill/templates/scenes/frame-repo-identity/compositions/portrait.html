@@ -1,188 +1,193 @@
 <!doctype html>
 <html lang="vi">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=1080, height=1920" />
-        <title>Repo Identity · Portrait 9:16</title>
-        <link
-            href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap"
-            rel="stylesheet"
-        />
-        <style>
-            /*
-   * frame-repo-identity — the intro identity card (feedback 2026-07-02): a circular
-   * OWNER AVATAR (spinning gradient ring) + the GitHub mark + `owner/repo`
-   * handle. Same Aurora-Violet liquid background as frame-liquid-bg-hero so it
-   * sits in the same visual family. INPUT-DRIVEN: avatar_url / owner / repo /
-   * tagline / sep. Owner + repo are shown EXACTLY as the author wrote them
-   * (never uppercased / title-cased). Keep this scene ≤ 2s — it only tells the
-   * viewer WHOSE repo this is, then the pain-blocks take over. Portrait 9:16.
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1080, height=1920" />
+<title>Repo Reveal / Overview · Portrait 9:16</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+  /*
+   * frame-repo-identity — the REVEAL / OVERVIEW card (PA1 arc). After the pain
+   * scenes land on "thì repo này giúp bạn", cut here: circular OWNER AVATAR
+   * (spinning gradient ring) + GitHub mark + `owner/repo` (author's exact casing,
+   * NEVER uppercased), tagline, then ONE conditional social-proof row →
+   *   - popular repo: stars / forks / language pills  (pass stars/forks/language)
+   *   - new repo:     a quiet "Mới ra mắt" tag         (pass new_tag, omit stars)
+   * then hand off to the full-bleed repo scroll. TOP-ANCHORED near the top safe
+   * edge. Karaoke caption is burned at compose — no caption band here.
+   * INPUT-DRIVEN: eyebrow / owner / repo / sep / avatar_url / tagline /
+   * stars / forks / language / new_tag. Portrait 9:16 (1080×1920).
    */
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            html, body { width: 1080px; height: 1920px; overflow: hidden; }
-            #root {
-                position: relative;
-                width: 1080px;
-                height: 1920px;
-                overflow: hidden;
-                background: #020c1a;
-                color: #fafaf8;
-                font-family: "Inter Tight", system-ui, sans-serif;
-            }
-            .blob { position:absolute; border-radius:50%; mix-blend-mode:screen; filter:blur(120px); z-index:0; opacity:0.55; }
-            @keyframes float1 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(80px,-60px) scale(1.15);} }
-            @keyframes float2 { 0%,100%{transform:translate(0,0) scale(1.1);} 50%{transform:translate(-100px,40px) scale(0.9);} }
-            @keyframes float3 { 0%,100%{transform:translate(0,0) scale(0.95);} 50%{transform:translate(50px,80px) scale(1.2);} }
-            .b1 { width:480px; height:480px; background:#1565c0; top:-100px; left:-120px; animation:float1 12s ease-in-out infinite; }
-            .b2 { width:400px; height:400px; background:#0d47a1; top:24%; right:-120px; animation:float2 10s ease-in-out infinite; }
-            .b3 { width:380px; height:380px; background:#1976d2; bottom:-100px; left:22%; animation:float3 14s ease-in-out infinite; }
-            .b4 { width:300px; height:300px; background:#0097a7; top:64%; left:6%; animation:float1 16s ease-in-out infinite; }
-            .scrim {
-                position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-                width:1180px; height:1180px; z-index:3; pointer-events:none;
-                background:radial-gradient(ellipse at center, rgba(2,8,20,0.78) 0%, rgba(2,8,20,0.55) 44%, rgba(2,8,20,0) 72%);
-                filter:blur(24px);
-            }
-            .chip {
-                position:absolute; left:96px; right:96px; display:flex; justify-content:space-between;
-                font-size:22px; letter-spacing:4px; text-transform:uppercase; opacity:0.7; z-index:5;
-                font-weight:500; text-shadow:0 2px 12px rgba(0,0,0,0.4);
-            }
-            .chip.top { top:90px; }
-            .chip.bot { bottom:90px; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #020c1a; }
+  #root {
+    position: relative; width: 1080px; height: 1920px; overflow: hidden;
+    background: #020c1a; color: #fafaf8;
+    font-family: "Be Vietnam Pro", system-ui, sans-serif;
+  }
+  .blob { position:absolute; border-radius:50%; mix-blend-mode:screen; filter:blur(120px); z-index:0; opacity:0.5; }
+  @keyframes fl1 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(70px,-50px) scale(1.14);} }
+  @keyframes fl2 { 0%,100%{transform:translate(0,0) scale(1.1);} 50%{transform:translate(-90px,40px) scale(0.9);} }
+  .b1 { width:480px; height:480px; background:#0e7490; top:-100px; left:-120px; animation:fl1 12s ease-in-out infinite; }
+  .b2 { width:420px; height:420px; background:#9f1239; bottom:-120px; right:-120px; animation:fl2 14s ease-in-out infinite; }
+  .scrim { position:absolute; inset:0; z-index:3; pointer-events:none;
+    background:radial-gradient(ellipse 900px 900px at 50% 42%, rgba(2,8,20,0.72) 0%, rgba(2,8,20,0.4) 46%, rgba(2,8,20,0) 74%); }
 
-            @keyframes fadeUp { from{opacity:0;transform:translateY(28px);} to{opacity:1;transform:translateY(0);} }
-            @keyframes spin { to { transform: rotate(360deg); } }
-            @keyframes pop { 0%{opacity:0;transform:scale(.82);} 60%{transform:scale(1.04);} 100%{opacity:1;transform:scale(1);} }
+  /* TOP-ANCHORED: eyebrow + identity stack near the top safe edge, not centered */
+  .eyebrow { position:absolute; top:200px; left:0; right:0; text-align:center; z-index:10;
+    font-size:28px; font-weight:700; letter-spacing:8px; text-transform:uppercase; color:#7ec8e3;
+    animation: fadeUp 0.6s ease-out 0.2s both; }
 
-            .identity {
-                position:absolute; left:96px; right:96px; top:470px; z-index:10;
-                display:flex; flex-direction:column; align-items:center; text-align:center;
-            }
-            .avatar-wrap {
-                position:relative; width:440px; height:440px; display:grid; place-items:center;
-                animation:pop 0.7s cubic-bezier(0.16,1,0.3,1) 0.2s both;
-            }
-            .avatar-ring {
-                position:absolute; inset:0; border-radius:50%;
-                background:conic-gradient(from 0deg, #ff8c00, #ff4d6d, #e040fb, #7c4dff, #5ce1e6, #ff8c00);
-                animation:spin 8s linear infinite;
-                filter:drop-shadow(0 0 60px rgba(224,64,251,0.45));
-            }
-            .avatar-gap { position:absolute; inset:12px; border-radius:50%; background:#020c1a; }
-            /* fallback face shown when no avatar_url supplied */
-            .avatar-fallback {
-                position:absolute; inset:14px; border-radius:50%; z-index:1;
-                background:radial-gradient(circle at 50% 38%, #1f6feb 0%, #0d2a52 70%);
-            }
-            .avatar-img {
-                position:relative; width:392px; height:392px; border-radius:50%; object-fit:cover; z-index:2;
-                box-shadow:inset 0 0 0 2px rgba(255,255,255,0.08);
-            }
-            .handle {
-                margin-top:54px; display:inline-flex; align-items:center; gap:20px;
-                padding:22px 40px; border-radius:999px;
-                background:rgba(255,255,255,0.06); border:1.5px solid rgba(255,255,255,0.14);
-                box-shadow:0 8px 40px rgba(0,0,0,0.45);
-                animation:fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.55s both;
-            }
-            .handle .gh-mark { width:52px; height:52px; flex:none; fill:#ffffff; }
-            /* handle text — NEVER text-transform: owner/repo keep the author's casing */
-            .handle .htext {
-                font-size:46px; font-weight:700; font-family:"JetBrains Mono","Inter Tight",monospace;
-                letter-spacing:-0.5px; white-space:nowrap;
-            }
-            .handle .owner { color:#cbd5e1; }
-            .handle .sep { color:#5ce1e6; margin:0 4px; font-weight:500; }
-            .handle .repo {
-                background:linear-gradient(120deg, #ff8c00 0%, #ff4d6d 45%, #e040fb 100%);
-                -webkit-background-clip:text; background-clip:text; color:transparent;
-            }
-            .tagline {
-                margin-top:40px; font-size:38px; font-weight:500; line-height:1.4; color:#5ce1e6;
-                opacity:0.9; max-width:820px; text-shadow:0 2px 16px rgba(0,0,0,0.4);
-                animation:fadeUp 0.8s ease-out 0.85s both;
-            }
-        </style>
-    </head>
-    <body>
-        <div
-            id="root"
-            data-composition-id="main"
-            data-start="0"
-            data-duration="2"
-            data-width="1080"
-            data-height="1920"
-            data-composition-variables='{"kicker":"REPO TOUR","owner":"owner","repo":"repo","sep":"/","tagline":"Mô tả ngắn một dòng về repo.","avatar_url":"","category":"OPEN SOURCE"}'
-        >
-            <div class="blob b1"></div>
-            <div class="blob b2"></div>
-            <div class="blob b3"></div>
-            <div class="blob b4"></div>
-            <div class="scrim"></div>
+  .wrap { position:absolute; left:96px; right:96px; top:300px; z-index:10;
+    display:flex; flex-direction:column; align-items:center; text-align:center; }
 
-            <div class="chip top"><span class="kicker"></span><span>9:16</span></div>
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes pop { 0%{opacity:0;transform:scale(.84);} 60%{transform:scale(1.04);} 100%{opacity:1;transform:scale(1);} }
+  .avatar-wrap { position:relative; width:340px; height:340px; display:grid; place-items:center;
+    animation:pop 0.7s cubic-bezier(0.16,1,0.3,1) 0.25s both; }
+  .avatar-ring { position:absolute; inset:0; border-radius:50%;
+    background:conic-gradient(from 0deg,#22d3ee,#5ce1e6,#fb7185,#e040fb,#22d3ee);
+    animation:spin 8s linear infinite; filter:drop-shadow(0 0 46px rgba(251,113,133,0.4)); }
+  .avatar-gap { position:absolute; inset:10px; border-radius:50%; background:#020c1a; }
+  .avatar-fallback { position:absolute; inset:12px; border-radius:50%; z-index:1;
+    background:radial-gradient(circle at 50% 38%,#1f6feb 0%,#0d2a52 70%); }
+  .avatar-img { position:relative; width:300px; height:300px; border-radius:50%; object-fit:cover; z-index:2;
+    box-shadow:inset 0 0 0 2px rgba(255,255,255,0.08); }
 
-            <div class="identity">
-                <div class="avatar-wrap">
-                    <div class="avatar-ring"></div>
-                    <div class="avatar-gap"></div>
-                    <div class="avatar-fallback"></div>
-                    <img class="avatar-img" alt="owner avatar" />
-                </div>
+  .handle { margin-top:44px; display:inline-flex; align-items:center; gap:18px;
+    padding:20px 38px; border-radius:999px;
+    background:rgba(255,255,255,0.06); border:1.5px solid rgba(255,255,255,0.14);
+    box-shadow:0 8px 40px rgba(0,0,0,0.45);
+    animation: fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.55s both; }
+  .handle .gh { width:46px; height:46px; fill:#fff; flex:none; }
+  /* handle text — NEVER text-transform: owner/repo keep the author's casing */
+  .handle .t { font-family:"JetBrains Mono",monospace; font-size:42px; font-weight:700; letter-spacing:-0.5px; white-space:nowrap; }
+  .handle .owner { color:#cbd5e1; } .handle .sep { color:#5ce1e6; margin:0 4px; }
+  .handle .repo { background:linear-gradient(120deg,#22d3ee,#fb7185);
+    -webkit-background-clip:text; background-clip:text; color:transparent; }
 
-                <div class="handle">
-                    <svg class="gh-mark" viewBox="0 0 98 96" aria-hidden="true">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"/>
-                    </svg>
-                    <span class="htext">
-                        <span class="owner"></span><span class="sep"></span><span class="repo"></span>
-                    </span>
-                </div>
+  .tagline { margin-top:40px; font-size:39px; font-weight:500; line-height:1.48; color:#cfe3f0;
+    max-width:840px; overflow:visible; animation: fadeUp 0.8s ease-out 0.8s both; }
 
-                <p class="tagline"></p>
-            </div>
+  /* conditional social-proof row (popular branch) */
+  .stats { margin-top:52px; display:flex; gap:26px; animation: fadeUp 0.8s ease-out 1.0s both; }
+  .stat { display:flex; align-items:center; gap:14px; padding:20px 30px; border-radius:20px;
+    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); }
+  .stat svg { width:36px; height:36px; flex:none; }
+  .stat .num { font-size:40px; font-weight:800; color:#fafaf8; letter-spacing:-0.5px; }
+  .stat .lbl { font-size:28px; font-weight:500; color:#9fb6c6; }
+  .stat .dot { width:18px; height:18px; border-radius:50%; background:#22d3ee; flex:none; }
 
-            <div class="chip bot"><span class="category"></span><span>GITHUB</span></div>
-        </div>
+  /* conditional new-repo tag (new branch — NO stars) */
+  .newtag { margin-top:52px; display:inline-flex; align-items:center; gap:16px;
+    padding:16px 30px; border-radius:999px; border:1px solid rgba(94,225,230,0.35);
+    background:rgba(94,225,230,0.08); animation: fadeUp 0.8s ease-out 1.0s both; }
+  .newtag .pulse { width:16px; height:16px; border-radius:50%; background:#5ce1e6;
+    box-shadow:0 0 0 0 rgba(94,225,230,0.6); animation: pulse 2s ease-out infinite; }
+  @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(94,225,230,0.5);} 70%{box-shadow:0 0 0 18px rgba(94,225,230,0);} 100%{box-shadow:0 0 0 0 rgba(94,225,230,0);} }
+  .newtag .txt { font-size:28px; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:#cfe3f0; }
 
-        <script>
-            (function () {
-                var v =
-                    window.__hyperframes &&
-                    typeof window.__hyperframes.getVariables === "function"
-                        ? window.__hyperframes.getVariables()
-                        : {};
-                var set = function (sel, text) {
-                    var el = document.querySelector(sel);
-                    if (el && text != null) el.textContent = String(text);
-                };
-                set(".kicker", v.kicker);
-                set(".owner", v.owner);
-                set(".sep", v.sep != null ? v.sep : "/");
-                set(".repo", v.repo);
-                set(".tagline", v.tagline);
-                set(".category", v.category);
-                // avatar: bind the owner photo; if none supplied, keep the neutral
-                // fallback face and hide the <img> (no broken-image icon).
-                var img = document.querySelector(".avatar-img");
-                var fb = document.querySelector(".avatar-fallback");
-                var src = v.avatar_url || v.avatar || v.logo;
-                if (img) {
-                    if (src) {
-                        img.src = src;
-                        img.onerror = function () { img.style.display = "none"; };
-                        if (fb) fb.style.display = "none";
-                    } else {
-                        img.style.display = "none";
-                    }
-                }
-                // hide any empty text slot so no placeholder shows
-                [".kicker", ".tagline", ".category", ".owner", ".repo"].forEach(function (s) {
-                    var el = document.querySelector(s);
-                    if (el && !(el.textContent || "").trim()) el.style.display = "none";
-                });
-            })();
-        </script>
-    </body>
+  @keyframes fadeUp { from{opacity:0;transform:translateY(26px);} to{opacity:1;transform:translateY(0);} }
+</style>
+</head>
+<body>
+  <div
+    id="root"
+    data-composition-id="main"
+    data-start="0"
+    data-duration="4"
+    data-width="1080"
+    data-height="1920"
+    data-composition-variables='{"eyebrow":"Thì repo này giúp bạn","owner":"owner","repo":"repo","sep":"/","tagline":"Mô tả ngắn một dòng về repo.","avatar_url":"","stars":"","forks":"","language":"","new_tag":"","category":"OPEN SOURCE"}'
+  >
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="scrim"></div>
+
+    <div class="eyebrow"></div>
+
+    <div class="wrap">
+      <div class="avatar-wrap">
+        <div class="avatar-ring"></div>
+        <div class="avatar-gap"></div>
+        <div class="avatar-fallback"></div>
+        <img class="avatar-img" alt="owner avatar" />
+      </div>
+
+      <div class="handle">
+        <svg class="gh" viewBox="0 0 98 96" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"/></svg>
+        <span class="t"><span class="owner"></span><span class="sep"></span><span class="repo"></span></span>
+      </div>
+
+      <div class="tagline"></div>
+
+      <div class="stats" style="display:none;"></div>
+      <div class="newtag" style="display:none;"><span class="pulse"></span><span class="txt"></span></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var v =
+        window.__hyperframes &&
+        typeof window.__hyperframes.getVariables === "function"
+          ? window.__hyperframes.getVariables()
+          : {};
+      var nfc = function (s) { return String(s == null ? "" : s).normalize("NFC"); };
+      var set = function (sel, text) {
+        var el = document.querySelector(sel);
+        if (el && text != null) el.textContent = nfc(text);
+      };
+      set(".eyebrow", v.eyebrow != null ? v.eyebrow : v.kicker);
+      set(".owner", v.owner);
+      set(".sep", v.sep != null ? v.sep : "/");
+      set(".repo", v.repo);
+      set(".tagline", v.tagline);
+
+      var STAR = '<svg viewBox="0 0 24 24" fill="#fbbf24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+      var FORK = '<svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="8" r="3"/><path d="M6 9v6M18 11c0 3-6 2-6 6"/></svg>';
+      var pill = function (icon, num, lbl) {
+        var d = document.createElement("div"); d.className = "stat";
+        d.innerHTML = icon +
+          (num != null && String(num).trim() ? '<span class="num">' + nfc(num) + '</span>' : '') +
+          (lbl ? '<span class="lbl">' + nfc(lbl) + '</span>' : '');
+        return d;
+      };
+      // Conditional overview: popular (stars/forks/language) OR new-repo tag.
+      var stars = v.stars, forks = v.forks, lang = v.language || v.lang;
+      var hasStats = (stars && String(stars).trim()) || (forks && String(forks).trim()) || (lang && String(lang).trim());
+      var statsEl = document.querySelector(".stats");
+      var newEl = document.querySelector(".newtag");
+      if (hasStats) {
+        if (stars && String(stars).trim()) statsEl.appendChild(pill(STAR, stars, "Sao"));
+        if (forks && String(forks).trim()) statsEl.appendChild(pill(FORK, forks, "Fork"));
+        if (lang && String(lang).trim()) {
+          var d = document.createElement("div"); d.className = "stat";
+          d.innerHTML = '<span class="dot"></span><span class="lbl" style="color:#cfe3f0;font-weight:700;">' + nfc(lang) + '</span>';
+          statsEl.appendChild(d);
+        }
+        statsEl.style.display = "flex";
+      } else if (v.new_tag && String(v.new_tag).trim()) {
+        newEl.querySelector(".txt").textContent = nfc(v.new_tag);
+        newEl.style.display = "inline-flex";
+      }
+
+      // avatar: owner photo; keep neutral fallback face if none, hide <img> (no broken icon)
+      var img = document.querySelector(".avatar-img");
+      var fb = document.querySelector(".avatar-fallback");
+      var src = v.avatar_url || v.avatar || v.logo;
+      if (img) {
+        if (src) { img.src = src; img.onerror = function () { img.style.display = "none"; }; if (fb) fb.style.display = "none"; }
+        else { img.style.display = "none"; }
+      }
+      [".eyebrow", ".tagline", ".owner", ".repo"].forEach(function (s) {
+        var el = document.querySelector(s);
+        if (el && !(el.textContent || "").trim()) el.style.display = "none";
+      });
+    })();
+
+    window.__timelines = window.__timelines || {};
+    window.__timelines["main"] = { pause: function () {}, seek: function () {}, paused: function () { return true; } };
+  </script>
+</body>
 </html>
