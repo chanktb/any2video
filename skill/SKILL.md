@@ -29,11 +29,11 @@ Before any clone / WebFetch, ask the user 4 questions in ONE message (AskUserQue
 
 1. **Input** — URL repo / URL article / paste raw text? (skill detects type from string)
 2. **Output folder** — default `workspace/runs/<slug>/` hay custom path?
-3. **Media riêng?** — user có ảnh/clip muốn chèn (screenshot, b-roll, clip output…)? Nếu có → bảo họ bỏ file vào `runs/<slug>/assets/`; Phase 2 đặt vào đúng beat qua `frame-media-full` (full-bleed, b-roll/clip output) hoặc `frame-media-card` (khung, screenshot/ảnh). Xem CATALOG.
+3. **Media riêng?** — user có ảnh/clip muốn chèn (screenshot, b-roll, clip output…)? Nếu có → bảo họ bỏ file vào `runs/<slug>/assets/`; Phase 2 đặt vào đúng beat qua `frame-media-full`. Xem CATALOG.
 4. **Gửi Telegram** — gửi 2 checkpoint duyệt (kịch bản trước TTS + hình scene trước render) và final.mp4 về DM? `[Y/n]` (default Y)
 5. **Caption** — (chỉ nếu Y ở câu 4) caption cho post final hay `auto` để skill tự gen từ tiêu đề source
 
-**User media (ảnh/clip):** `frame-media-full` (phủ khung — b-roll/screen-record/clip output; video tự phát, ảnh có Ken Burns) và `frame-media-card` (khung bo góc — screenshot/ảnh/logo). Slot `media` nhận URL `https://` hoặc `file:///…assets/x`; tự nhận ảnh vs video theo đuôi. Chèn vào **body** (sau scroll / cạnh claim để làm proof), KHÔNG để media sáng-trắng làm scene 1 (ship-gate chặn thumb trắng). Karaoke + nền + ship-gate dùng chung, không cần chỉnh.
+**User media (ảnh/clip):** một template duy nhất `frame-media-full` cho CẢ ảnh lẫn video — **full-width, không khung, không safezone**, `object-fit: contain` (thấy trọn nội dung, ko crop; clip 9:16 lấp đầy, ảnh dọc full width + dải tối trên/dưới có chấm theme). Video tự phát; ảnh đứng yên. Slot `media` nhận URL `https://` hoặc `file:///…assets/x`; tự nhận ảnh vs video theo đuôi. Chèn vào **body** (sau scroll / cạnh claim để làm proof), KHÔNG để media sáng-trắng làm scene 1 (ship-gate chặn thumb trắng). Scrim + karaoke + nền + ship-gate dùng chung, không cần chỉnh.
 
 If args present on `/any2video <url>` invocation, skip Q1. Otherwise wait for answer.
 
@@ -753,13 +753,22 @@ python -m lib.critic.ship_gate workspace/runs/<slug>/final.mp4
 
 It BLOCKS the ship (exit 1) unless all pass: (1) the t=0 frame is the scene-1 poster — a real settled hero, not a white/black/blank thumb (FB/TikTok grab t=0); (2) NONE of the first ~1.5s is white (the "1-2s màn hình trắng đầu video, voice đã phát" bug); (3) the audio is as long as the video AND there's real speech in the final scene's voice window (closing/promo narration not clipped). If it fails, fix the cause (re-render / re-compose) and re-gate — **never send a video that fails the ship gate.**
 
-After `final.mp4` exists + Gate-3 + Gate-4 pass, if `intake.telegram == true`:
+**MANDATORY caption.txt (HARD — every ship carries a caption).** Before ANY ship, ALWAYS write `runs/<slug>/caption.txt` — the ready-to-post social caption. **Voice depends on ownership:**
+
+- **Operator's OWN repo — ONLY when the operator EXPLICITLY says so** ("đây là repo của anh/mình", "viết fb post cho repo này") → write in the operator's first-person maker voice per **`fb-post.md`** ("mình" / "các bạn", humble, no oversell).
+- **Everything else (DEFAULT — other people's repos, articles, raw text, or ownership not stated)** → **NEUTRAL, NO PRONOUN**: zero "mình / tôi / bạn / các bạn / chúng ta". Descriptive/informational third-person-less prose. Keep the SAME hygiene as fb-post (paragraphs ≤ 2 lines, blank line between, NO em-dash, ≤ 3 icons, honest caveat, who-it's-for, soft CTA, link goes in the FIRST COMMENT not the body).
+
+Do not assume a `chanktb/...` repo is "his" — the trigger is an explicit statement in THIS request; when unsure, use the neutral voice.
+
+After `final.mp4` exists + Gate-3 + Gate-4 pass + caption.txt written, if `intake.telegram == true`:
 
 ```
 python -m lib.notify.telegram final workspace/runs/<slug>/final.mp4 \
   --source-url "<original input URL>" \
-  --caption "<caption text from intake.caption_mode or auto-gen>"
+  --caption "$(cat workspace/runs/<slug>/caption.txt)"   # ship the caption WITH the video
 ```
+
+If caption.txt exceeds the TG 1024-char video-caption cap, send the video with a short first-line caption, then send the full caption.txt as a follow-up `telegram text` message.
 
 This step is OPTIONAL and only runs when `ANY2VIDEO_TG_BOT_TOKEN` / `ANY2VIDEO_TG_CHAT_ID` are configured (env vars or a local `.env`).
 
