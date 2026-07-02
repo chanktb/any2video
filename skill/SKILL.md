@@ -742,7 +742,15 @@ Recommended compose call: `python -m any2video.lib.compose.ffmpeg_compose <plan>
 
 ### Phase 6 — Final delivery to Telegram (NEW, gated on `intake.telegram`, OPTIONAL)
 
-After `final.mp4` exists + Gate-3 passes, if `intake.telegram == true`:
+**Gate 4 — SHIP GATE (HARD, blocks delivery).** Before ANY send/upload of `final.mp4`, run:
+
+```
+python -m lib.critic.ship_gate workspace/runs/<slug>/final.mp4
+```
+
+It BLOCKS the ship (exit 1) unless all pass: (1) the t=0 frame is the scene-1 poster — a real settled hero, not a white/black/blank thumb (FB/TikTok grab t=0); (2) NONE of the first ~1.5s is white (the "1-2s màn hình trắng đầu video, voice đã phát" bug); (3) the audio is as long as the video AND there's real speech in the final scene's voice window (closing/promo narration not clipped). If it fails, fix the cause (re-render / re-compose) and re-gate — **never send a video that fails the ship gate.**
+
+After `final.mp4` exists + Gate-3 + Gate-4 pass, if `intake.telegram == true`:
 
 ```
 python -m lib.notify.telegram final workspace/runs/<slug>/final.mp4 \

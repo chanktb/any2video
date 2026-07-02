@@ -43,6 +43,27 @@ _FREEZE_SCRIPT = r"""
 }
 """
 
+# Dark-background init — runs at document_start (IIFE, so it actually executes,
+# unlike _FREEZE_SCRIPT above which is a bare arrow expression). Playwright's video
+# recording starts on the browser's WHITE about:blank; before the page paints its
+# own #020c1a, the recording shows white — and the lead-trim can't fully remove it
+# (sparse-keyframe webm). Painting the document dark from the first frame means the
+# lead is dark (the intended canvas), never a white flash over the voice.
+_DARK_BG_SCRIPT = r"""
+(() => {
+  var BG = '#020c1a';
+  var set = function () {
+    if (document.documentElement) {
+      document.documentElement.style.background = BG;
+      document.documentElement.style.backgroundColor = BG;
+    }
+    if (document.body) { document.body.style.background = BG; }
+  };
+  set();
+  document.addEventListener('DOMContentLoaded', set, { once: true });
+})()
+"""
+
 # Wait-for-fonts script — runs after page goto:
 # 1. wait for all <link rel="stylesheet"> to load (so @font-face rules register)
 # 2. explicitly fonts.load() each registered face (display:swap doesn't auto-download)
@@ -96,6 +117,9 @@ def render_scene(html_path: Path, duration_sec: float, out_mp4: Path) -> dict:
             page = ctx.new_page()
             # Step 1: install freeze BEFORE navigation so animations never start
             page.add_init_script(_FREEZE_SCRIPT)
+            # Paint the document dark from frame 1 so the recording never shows the
+            # browser's white about:blank (the "1-2s màn hình trắng" head bug).
+            page.add_init_script(_DARK_BG_SCRIPT)
             # Wait only for DOM parse, NOT 'load'. 'load' blocks on the Google
             # Fonts stylesheet+faces, so the page sits on the WHITE about:blank
             # until fonts finish (~1-2s of white lead — worst on Inter/build-minimal).
@@ -130,12 +154,14 @@ def render_scene(html_path: Path, duration_sec: float, out_mp4: Path) -> dict:
             return {"error": "no_webm_recorded"}
         webm_path = webms[0]
 
-        # -ss BEFORE -i = input seek (fast, skips the pre-paint white).
-        # -t duration_sec then takes exactly the wanted span.
+        # -ss AFTER -i = output seek: frame-accurate, decodes from 0 and DROPS the
+        # lead. (Input seek before -i lands on the nearest prior keyframe — Playwright
+        # webms have very sparse keyframes, so -ss 1.2 landed on keyframe 0 and the
+        # white lead survived. Output seek costs a little decode time but actually trims.)
         cp = subprocess.run(
             ["ffmpeg", "-y", "-loglevel", "error",
-             "-ss", f"{_SKIP_LEAD_SEC:.3f}",
              "-i", str(webm_path),
+             "-ss", f"{_SKIP_LEAD_SEC:.3f}",
              "-t", f"{duration_sec:.3f}",
              "-pix_fmt", "yuv420p",
              "-vf", "scale=1080:1920:flags=lanczos",
