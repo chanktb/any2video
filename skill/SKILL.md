@@ -385,6 +385,9 @@ misses items 1–4 is **unfinished, not "chưa tới"** — re-open the phase, d
 6. **Pattern-interrupt cadence ≤ ~3.5s.** Every scene shows a visible change at
    least every ~3s (reveal, counter roll, bar growth, line-draw). Beat-split gives
    this for multi-item scenes; single-fact scenes still need internal motion.
+   Stat numbers **count up automatically** (0 → target, synced to their fade-in) —
+   nothing to author; just put the number in a `.number`/`.num` slot. Set
+   `meta.theme: particles` (or `grid`) for a drifting ambient background.
 
 7. **Giant hero-number + ghost echo** for the one number that matters most in a
    scene (v2 device). **Warning-red only on the problem/alert beat; mint/emerald
@@ -464,6 +467,9 @@ meta:
                                                # recolours the highlighted words across ALL
                                                # scenes (pick a vibrant pair). Per-scene
                                                # inputs.accent_from/to still override.
+  theme: aurora                     # OPTIONAL ambient background motion (adds "alive/tech" feel):
+                                    #   aurora (default, liquid blobs) · particles (drifting dots) · grid
+                                    # Injected behind all content; pick per topic (dev/AI → particles or grid).
   brand: { name, avatar_url, tagline }
   footer: [ list of stat strings ]
 

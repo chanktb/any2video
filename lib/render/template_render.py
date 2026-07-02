@@ -73,8 +73,45 @@ def _accent_css(accent) -> str:
     )
 
 
+def _theme_layer(theme) -> str:
+    """Ambient background theme (meta.theme). Injects a drifting motion layer as
+    the FIRST child of #root at z-index:0 — behind ALL content (content sits at
+    z-index ≥1 in every template) but above the base #020c1a fill, so a video
+    always feels alive ("chất công nghệ"). `aurora` (default) adds nothing — the
+    templates already carry the liquid blobs. `particles` = two parallax dot
+    fields; `grid` = a faint drifting grid. Transparent, pointer-events:none;
+    gracefully hidden by any template that paints an opaque full-screen sheet."""
+    t = (theme or "").lower().strip()
+    if t in ("", "aurora", "default", "blobs"):
+        return ""
+    if t == "particles":
+        css = (".a2v-theme{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;}"
+               ".a2v-theme i{position:absolute;inset:-30%;display:block;}"
+               ".a2v-theme .d1{background-image:radial-gradient(circle,rgba(120,200,230,0.30) 1.6px,transparent 2.2px);"
+               "background-size:48px 48px;animation:a2vDriftA 42s linear infinite;}"
+               ".a2v-theme .d2{background-image:radial-gradient(circle,rgba(180,150,255,0.18) 1.2px,transparent 2px);"
+               "background-size:80px 80px;animation:a2vDriftB 66s linear infinite;}"
+               "@keyframes a2vDriftA{to{transform:translate(48px,72px);}}"
+               "@keyframes a2vDriftB{to{transform:translate(-80px,56px);}}")
+        inner = "<i class=\\\"d1\\\"></i><i class=\\\"d2\\\"></i>"
+    elif t == "grid":
+        css = (".a2v-theme{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;}"
+               ".a2v-theme i{position:absolute;inset:-30%;display:block;"
+               "background-image:linear-gradient(rgba(120,200,230,0.10) 1px,transparent 1px),"
+               "linear-gradient(90deg,rgba(120,200,230,0.10) 1px,transparent 1px);"
+               "background-size:64px 64px;animation:a2vDriftA 54s linear infinite;}"
+               "@keyframes a2vDriftA{to{transform:translate(64px,64px);}}")
+        inner = "<i></i>"
+    else:
+        return ""
+    return ("<style>" + css + "</style>"
+            "<script>(function(){var r=document.getElementById('root')||document.body;if(!r)return;"
+            "var d=document.createElement('div');d.className='a2v-theme';d.innerHTML='" + inner + "';"
+            "if(r.firstChild)r.insertBefore(d,r.firstChild);else r.appendChild(d);})();</script>")
+
+
 def render_template(template_id: str, inputs: dict, out_html: Path,
-                    accent=None) -> dict:
+                    accent=None, theme=None) -> dict:
     """Inject `inputs` into the template's portrait.html, write to out_html.
 
     The out_html is self-contained: any relative asset paths in the template
@@ -235,6 +272,14 @@ def render_template(template_id: str, inputs: dict, out_html: Path,
         else:
             new_html = _acc + new_html
 
+    # Optional ambient background theme (meta.theme in plan.md).
+    _theme = _theme_layer(theme)
+    if _theme:
+        if "</body>" in new_html:
+            new_html = new_html.replace("</body>", _theme + "</body>", 1)
+        else:
+            new_html = new_html + _theme
+
     # Copy any template-local assets (fonts, images) into a sibling dir so
     # relative paths in the HTML still resolve. Most lifted templates only use
     # Google Fonts (CDN) — no local assets — so this is usually a no-op.
@@ -274,7 +319,9 @@ def render_all_from_plan(plan_path: Path) -> dict:
 
     # Video-wide accent (meta.accent = {from, to} or {color}). Per-scene
     # inputs.accent_from/accent_to still win where a template reads them.
-    accent = (plan.get("meta") or {}).get("accent")
+    meta = plan.get("meta") or {}
+    accent = meta.get("accent")
+    theme = meta.get("theme")   # aurora (default) / particles / grid
 
     results = []
     for s in scenes:
@@ -284,10 +331,11 @@ def render_all_from_plan(plan_path: Path) -> dict:
         if not template_id:
             results.append({"id": sid, "status": "skipped", "reason": "no templateId"})
             continue
-        # per-scene accent override beats the video-wide one
+        # per-scene accent/theme override beats the video-wide one
         scene_accent = s.get("accent") or accent
+        scene_theme = s.get("theme") or theme
         out_html = scenes_dir / f"{sid}.html"
-        r = render_template(template_id, inputs, out_html, accent=scene_accent)
+        r = render_template(template_id, inputs, out_html, accent=scene_accent, theme=scene_theme)
         r["id"] = sid
         results.append(r)
 
