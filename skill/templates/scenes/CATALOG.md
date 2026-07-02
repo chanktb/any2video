@@ -38,9 +38,10 @@ Show `owner` and `repo` **exactly as the author wrote them** — never uppercase
 
 ## Slot reference per template
 
-### frame-pain-hero (pain opener + pain blocks — GitHub tour scene 1..k) — VERIFIED ✓
-The BIGGEST pain, full-bleed + top-anchored, with a subtle github context chip (owner avatar + GitHub mark + `owner/repo`, author's casing). Use for scene 1 AND every pain block (so each carries the chip). Karaoke caption is burned at compose — no caption band here.
-- `owner` / `repo` / `sep` — chip handle, author's casing (never uppercased)
+### frame-pain-hero (pain opener + pain blocks — scene 1..k) — VERIFIED ✓
+The BIGGEST pain, full-bleed + top-anchored, with a subtle context chip. Use for scene 1 AND every pain block. Karaoke caption is burned at compose — no caption band here. The chip has 3 modes: **repo** (pass `owner`/`repo` → octocat + avatar + `owner/repo`), **source** (pass `source_label` only → globe + domain, for article inputs), or **hidden** (pass none → no chip, for raw text). See SKILL §2.2.5.1.
+- `owner` / `repo` / `sep` — repo chip handle, author's casing (never uppercased)
+- `source_label` — domain/publication for a non-repo article (e.g. `vnexpress.net`); shown with a globe when no owner/repo
 - `avatar_url` — owner photo for the chip (e.g. `https://github.com/<owner>.png`); omit → chip avatar hidden
 - `pain_no` — pain index label, top-right (e.g. "NỖI ĐAU 01")
 - `eyebrow` — small uppercase line above the hero (e.g. "Nếu bạn làm content dạy ngoại ngữ")

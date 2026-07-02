@@ -211,6 +211,24 @@ Structure:
 
 **Visual (statement-outro):** the `source` slot still shows the URL as a quiet visual reference (viewer can screenshot). The `cta` slot shows the pain-CTA in caps (e.g. "THỬ SKILL NÀY NẾU BẠN CHẠY ADS"), and `channel` stays as `<owner> / <repo>`.
 
+##### 2.2.5.1 Non-repo inputs — article & raw-text arcs (HARD)
+
+The PA1 spine (**pain-first → reveal → body**) is universal — only the three *proof* beats (chip · footage · outro) adapt to what's actually real. `plan_critic`'s repo-arc gate runs ONLY for GitHub sources, so an article/text video is free to follow the arc below. The opener is always `frame-pain-hero`; the reveal is `frame-repo-identity` for a repo but a **headline/thesis card** (`frame-liquid-bg-hero`, or `frame-build-minimal` for one bold line) for an article/text.
+
+| Beat | GitHub repo | **Article URL** | **Raw text** |
+|------|-------------|-----------------|--------------|
+| Open (pain hero) | chip = `owner/repo` + avatar | chip = `source_label` (domain) + globe | **no chip** (omit owner/repo/source_label) |
+| Pain blocks | `frame-pain-hero` ×4-6 | same | same |
+| Reveal | `frame-repo-identity` + conditional stars/forks | `frame-liquid-bg-hero` = the article's **thesis** (headline) | `frame-liquid-bg-hero` = the **core idea** |
+| Footage | full-bleed repo scroll (`capture_url` = repo) | OPTIONAL article-page scroll (`capture_url` = article URL); skip if paywalled/ugly | **none** — nothing real to scroll |
+| Body | problem / weapons | 2-4 key-point card scenes | 2-4 key-point card scenes |
+| Outro | author-profile scroll + **star nudge** | source credit + soft "đọc full ở link" (NO star nudge) | a takeaway card (NO scroll, NO star) |
+| Promo | `frame-made-with` (default ON) | ✓ | ✓ |
+
+- **`frame-pain-hero` chip is source-adaptive:** pass `source_label` (e.g. `vnexpress.net`) for an article → globe + domain; omit owner/repo/source_label for raw text → the chip hides entirely.
+- **No star nudge off-repo.** The star line is repo-specific; for article/text close on a takeaway or "đọc full / lưu lại" — `plan_critic` won't force the star line (it's github-only).
+- Everything else — pain-first opening, count-up numbers, `meta.theme`, karaoke, TTS rules — applies unchanged.
+
 #### 2.2.6 VN TTS optimization — voiceText rules (HARD)
 
 These apply to EVERY `narration` field. Violation = re-TTS will sound wrong even with the best voice (vi-VN-NamMinhNeural). Visual `inputs` (template slots) are EXEMPT — they keep formatted display ("82.7%", "$5", "GPT-5.5").
