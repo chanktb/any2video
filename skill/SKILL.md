@@ -765,10 +765,10 @@ After `final.mp4` exists + Gate-3 + Gate-4 pass + caption.txt written, if `intak
 ```
 python -m lib.notify.telegram final workspace/runs/<slug>/final.mp4 \
   --source-url "<original input URL>" \
-  --caption "$(cat workspace/runs/<slug>/caption.txt)"   # ship the caption WITH the video
+  --caption-file workspace/runs/<slug>/caption.txt   # reads UTF-8 directly; ships the caption WITH the video
 ```
 
-If caption.txt exceeds the TG 1024-char video-caption cap, send the video with a short first-line caption, then send the full caption.txt as a follow-up `telegram text` message.
+Use `--caption-file` (NOT `--caption "$(cat …)"`): on Windows the shell/argv mangles Vietnamese diacritics; `--caption-file` reads the file as UTF-8 and drops any `\n---` note footer. If caption.txt exceeds the TG 1024-char video-caption cap, the send still works (Telegram truncates) — for the full text also send it as a follow-up `telegram text` message.
 
 This step is OPTIONAL and only runs when `ANY2VIDEO_TG_BOT_TOKEN` / `ANY2VIDEO_TG_CHAT_ID` are configured (env vars or a local `.env`).
 

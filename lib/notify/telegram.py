@@ -280,6 +280,9 @@ def main() -> int:
     f.add_argument("mp4", help="Path to final.mp4")
     f.add_argument("--source-url", default="", help="Original source URL")
     f.add_argument("--caption", default="", help="Caption text (may include <b>...</b>)")
+    f.add_argument("--caption-file", default="", help="Read caption from a UTF-8 file "
+                   "(e.g. runs/<slug>/caption.txt) — robust against Windows shell/argv "
+                   "encoding that mangles Vietnamese in --caption. Overrides --caption.")
 
     t = sub.add_parser("text", help="Send arbitrary text (debug)")
     t.add_argument("message")
@@ -293,7 +296,10 @@ def main() -> int:
     elif args.cmd == "preview":
         r = preview_transcript(Path(args.plan).resolve())
     elif args.cmd == "final":
-        r = final_delivery(Path(args.mp4).resolve(), args.source_url, args.caption)
+        caption = args.caption
+        if args.caption_file:
+            caption = Path(args.caption_file).read_text(encoding="utf-8").split("\n---")[0].strip()
+        r = final_delivery(Path(args.mp4).resolve(), args.source_url, caption)
     elif args.cmd == "text":
         r = send_text(args.message)
     else:
