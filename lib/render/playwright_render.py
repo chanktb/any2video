@@ -92,6 +92,31 @@ _FONTS_READY_SCRIPT = r"""
 """
 
 
+def _content_start_sec(webm_path: Path, cap: float = 6.0, fps: int = 10) -> float:
+    """Find the first moment the recording is NOT white/blank — i.e. where the
+    dark scene canvas has painted. The browser records on a white about:blank and
+    paint timing varies (font load, batch pressure), so a FIXED lead-trim leaks a
+    white flash whenever paint is slow. This samples a tiny gray filmstrip in ONE
+    ffmpeg pass and returns the timestamp of the first dark frame (mean luma < 200),
+    which becomes the accurate trim offset. Falls back to _SKIP_LEAD_SEC if the whole
+    head is bright (shouldn't happen for a dark template scene)."""
+    w, h = 16, 28
+    cp = subprocess.run(
+        ["ffmpeg", "-v", "error", "-i", str(webm_path),
+         "-t", f"{cap:.2f}", "-vf", f"fps={fps},scale={w}:{h},format=gray",
+         "-f", "rawvideo", "-"],
+        capture_output=True,
+    )
+    data = cp.stdout
+    fsize = w * h
+    nframes = len(data) // fsize
+    for i in range(nframes):
+        frame = data[i * fsize:(i + 1) * fsize]
+        if sum(frame) / fsize < 200:          # dark canvas is up
+            return i / float(fps)
+    return _SKIP_LEAD_SEC
+
+
 def render_scene(html_path: Path, duration_sec: float, out_mp4: Path) -> dict:
     """Record HTML scene as video, convert to mp4 of `duration_sec`.
 
@@ -144,8 +169,9 @@ def render_scene(html_path: Path, duration_sec: float, out_mp4: Path) -> dict:
             # keeps the final numbers (non-destructive). It self-times off each
             # number's fade-in, so the roll plays in the recorded window.
             page.evaluate("() => window.__a2vCountup && window.__a2vCountup()")
-            # Step 4: let the scene run + a little headroom so trim has slack
-            page.wait_for_timeout(int((duration_sec + _SKIP_LEAD_SEC) * 1000))
+            # Step 4: let the scene run + headroom so the content-aware trim (which
+            # may cut later than _SKIP_LEAD_SEC when paint is slow) still has `duration`.
+            page.wait_for_timeout(int((duration_sec + _SKIP_LEAD_SEC + 1.5) * 1000))
             ctx.close()
             browser.close()
 
@@ -154,14 +180,16 @@ def render_scene(html_path: Path, duration_sec: float, out_mp4: Path) -> dict:
             return {"error": "no_webm_recorded"}
         webm_path = webms[0]
 
-        # -ss AFTER -i = output seek: frame-accurate, decodes from 0 and DROPS the
-        # lead. (Input seek before -i lands on the nearest prior keyframe — Playwright
-        # webms have very sparse keyframes, so -ss 1.2 landed on keyframe 0 and the
-        # white lead survived. Output seek costs a little decode time but actually trims.)
+        # Content-aware lead-trim: cut to where the dark canvas actually painted
+        # (not a fixed 1.2s — paint timing varies and leaked a white flash under load).
+        # -ss AFTER -i = output seek: frame-accurate, decodes from 0 and DROPS the lead.
+        # (Input seek before -i lands on the nearest prior keyframe — Playwright webms
+        # have very sparse keyframes, so -ss lands on keyframe 0 and the lead survives.)
+        lead = _content_start_sec(webm_path)
         cp = subprocess.run(
             ["ffmpeg", "-y", "-loglevel", "error",
              "-i", str(webm_path),
-             "-ss", f"{_SKIP_LEAD_SEC:.3f}",
+             "-ss", f"{lead:.3f}",
              "-t", f"{duration_sec:.3f}",
              "-pix_fmt", "yuv420p",
              "-vf", "scale=1080:1920:flags=lanczos",
