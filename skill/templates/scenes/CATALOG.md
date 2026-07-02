@@ -32,6 +32,42 @@ The first seconds decide retention, so the opening is fixed (PA1): **open on the
 
 > `frame-liquid-bg-hero` (headline-first hero) still ships for non-repo intros / raw-text videos, but a GitHub tour opens on `frame-pain-hero`.
 
+## Visual / data-viz library (v6 — charts · graphs · diagrams, all VERIFIED ✓)
+
+A mix-and-match set of **visual-first** templates so a body scene can be a real chart/diagram instead of another text card. Each is pure inline SVG/CSS (no external image → never a `broken_image`), top-anchored, VN-diacritic-safe, and **ships its own distinct palette** so mixing 3-4 of them in one video already looks varied. Numbers count up; bars/arcs/lines animate in. Slots are documented in each template's `meta.json`.
+
+| templateId | What it shows | Good for | Palette |
+|---|---|---|---|
+| `frame-bar-chart` | vertical bar chart, one bar highlighted | comparison / "X vs the rest" | cyan→blue |
+| `frame-metric-bars` | horizontal progress bars (label · fill · %) | scores / feature readiness | amber→orange |
+| `frame-donut-stat` | one big % ring, number in the centre | a single headline percentage | emerald→teal |
+| `frame-gauge` | semicircle gauge arc 0→value | a score / level with min-max | amber→red |
+| `frame-line-chart` | animated trend line + area + peak callout | growth / trend over time | purple→indigo |
+| `frame-stat-grid` | 2×2 stat cards, per-card accent bar | "by the numbers" (2-4 stats) | sky (multi-accent) |
+| `frame-feature-grid` | 2×2 cards each with an inline-SVG icon | 3-4 capabilities with icons | teal→green |
+| `frame-flow-steps` | vertical numbered pipeline + spine | ordered steps / a process | rose→red |
+| `frame-timeline` | vertical roadmap: period pill + entry | milestones / phases / history | indigo→violet |
+| `frame-quote-callout` | big pull-quote + inline accent + attribution | a philosophy / thesis line | gold |
+
+- Pass `hl: true` on the item/step/entry you want highlighted (bar-chart, metric-bars, flow-steps, timeline).
+- `frame-feature-grid` icon keys: `bolt lock sync search chart code cloud layers database link globe cpu check doc rocket` (unknown key → a filled dot).
+- `meta.accent` recolours each template's **title accent phrase** video-wide; the chart/number colours stay the template's palette (that's what keeps a multi-template video colourful, not monotone).
+- **Reserved class names (HARD):** never name a visible element `.caption`/`.caption-overlay` — the karaoke system force-hides them. And don't put a positioning `transform: translate(...)` on an element that also runs a `transform` animation (the animation wins and un-centres it) — clamp a fixed-width box's `left` instead.
+
+## Ambient themes (`meta.theme` — drifting background motion)
+
+Set `meta.theme` to layer a subtle, always-moving background behind ALL content (adds "chất công nghệ"; pointer-events off, transparent, gated by z-index so any template stays on top). Mix per topic for variety:
+
+| theme | Look |
+|---|---|
+| `aurora` (default) | the template's own liquid blobs (adds nothing extra) |
+| `particles` | two parallax fields of drifting dots |
+| `grid` | a faint drifting technical grid |
+| `mesh` | three soft colour blobs slowly floating (living gradient) |
+| `beams` | faint diagonal light streaks sweeping across |
+| `rays` | a very slow rotating conic light fan from the top |
+| `stars` | a field of faint stars gently twinkling |
+
 ## Respect the author's name casing (HARD)
 
 Show `owner` and `repo` **exactly as the author wrote them** — never uppercase or title-case them. `chanktb/any2video` stays `chanktb/any2video`, not `CHANKTB / ANY2VIDEO`. The identity/promo templates render these in a non-uppercased pill on purpose; only generic labels (OPEN SOURCE, MIT) are uppercased. plan_critic verifies the casing against the source URL (`name_casing_changed`).

@@ -1,0 +1,13 @@
+{
+  "id": "frame-bar-chart",
+  "name": "Bar Chart",
+  "description": "Vertical bar chart; one bar highlighted; values count up.",
+  "slots": {
+    "kicker": "str",
+    "title": "str",
+    "accent": "str (title accent phrase)",
+    "unit": "str suffix on values e.g. %",
+    "items": "[{label,value,hl}]",
+    "note": "str"
+  }
+}

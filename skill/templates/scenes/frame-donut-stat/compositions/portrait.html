@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Donut Stat · Portrait 9:16</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+    <style>
+      /*
+       * frame-donut-stat — one big PERCENT ring (SVG arc sweeps 0→P%) with the number
+       * counting up in the centre, plus a caption and an optional two-line legend.
+       * Pure SVG/CSS, no image. Slots: kicker, percent (e.g. "60"), unit (default "%"),
+       * center_label, caption, legend:[{label,val}].
+       */
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #071019; }
+      #root {
+        position: relative; width: 1080px; height: 1920px; overflow: hidden;
+        background:
+          radial-gradient(ellipse 680px 680px at 50% 46%, rgba(16, 185, 129, 0.12), transparent 60%),
+          radial-gradient(ellipse 620px 560px at 88% 96%, rgba(20, 184, 166, 0.10), transparent 60%),
+          #071019;
+        color: #eafaf3; font-family: "Be Vietnam Pro", sans-serif;
+      }
+      .head { position: absolute; left: 96px; right: 96px; top: 300px; z-index: 2; text-align: center; }
+      .kicker {
+        font-size: 25px; font-weight: 700; letter-spacing: 7px; text-transform: uppercase;
+        color: #4fd6a6; opacity: 0; animation: fadeUp 0.7s ease-out 0.15s forwards;
+      }
+      .title {
+        margin-top: 20px; font-size: 60px; font-weight: 800; line-height: 1.24;
+        letter-spacing: -1px; padding-top: 0.08em; overflow: visible;
+        opacity: 0; animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s forwards;
+      }
+
+      .ring { position: absolute; left: 50%; top: 620px; transform: translateX(-50%); width: 520px; height: 520px; z-index: 2; }
+      .ring svg { width: 520px; height: 520px; transform: rotate(-90deg); }
+      .track { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 40; }
+      .arc { fill: none; stroke: url(#donutGrad); stroke-width: 40; stroke-linecap: round; filter: drop-shadow(0 0 26px rgba(52, 211, 153, 0.45)); }
+      .center {
+        position: absolute; inset: 0; display: flex; flex-direction: column;
+        align-items: center; justify-content: center; z-index: 3;
+      }
+      .figure {
+        font-family: "Space Grotesk", "Be Vietnam Pro", sans-serif;
+        font-size: 168px; font-weight: 700; line-height: 1.0; letter-spacing: -4px;
+        background: linear-gradient(140deg, #6ee7b7 0%, #14b8a6 100%);
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+        overflow: visible;
+      }
+      .clabel {
+        margin-top: 8px; font-size: 30px; font-weight: 600; letter-spacing: 2px;
+        text-transform: uppercase; color: #7fb8a6;
+      }
+
+      .blurb {
+        position: absolute; left: 120px; right: 120px; top: 1220px; z-index: 2; text-align: center;
+        font-size: 34px; font-weight: 500; line-height: 1.42; color: #cfe9df;
+        opacity: 0; animation: fadeUp 0.7s ease-out 0.6s forwards;
+      }
+      .legend {
+        position: absolute; left: 120px; right: 120px; top: 1370px; z-index: 2;
+        display: flex; justify-content: center; gap: 60px;
+        opacity: 0; animation: fadeUp 0.7s ease-out 0.78s forwards;
+      }
+      .leg { display: flex; align-items: center; gap: 14px; }
+      .leg .dot { width: 22px; height: 22px; border-radius: 6px; flex: none; }
+      .leg .lv { font-family: "Space Grotesk", sans-serif; font-size: 34px; font-weight: 700; color: #eafaf3; }
+      .leg .ll { font-size: 27px; font-weight: 500; color: #8fb3a8; }
+
+      @keyframes fadeUp { 0% { opacity: 0; transform: translateY(24px); } 100% { opacity: 1; transform: translateY(0); } }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="6"
+      data-width="1080"
+      data-height="1920"
+      data-composition-variables='{"kicker":"TIẾT KIỆM","title":"Cắt bớt token Opus","percent":"60","unit":"%","center_label":"ÍT HƠN","caption":"Đẩy phần sinh code sang model rẻ hơn mà vẫn giữ chất lượng.","legend":[{"label":"Trước","val":"100%"},{"label":"Sau","val":"40%"}]}'
+    >
+      <div class="head">
+        <div class="kicker"></div>
+        <div class="title"></div>
+      </div>
+
+      <div class="ring">
+        <svg viewBox="0 0 520 520">
+          <defs>
+            <linearGradient id="donutGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#6ee7b7" />
+              <stop offset="1" stop-color="#2f9be0" />
+            </linearGradient>
+          </defs>
+          <circle class="track" cx="260" cy="260" r="210"></circle>
+          <circle class="arc" cx="260" cy="260" r="210"></circle>
+        </svg>
+        <div class="center">
+          <div class="figure num"></div>
+          <div class="clabel"></div>
+        </div>
+      </div>
+
+      <div class="blurb"></div>
+      <div class="legend"></div>
+    </div>
+
+    <script>
+      (function () {
+        var v =
+          window.__hyperframes &&
+          typeof window.__hyperframes.getVariables === "function"
+            ? window.__hyperframes.getVariables()
+            : {};
+        var set = function (sel, text) {
+          var el = document.querySelector(sel);
+          if (el && text != null) el.textContent = String(text).normalize("NFC");
+        };
+        set(".kicker", v.kicker);
+        set(".title", v.title);
+        set(".clabel", v.center_label);
+        set(".blurb", v.caption);
+
+        var unit = v.unit != null ? String(v.unit) : "%";
+        var pct = parseFloat(String(v.percent != null ? v.percent : 60).replace(/,/g, "")) || 0;
+        var fig = document.querySelector(".figure");
+        if (fig) fig.textContent = pct + unit;
+
+        var R = 210, C = 2 * Math.PI * R;
+        var arc = document.querySelector(".arc");
+        if (arc) {
+          var off = C * (1 - Math.max(0, Math.min(100, pct)) / 100);
+          arc.style.strokeDasharray = C;
+          var st = document.createElement("style");
+          st.textContent = "@keyframes donutSweep{from{stroke-dashoffset:" + C + ";}to{stroke-dashoffset:" + off + ";}}";
+          document.head.appendChild(st);
+          arc.style.strokeDashoffset = off;
+          arc.style.animation = "donutSweep 1.2s cubic-bezier(0.16,1,0.3,1) 0.5s forwards";
+        }
+
+        var legend = Array.isArray(v.legend) ? v.legend.slice(0, 3) : [];
+        var lwrap = document.querySelector(".legend");
+        var cols = ["#2f9be0", "#6ee7b7", "#f2b64c"];
+        legend.forEach(function (it, i) {
+          it = it || {};
+          var leg = document.createElement("div"); leg.className = "leg";
+          var dot = document.createElement("span"); dot.className = "dot"; dot.style.background = cols[i % cols.length];
+          var lv = document.createElement("span"); lv.className = "lv"; lv.textContent = it.val != null ? String(it.val) : "";
+          var ll = document.createElement("span"); ll.className = "ll"; ll.textContent = it.label != null ? String(it.label).normalize("NFC") : "";
+          leg.appendChild(dot); leg.appendChild(lv); leg.appendChild(ll);
+          lwrap.appendChild(leg);
+        });
+      })();
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = {
+        pause: function () {}, seek: function () {}, paused: function () { return true; },
+      };
+    </script>
+  </body>
+</html>

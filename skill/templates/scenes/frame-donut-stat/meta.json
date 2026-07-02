@@ -1,0 +1,14 @@
+{
+  "id": "frame-donut-stat",
+  "name": "Donut Stat",
+  "description": "One big percent ring sweeping 0→P%, number counts up in the centre.",
+  "slots": {
+    "kicker": "str",
+    "title": "str",
+    "percent": "0-100",
+    "unit": "str (default %)",
+    "center_label": "str",
+    "caption": "str",
+    "legend": "[{label,val}]"
+  }
+}

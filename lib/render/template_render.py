@@ -102,6 +102,48 @@ def _theme_layer(theme) -> str:
                "background-size:64px 64px;animation:a2vDriftA 54s linear infinite;}"
                "@keyframes a2vDriftA{to{transform:translate(64px,64px);}}")
         inner = "<i></i>"
+    elif t == "mesh":
+        # three soft colour blobs slowly drifting — a living gradient wash.
+        css = (".a2v-theme{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;}"
+               ".a2v-theme i{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.28;}"
+               ".a2v-theme .m1{width:560px;height:560px;left:-140px;top:6%;background:radial-gradient(circle,rgba(56,189,248,0.9),transparent 70%);animation:a2vFloatA 28s ease-in-out infinite;}"
+               ".a2v-theme .m2{width:620px;height:620px;right:-180px;top:42%;background:radial-gradient(circle,rgba(129,140,248,0.85),transparent 70%);animation:a2vFloatB 34s ease-in-out infinite;}"
+               ".a2v-theme .m3{width:480px;height:480px;left:24%;bottom:-160px;background:radial-gradient(circle,rgba(45,212,191,0.8),transparent 70%);animation:a2vFloatC 31s ease-in-out infinite;}"
+               "@keyframes a2vFloatA{0%,100%{transform:translate(0,0);}50%{transform:translate(90px,64px);}}"
+               "@keyframes a2vFloatB{0%,100%{transform:translate(0,0);}50%{transform:translate(-76px,-54px);}}"
+               "@keyframes a2vFloatC{0%,100%{transform:translate(0,0);}50%{transform:translate(56px,-78px);}}")
+        inner = "<i class=\\\"m1\\\"></i><i class=\\\"m2\\\"></i><i class=\\\"m3\\\"></i>"
+    elif t == "beams":
+        # faint diagonal light streaks slowly sweeping across.
+        css = (".a2v-theme{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;}"
+               ".a2v-theme i{position:absolute;inset:-40%;"
+               "background:repeating-linear-gradient(115deg,transparent 0,transparent 92px,"
+               "rgba(255,255,255,0.03) 92px,rgba(255,255,255,0.03) 94px,transparent 96px,transparent 240px);"
+               "animation:a2vBeam 44s linear infinite;}"
+               "@keyframes a2vBeam{to{transform:translateX(240px);}}")
+        inner = "<i></i>"
+    elif t == "rays":
+        # a very slow rotating conic light fan from the top.
+        css = (".a2v-theme{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;}"
+               ".a2v-theme i{position:absolute;left:50%;top:-34%;width:1700px;height:1700px;margin-left:-850px;"
+               "background:conic-gradient(from 0deg,transparent 0deg,rgba(255,255,255,0.035) 10deg,transparent 22deg,"
+               "transparent 58deg,rgba(255,255,255,0.03) 70deg,transparent 82deg,transparent 130deg,"
+               "rgba(255,255,255,0.03) 142deg,transparent 154deg);animation:a2vSpin 100s linear infinite;transform-origin:50% 50%;}"
+               "@keyframes a2vSpin{to{transform:rotate(360deg);}}")
+        inner = "<i></i>"
+    elif t == "stars":
+        # a field of faint stars gently twinkling.
+        css = (".a2v-theme{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;}"
+               ".a2v-theme i{position:absolute;inset:0;background-image:"
+               "radial-gradient(1.6px 1.6px at 18% 24%,rgba(255,255,255,0.6),transparent),"
+               "radial-gradient(1.4px 1.4px at 68% 58%,rgba(255,255,255,0.5),transparent),"
+               "radial-gradient(2px 2px at 42% 82%,rgba(255,255,255,0.5),transparent),"
+               "radial-gradient(1.5px 1.5px at 86% 20%,rgba(255,255,255,0.55),transparent),"
+               "radial-gradient(1.5px 1.5px at 30% 62%,rgba(255,255,255,0.4),transparent),"
+               "radial-gradient(1.5px 1.5px at 78% 82%,rgba(255,255,255,0.45),transparent);"
+               "animation:a2vTwinkle 6s ease-in-out infinite;}"
+               "@keyframes a2vTwinkle{0%,100%{opacity:0.5;}50%{opacity:1;}}")
+        inner = "<i></i>"
     else:
         return ""
     return ("<style>" + css + "</style>"

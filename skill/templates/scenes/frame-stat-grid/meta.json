@@ -1,0 +1,12 @@
+{
+  "id": "frame-stat-grid",
+  "name": "Stat Grid",
+  "description": "2x2 grid of stat cards with count-up numbers + per-card accent bar.",
+  "slots": {
+    "kicker": "str",
+    "title": "str",
+    "accent": "str",
+    "stats": "[{value,label,sub}] (2-4)",
+    "note": "str"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "frame-flow-steps",
+  "name": "Flow Steps",
+  "description": "Vertical numbered pipeline joined by a spine; one step hl.",
+  "slots": {
+    "kicker": "str",
+    "title": "str",
+    "accent": "str",
+    "steps": "[{title,desc,hl}]",
+    "note": "str"
+  }
+}

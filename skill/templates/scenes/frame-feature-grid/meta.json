@@ -1,0 +1,13 @@
+{
+  "id": "frame-feature-grid",
+  "name": "Feature Grid",
+  "description": "2x2 feature cards each with a built-in inline-SVG icon.",
+  "slots": {
+    "kicker": "str",
+    "title": "str",
+    "accent": "str",
+    "features": "[{icon,title,desc}] (2-4)",
+    "note": "str",
+    "icon_keys": "bolt lock sync search chart code cloud layers database link globe cpu check doc rocket"
+  }
+}

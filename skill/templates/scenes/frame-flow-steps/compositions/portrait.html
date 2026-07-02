@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Flow Steps · Portrait 9:16</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+    <style>
+      /*
+       * frame-flow-steps — a vertical numbered PIPELINE. Numbered circles joined by a
+       * spine (measured in JS so it aligns for any step height), each with a title +
+       * optional desc, revealing top→down. One step can be highlighted (hl). No image.
+       * Slots: kicker, title, accent, steps:[{title,desc,hl}], note.
+       */
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #140810; }
+      #root {
+        position: relative; width: 1080px; height: 1920px; overflow: hidden;
+        background:
+          radial-gradient(ellipse 720px 600px at 86% 8%, rgba(244, 63, 94, 0.13), transparent 60%),
+          radial-gradient(ellipse 620px 620px at 6% 96%, rgba(251, 113, 133, 0.09), transparent 62%),
+          #140810;
+        color: #fbeef1; font-family: "Be Vietnam Pro", sans-serif;
+      }
+      .head { position: absolute; left: 96px; right: 96px; top: 300px; z-index: 3; }
+      .kicker { font-size: 25px; font-weight: 700; letter-spacing: 7px; text-transform: uppercase; color: #fb7a92; opacity: 0; animation: fadeUp 0.7s ease-out 0.15s forwards; }
+      .title { margin-top: 22px; font-size: 78px; font-weight: 800; line-height: 1.16; letter-spacing: -1.5px; opacity: 0; animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s forwards; }
+      .title .accent { background: linear-gradient(96deg, #fb7185 0%, #f43f5e 100%); -webkit-background-clip: text; background-clip: text; color: transparent; line-height: 1.4; padding-top: 0.14em; overflow: visible; display: inline-block; }
+
+      .spine { position: absolute; width: 4px; border-radius: 2px; z-index: 1;
+        background: linear-gradient(180deg, rgba(251,113,133,0.7), rgba(244,63,94,0.25)); }
+
+      .steps { position: absolute; left: 96px; right: 96px; top: 660px; z-index: 2; }
+      .step { display: flex; gap: 38px; padding-bottom: 44px; opacity: 0; animation: fadeUp 0.6s ease-out forwards; }
+      .step:last-child { padding-bottom: 0; }
+      .num {
+        width: 74px; height: 74px; flex: none; border-radius: 50%;
+        background: #241019; border: 2px solid rgba(251,113,133,0.4);
+        display: flex; align-items: center; justify-content: center;
+        font-family: "Space Grotesk", sans-serif; font-size: 34px; font-weight: 700; color: #ffb3c0;
+      }
+      .step.hl .num { background: linear-gradient(140deg, #fb7185, #f43f5e); border-color: transparent; color: #fff; box-shadow: 0 0 34px rgba(244,63,94,0.55); }
+      .body { flex: 1; padding-top: 6px; }
+      .stitle { font-size: 44px; font-weight: 700; line-height: 1.22; color: #fbeef1; padding-top: 0.04em; }
+      .step.hl .stitle { color: #ffe3e8; }
+      .sdesc { margin-top: 8px; font-size: 30px; font-weight: 400; line-height: 1.4; color: #c69aa4; }
+
+      .note { position: absolute; left: 96px; right: 96px; top: 1420px; z-index: 3; font-size: 30px; font-weight: 400; line-height: 1.45; color: #b78f98;
+        opacity: 0; animation: fadeUp 0.8s ease-out 1.2s forwards; }
+
+      @keyframes fadeUp { 0% { opacity: 0; transform: translateY(24px); } 100% { opacity: 1; transform: translateY(0); } }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="6"
+      data-width="1080"
+      data-height="1920"
+      data-composition-variables='{"kicker":"QUY TRÌNH","title":"Chín bước","accent":"tự động","steps":[{"title":"Nghiên cứu","desc":"Đọc tài liệu, HAR, cộng đồng"},{"title":"Dựng khung","desc":"Sinh CLI từ spec"},{"title":"Làm giàu","desc":"Thêm lệnh phân tích NOI","hl":true},{"title":"Kiểm thử & Ship","desc":"Scorecard, dogfood, đóng gói"}],"note":"Pipeline đảm bảo CLI cuối vừa biên dịch được vừa hợp với AI Agent."}'
+    >
+      <div class="head">
+        <div class="kicker"></div>
+        <div class="title"></div>
+      </div>
+      <div class="steps"></div>
+      <div class="note"></div>
+    </div>
+
+    <script>
+      (function () {
+        var v =
+          window.__hyperframes &&
+          typeof window.__hyperframes.getVariables === "function"
+            ? window.__hyperframes.getVariables()
+            : {};
+        var set = function (sel, text) { var el = document.querySelector(sel); if (el && text != null) el.textContent = String(text).normalize("NFC"); };
+        set(".kicker", v.kicker);
+        set(".note", v.note);
+
+        var titleEl = document.querySelector(".title");
+        if (titleEl) {
+          var t = v.title != null ? String(v.title).normalize("NFC") : "";
+          var acc = v.accent != null ? String(v.accent).normalize("NFC") : "";
+          titleEl.textContent = ""; titleEl.appendChild(document.createTextNode(acc ? t + " " : t));
+          if (acc) { var s = document.createElement("span"); s.className = "accent"; s.textContent = acc; titleEl.appendChild(s); }
+        }
+
+        var steps = Array.isArray(v.steps) ? v.steps.slice(0, 6) : [];
+        var wrap = document.querySelector(".steps");
+        steps.forEach(function (it, i) {
+          it = it || {};
+          var step = document.createElement("div");
+          step.className = "step" + (it.hl ? " hl" : "");
+          step.style.animationDelay = (0.4 + i * 0.13) + "s";
+          var num = document.createElement("div"); num.className = "num"; num.textContent = (i + 1);
+          var body = document.createElement("div"); body.className = "body";
+          var st = document.createElement("div"); st.className = "stitle"; st.textContent = it.title != null ? String(it.title).normalize("NFC") : "";
+          body.appendChild(st);
+          if (it.desc != null && String(it.desc).trim()) {
+            var sd = document.createElement("div"); sd.className = "sdesc"; sd.textContent = String(it.desc).normalize("NFC");
+            body.appendChild(sd);
+          }
+          step.appendChild(num); step.appendChild(body);
+          wrap.appendChild(step);
+        });
+
+        // Spine measured AFTER layout so it spans first→last circle centre exactly.
+        var root = document.getElementById("root");
+        var nums = document.querySelectorAll(".num");
+        if (nums.length > 1) {
+          var f = nums[0].getBoundingClientRect();
+          var l = nums[nums.length - 1].getBoundingClientRect();
+          var cx = f.left + f.width / 2, cyTop = f.top + f.height / 2, cyBot = l.top + l.height / 2;
+          var spine = document.createElement("div"); spine.className = "spine";
+          spine.style.left = (cx - 2) + "px";
+          spine.style.top = cyTop + "px";
+          spine.style.height = Math.max(0, cyBot - cyTop) + "px";
+          root.appendChild(spine);
+        }
+      })();
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = { pause: function () {}, seek: function () {}, paused: function () { return true; } };
+    </script>
+  </body>
+</html>

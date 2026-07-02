@@ -1,0 +1,15 @@
+{
+  "id": "frame-gauge",
+  "name": "Gauge",
+  "description": "Semicircle gauge arc 0→value, number counts up, min/max end labels.",
+  "slots": {
+    "kicker": "str",
+    "title": "str",
+    "value": "0-100",
+    "unit": "str",
+    "center_label": "str",
+    "min_label": "str",
+    "max_label": "str",
+    "caption": "str"
+  }
+}

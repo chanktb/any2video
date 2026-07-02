@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Stat Grid · Portrait 9:16</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+    <style>
+      /*
+       * frame-stat-grid — a 2×2 grid of STAT cards, each with a count-up number, a
+       * label and a small sub. Great for "by the numbers". Pure CSS. Slots: kicker,
+       * title, accent, stats:[{value, label, sub}] (2-4), note.
+       */
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #050b14; }
+      #root {
+        position: relative; width: 1080px; height: 1920px; overflow: hidden;
+        background:
+          radial-gradient(ellipse 740px 620px at 82% 8%, rgba(56, 189, 248, 0.12), transparent 60%),
+          radial-gradient(ellipse 640px 640px at 8% 94%, rgba(129, 140, 248, 0.12), transparent 62%),
+          #050b14;
+        color: #eef4fb; font-family: "Be Vietnam Pro", sans-serif;
+      }
+      .head { position: absolute; left: 96px; right: 96px; top: 300px; z-index: 2; }
+      .kicker { font-size: 25px; font-weight: 700; letter-spacing: 7px; text-transform: uppercase; color: #6cc6f5; opacity: 0; animation: fadeUp 0.7s ease-out 0.15s forwards; }
+      .title { margin-top: 22px; font-size: 80px; font-weight: 800; line-height: 1.16; letter-spacing: -1.5px; opacity: 0; animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s forwards; }
+      .title .accent { background: linear-gradient(96deg, #38bdf8 0%, #818cf8 100%); -webkit-background-clip: text; background-clip: text; color: transparent; line-height: 1.4; padding-top: 0.14em; overflow: visible; display: inline-block; }
+
+      .grid { position: absolute; left: 96px; right: 96px; top: 690px; z-index: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 34px; }
+      .card {
+        position: relative; border-radius: 34px; padding: 50px 46px 46px;
+        background: linear-gradient(160deg, rgba(255,255,255,0.055), rgba(255,255,255,0.02));
+        border: 1px solid rgba(255,255,255,0.09);
+        box-shadow: 0 24px 60px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
+        overflow: hidden; opacity: 0; animation: cardIn 0.6s cubic-bezier(0.16,1,0.3,1) forwards;
+      }
+      .card::before { content: ""; position: absolute; left: 0; top: 0; width: 6px; height: 100%; }
+      .card .cnum {
+        font-family: "Space Grotesk", "Be Vietnam Pro", sans-serif;
+        font-size: 108px; font-weight: 700; line-height: 1.02; letter-spacing: -3px; overflow: visible;
+        background: linear-gradient(140deg, #7dd3fc 0%, #818cf8 100%);
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+      }
+      .card .clabel { margin-top: 12px; font-size: 38px; font-weight: 700; line-height: 1.2; color: #e6eefb; padding-top: 0.04em; }
+      .card .csub { margin-top: 8px; font-size: 27px; font-weight: 400; line-height: 1.36; color: #93a6bd; }
+      @keyframes cardIn { 0% { opacity: 0; transform: translateY(30px) scale(0.97); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+
+      .note { position: absolute; left: 96px; right: 96px; top: 1420px; z-index: 2; font-size: 30px; font-weight: 400; line-height: 1.45; color: #849ab3;
+        opacity: 0; animation: fadeUp 0.8s ease-out 1.2s forwards; }
+
+      @keyframes fadeUp { 0% { opacity: 0; transform: translateY(24px); } 100% { opacity: 1; transform: translateY(0); } }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="6"
+      data-width="1080"
+      data-height="1920"
+      data-composition-variables='{"kicker":"THEO SỐ LIỆU","title":"Một lệnh,","accent":"cả bộ đồ nghề","stats":[{"value":"9","label":"Bước pipeline","sub":"Tự động từ đầu tới cuối"},{"value":"3","label":"Sản phẩm ra","sub":"CLI · MCP · Skill"},{"value":"60%","label":"Ít token hơn","sub":"Nhờ Codex mode"},{"value":"1ms","label":"Truy vấn local","sub":"SQLite, khỏi gọi mạng"}],"note":"Tất cả sinh ra từ một câu lệnh duy nhất."}'
+    >
+      <div class="head">
+        <div class="kicker"></div>
+        <div class="title"></div>
+      </div>
+      <div class="grid"></div>
+      <div class="note"></div>
+    </div>
+
+    <script>
+      (function () {
+        var v =
+          window.__hyperframes &&
+          typeof window.__hyperframes.getVariables === "function"
+            ? window.__hyperframes.getVariables()
+            : {};
+        var set = function (sel, text) { var el = document.querySelector(sel); if (el && text != null) el.textContent = String(text).normalize("NFC"); };
+        set(".kicker", v.kicker);
+        set(".note", v.note);
+
+        var titleEl = document.querySelector(".title");
+        if (titleEl) {
+          var t = v.title != null ? String(v.title).normalize("NFC") : "";
+          var acc = v.accent != null ? String(v.accent).normalize("NFC") : "";
+          titleEl.textContent = ""; titleEl.appendChild(document.createTextNode(acc ? t + " " : t));
+          if (acc) { var s = document.createElement("span"); s.className = "accent"; s.textContent = acc; titleEl.appendChild(s); }
+        }
+
+        var stats = Array.isArray(v.stats) ? v.stats.slice(0, 4) : [];
+        var grid = document.querySelector(".grid");
+        var bars = ["linear-gradient(180deg,#38bdf8,#0ea5e9)", "linear-gradient(180deg,#818cf8,#6366f1)", "linear-gradient(180deg,#34d399,#10b981)", "linear-gradient(180deg,#fbbf24,#f59e0b)"];
+        stats.forEach(function (it, i) {
+          it = it || {};
+          var card = document.createElement("div"); card.className = "card";
+          card.style.animationDelay = (0.4 + i * 0.11) + "s";
+          var num = document.createElement("div"); num.className = "cnum num"; num.textContent = it.value != null ? String(it.value) : "";
+          var lab = document.createElement("div"); lab.className = "clabel"; lab.textContent = it.label != null ? String(it.label).normalize("NFC") : "";
+          card.appendChild(num); card.appendChild(lab);
+          if (it.sub != null && String(it.sub).trim()) {
+            var sub = document.createElement("div"); sub.className = "csub"; sub.textContent = String(it.sub).normalize("NFC");
+            card.appendChild(sub);
+          }
+          grid.appendChild(card);
+        });
+        // colour each card's left accent bar (a child span, per-card hue)
+        var cards = document.querySelectorAll(".card");
+        cards.forEach(function (c, i) {
+          var b = document.createElement("span");
+          b.style.cssText = "position:absolute;left:0;top:0;width:6px;height:100%;border-radius:34px 0 0 34px;background:" + bars[i % bars.length] + ";";
+          c.insertBefore(b, c.firstChild);
+        });
+      })();
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = { pause: function () {}, seek: function () {}, paused: function () { return true; } };
+    </script>
+  </body>
+</html>

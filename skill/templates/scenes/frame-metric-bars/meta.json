@@ -1,0 +1,12 @@
+{
+  "id": "frame-metric-bars",
+  "name": "Metric Bars",
+  "description": "Horizontal progress bars (label · fill · value) growing left→right; one hl.",
+  "slots": {
+    "kicker": "str",
+    "title": "str",
+    "accent": "str",
+    "items": "[{label,value,display,hl}]",
+    "note": "str"
+  }
+}

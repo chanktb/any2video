@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Gauge · Portrait 9:16</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+    <style>
+      /*
+       * frame-gauge — a semicircle GAUGE: an arc sweeps 0→value with the number
+       * counting up below it, plus min/max end labels and a caption. Pure SVG/CSS.
+       * Slots: kicker, title, value(0-100), unit, center_label, min_label, max_label,
+       * caption.
+       */
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #140b06; }
+      #root {
+        position: relative; width: 1080px; height: 1920px; overflow: hidden;
+        background:
+          radial-gradient(ellipse 720px 640px at 50% 40%, rgba(249, 115, 22, 0.13), transparent 60%),
+          radial-gradient(ellipse 620px 560px at 88% 96%, rgba(239, 68, 68, 0.10), transparent 60%),
+          #140b06;
+        color: #fbf1e8; font-family: "Be Vietnam Pro", sans-serif;
+      }
+      .head { position: absolute; left: 96px; right: 96px; top: 300px; z-index: 2; text-align: center; }
+      .kicker { font-size: 25px; font-weight: 700; letter-spacing: 7px; text-transform: uppercase; color: #f6a24a; opacity: 0; animation: fadeUp 0.7s ease-out 0.15s forwards; }
+      .title { margin-top: 20px; font-size: 62px; font-weight: 800; line-height: 1.22; letter-spacing: -1px; padding-top: 0.08em; overflow: visible;
+        opacity: 0; animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s forwards; }
+
+      .gauge { position: absolute; left: 240px; top: 650px; width: 600px; height: 340px; z-index: 2; }
+      .gauge svg { width: 600px; height: 340px; overflow: visible; }
+      .track { fill: none; stroke: rgba(255,255,255,0.09); stroke-width: 46; stroke-linecap: round; }
+      .arc { fill: none; stroke: url(#gaugeGrad); stroke-width: 46; stroke-linecap: round; filter: drop-shadow(0 0 26px rgba(249,115,22,0.5)); }
+      .readout { position: absolute; left: 0; right: 0; top: 150px; text-align: center; z-index: 3; }
+      .figure {
+        font-family: "Space Grotesk", "Be Vietnam Pro", sans-serif; font-size: 156px; font-weight: 700; line-height: 1.0; letter-spacing: -4px; overflow: visible;
+        background: linear-gradient(140deg, #fbbf24 0%, #f43f5e 100%);
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+      }
+      .clabel { margin-top: 6px; font-size: 30px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: #c79a6f; }
+      .ends { position: absolute; left: 210px; top: 1055px; width: 660px; z-index: 3; display: flex; justify-content: space-between; }
+      .end { font-family: "Space Grotesk", sans-serif; font-size: 30px; font-weight: 600; color: #a5895f; }
+
+      .caption2 { position: absolute; left: 120px; right: 120px; top: 1190px; z-index: 2; text-align: center; font-size: 34px; font-weight: 500; line-height: 1.42; color: #f0ddc9;
+        opacity: 0; animation: fadeUp 0.8s ease-out 0.7s forwards; }
+
+      @keyframes fadeUp { 0% { opacity: 0; transform: translateY(24px); } 100% { opacity: 1; transform: translateY(0); } }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="6"
+      data-width="1080"
+      data-height="1920"
+      data-composition-variables='{"kicker":"MỨC ĐỘ","title":"Sẵn sàng cho AI Agent","value":"92","unit":"","center_label":"ĐIỂM AGENT-READY","min_label":"0","max_label":"100","caption":"Trên ngưỡng khuyến nghị, AI có thể dùng ngay mà ít phải sửa."}'
+    >
+      <div class="head">
+        <div class="kicker"></div>
+        <div class="title"></div>
+      </div>
+      <div class="gauge">
+        <svg viewBox="0 0 600 340" preserveAspectRatio="xMidYMin meet">
+          <defs>
+            <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#fbbf24" /><stop offset="0.55" stop-color="#f97316" /><stop offset="1" stop-color="#ef4444" />
+            </linearGradient>
+          </defs>
+          <path class="track" d="M55 300 A245 245 0 0 1 545 300"></path>
+          <path class="arc" d="M55 300 A245 245 0 0 1 545 300"></path>
+        </svg>
+        <div class="readout">
+          <div class="figure num"></div>
+          <div class="clabel"></div>
+        </div>
+      </div>
+      <div class="ends">
+        <div class="end e-min"></div>
+        <div class="end e-max"></div>
+      </div>
+      <div class="caption2"></div>
+    </div>
+
+    <script>
+      (function () {
+        var v =
+          window.__hyperframes &&
+          typeof window.__hyperframes.getVariables === "function"
+            ? window.__hyperframes.getVariables()
+            : {};
+        var set = function (sel, text) { var el = document.querySelector(sel); if (el && text != null) el.textContent = String(text).normalize("NFC"); };
+        set(".kicker", v.kicker);
+        set(".title", v.title);
+        set(".clabel", v.center_label);
+        set(".caption2", v.caption);
+        set(".e-min", v.min_label != null ? v.min_label : "0");
+        set(".e-max", v.max_label != null ? v.max_label : "100");
+
+        var unit = v.unit != null ? String(v.unit) : "";
+        var val = Math.max(0, Math.min(100, parseFloat(String(v.value).replace(/[^0-9.]/g, "")) || 0));
+        var fig = document.querySelector(".figure");
+        if (fig) fig.textContent = val + unit;
+
+        var arc = document.querySelector(".arc");
+        if (arc) {
+          var len = arc.getTotalLength();
+          var off = len * (1 - val / 100);
+          arc.style.strokeDasharray = len;
+          var st = document.createElement("style");
+          st.textContent = "@keyframes gaugeSweep{from{stroke-dashoffset:" + len + ";}to{stroke-dashoffset:" + off + ";}}";
+          document.head.appendChild(st);
+          arc.style.strokeDashoffset = off;
+          arc.style.animation = "gaugeSweep 1.2s cubic-bezier(0.16,1,0.3,1) 0.5s forwards";
+        }
+      })();
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = { pause: function () {}, seek: function () {}, paused: function () { return true; } };
+    </script>
+  </body>
+</html>

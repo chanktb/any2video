@@ -1,0 +1,12 @@
+{
+  "id": "frame-quote-callout",
+  "name": "Quote Callout",
+  "description": "Big pull-quote with a giant quote mark + inline accent phrase + attribution.",
+  "slots": {
+    "eyebrow": "str",
+    "quote": "str",
+    "accent": "str (a phrase inside quote to colour)",
+    "author": "str",
+    "role": "str"
+  }
+}

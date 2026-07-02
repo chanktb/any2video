@@ -1,0 +1,12 @@
+{
+  "id": "frame-timeline",
+  "name": "Timeline",
+  "description": "Vertical roadmap: dotted spine + period pill + title/desc per entry; one hl.",
+  "slots": {
+    "kicker": "str",
+    "title": "str",
+    "accent": "str",
+    "entries": "[{period,title,desc,hl}]",
+    "note": "str"
+  }
+}

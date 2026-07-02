@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Quote Callout · Portrait 9:16</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+      /*
+       * frame-quote-callout — a big PULL-QUOTE with a giant quotation mark, an optional
+       * accent phrase inside the quote, and an attribution. For a philosophy / thesis
+       * line. Pure CSS. Slots: eyebrow, quote, accent(a phrase inside `quote` to colour),
+       * author, role.
+       */
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #0d0b07; }
+      #root {
+        position: relative; width: 1080px; height: 1920px; overflow: hidden;
+        background:
+          radial-gradient(ellipse 760px 640px at 20% 16%, rgba(245, 158, 11, 0.12), transparent 60%),
+          radial-gradient(ellipse 640px 640px at 92% 92%, rgba(234, 179, 8, 0.09), transparent 62%),
+          #0d0b07;
+        color: #f7efe0; font-family: "Be Vietnam Pro", sans-serif;
+      }
+      .wrap { position: absolute; left: 96px; right: 96px; top: 360px; z-index: 2; }
+      .eyebrow { font-size: 26px; font-weight: 700; letter-spacing: 8px; text-transform: uppercase; color: #eab54c;
+        opacity: 0; animation: fadeUp 0.7s ease-out 0.2s forwards; }
+      .qmark {
+        font-family: Georgia, "Be Vietnam Pro", serif; font-size: 300px; line-height: 0.7; font-weight: 700; height: 150px;
+        background: linear-gradient(140deg, #fcd34d, #f59e0b); -webkit-background-clip: text; background-clip: text; color: transparent;
+        opacity: 0; animation: fadeUp 0.8s ease-out 0.3s forwards; margin-top: 30px;
+      }
+      .quote {
+        margin-top: 26px; font-size: 74px; font-weight: 800; line-height: 1.3; letter-spacing: -1px; color: #f7efe0;
+        overflow: visible; padding-top: 0.06em;
+        opacity: 0; animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.5s forwards;
+      }
+      .quote .accent {
+        background: linear-gradient(96deg, #fcd34d 0%, #f59e0b 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+        line-height: 1.34; overflow: visible;
+      }
+      .rule { width: 0; height: 4px; border-radius: 2px; background: linear-gradient(90deg, #fcd34d, #f59e0b); margin: 54px 0 34px;
+        animation: grow 0.9s cubic-bezier(0.16,1,0.3,1) 1.0s forwards; }
+      @keyframes grow { to { width: 120px; } }
+      .author { font-size: 42px; font-weight: 700; color: #f7efe0; opacity: 0; animation: fadeUp 0.8s ease-out 1.05s forwards; padding-top: 0.04em; }
+      .role { margin-top: 8px; font-size: 30px; font-weight: 400; color: #b9a887; opacity: 0; animation: fadeUp 0.8s ease-out 1.15s forwards; }
+
+      @keyframes fadeUp { 0% { opacity: 0; transform: translateY(24px); } 100% { opacity: 1; transform: translateY(0); } }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="6"
+      data-width="1080"
+      data-height="1920"
+      data-composition-variables='{"eyebrow":"TRIẾT LÝ","quote":"API không phải chỉ là một tập hợp các endpoint.","accent":"không phải chỉ là","author":"CLI Printing Press","role":"Tư tưởng xuyên suốt dự án"}'
+    >
+      <div class="wrap">
+        <div class="eyebrow"></div>
+        <div class="qmark">&ldquo;</div>
+        <div class="quote"></div>
+        <div class="rule"></div>
+        <div class="author"></div>
+        <div class="role"></div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        var v =
+          window.__hyperframes &&
+          typeof window.__hyperframes.getVariables === "function"
+            ? window.__hyperframes.getVariables()
+            : {};
+        var set = function (sel, text) { var el = document.querySelector(sel); if (el && text != null) el.textContent = String(text).normalize("NFC"); };
+        set(".eyebrow", v.eyebrow);
+        set(".author", v.author);
+        set(".role", v.role);
+
+        var qEl = document.querySelector(".quote");
+        if (qEl) {
+          var q = v.quote != null ? String(v.quote).normalize("NFC") : "";
+          var acc = v.accent != null ? String(v.accent).normalize("NFC") : "";
+          var idx = acc ? q.indexOf(acc) : -1;
+          if (idx >= 0) {
+            qEl.textContent = "";
+            qEl.appendChild(document.createTextNode(q.slice(0, idx)));
+            var s = document.createElement("span"); s.className = "accent"; s.textContent = acc; qEl.appendChild(s);
+            qEl.appendChild(document.createTextNode(q.slice(idx + acc.length)));
+          } else {
+            qEl.textContent = q;
+          }
+        }
+      })();
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = { pause: function () {}, seek: function () {}, paused: function () { return true; } };
+    </script>
+  </body>
+</html>

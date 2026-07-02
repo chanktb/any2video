@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Timeline · Portrait 9:16</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+      /*
+       * frame-timeline — a vertical ROADMAP: a dotted spine (measured in JS) with a
+       * period pill + title + desc per entry, revealing top→down; one entry can be
+       * highlighted (hl, e.g. "now"). No image. Slots: kicker, title, accent,
+       * entries:[{period,title,desc,hl}], note.
+       */
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #0a0a16; }
+      #root {
+        position: relative; width: 1080px; height: 1920px; overflow: hidden;
+        background:
+          radial-gradient(ellipse 740px 620px at 84% 8%, rgba(129, 140, 248, 0.13), transparent 60%),
+          radial-gradient(ellipse 640px 640px at 6% 94%, rgba(99, 102, 241, 0.11), transparent 62%),
+          #0a0a16;
+        color: #eef0fc; font-family: "Be Vietnam Pro", sans-serif;
+      }
+      .head { position: absolute; left: 96px; right: 96px; top: 300px; z-index: 3; }
+      .kicker { font-size: 25px; font-weight: 700; letter-spacing: 7px; text-transform: uppercase; color: #a6b0fb; opacity: 0; animation: fadeUp 0.7s ease-out 0.15s forwards; }
+      .title { margin-top: 22px; font-size: 78px; font-weight: 800; line-height: 1.16; letter-spacing: -1.5px; opacity: 0; animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s forwards; }
+      .title .accent { background: linear-gradient(96deg, #818cf8 0%, #6366f1 100%); -webkit-background-clip: text; background-clip: text; color: transparent; line-height: 1.4; padding-top: 0.14em; overflow: visible; display: inline-block; }
+
+      .spine { position: absolute; width: 3px; border-radius: 2px; z-index: 1;
+        background: linear-gradient(180deg, rgba(129,140,248,0.65), rgba(99,102,241,0.2)); }
+
+      .rows { position: absolute; left: 96px; right: 96px; top: 660px; z-index: 2; }
+      .row { display: flex; gap: 40px; padding-bottom: 50px; opacity: 0; animation: fadeUp 0.6s ease-out forwards; }
+      .row:last-child { padding-bottom: 0; }
+      .dotcol { width: 34px; flex: none; display: flex; justify-content: center; padding-top: 12px; }
+      .dot { width: 26px; height: 26px; border-radius: 50%; background: #6366f1; border: 4px solid #171733; box-shadow: 0 0 0 2px rgba(129,140,248,0.4); }
+      .row.hl .dot { width: 34px; height: 34px; background: linear-gradient(140deg,#a5b4fc,#6366f1); box-shadow: 0 0 30px rgba(129,140,248,0.7); }
+      .body { flex: 1; padding-top: 2px; }
+      .period { display: inline-block; font-size: 24px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #b7c0fc;
+        background: rgba(129,140,248,0.14); border: 1px solid rgba(129,140,248,0.3); padding: 6px 18px; border-radius: 999px; margin-bottom: 16px; }
+      .row.hl .period { color: #fff; background: rgba(129,140,248,0.28); }
+      .rtitle { font-size: 44px; font-weight: 700; line-height: 1.22; color: #eef0fc; padding-top: 0.04em; }
+      .rdesc { margin-top: 8px; font-size: 30px; font-weight: 400; line-height: 1.4; color: #9ba0c8; }
+
+      .note { position: absolute; left: 96px; right: 96px; top: 1440px; z-index: 3; font-size: 30px; font-weight: 400; line-height: 1.45; color: #8a90ba;
+        opacity: 0; animation: fadeUp 0.8s ease-out 1.2s forwards; }
+
+      @keyframes fadeUp { 0% { opacity: 0; transform: translateY(24px); } 100% { opacity: 1; transform: translateY(0); } }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="6"
+      data-width="1080"
+      data-height="1920"
+      data-composition-variables='{"kicker":"LỘ TRÌNH","title":"Từ API tới","accent":"bộ công cụ","entries":[{"period":"Bước 1","title":"Thu thập","desc":"Spec, HAR hoặc chỉ một link web"},{"period":"Bước 2","title":"Nghiên cứu","desc":"Đọc cách cộng đồng thật sự dùng"},{"period":"Bước 3","title":"Sinh mã","desc":"Go CLI, MCP Server, Claude Code Skill","hl":true}],"note":"Cả lộ trình gói trong một câu lệnh duy nhất."}'
+    >
+      <div class="head">
+        <div class="kicker"></div>
+        <div class="title"></div>
+      </div>
+      <div class="rows"></div>
+      <div class="note"></div>
+    </div>
+
+    <script>
+      (function () {
+        var v =
+          window.__hyperframes &&
+          typeof window.__hyperframes.getVariables === "function"
+            ? window.__hyperframes.getVariables()
+            : {};
+        var set = function (sel, text) { var el = document.querySelector(sel); if (el && text != null) el.textContent = String(text).normalize("NFC"); };
+        set(".kicker", v.kicker);
+        set(".note", v.note);
+
+        var titleEl = document.querySelector(".title");
+        if (titleEl) {
+          var t = v.title != null ? String(v.title).normalize("NFC") : "";
+          var acc = v.accent != null ? String(v.accent).normalize("NFC") : "";
+          titleEl.textContent = ""; titleEl.appendChild(document.createTextNode(acc ? t + " " : t));
+          if (acc) { var s = document.createElement("span"); s.className = "accent"; s.textContent = acc; titleEl.appendChild(s); }
+        }
+
+        var entries = Array.isArray(v.entries) ? v.entries.slice(0, 5) : [];
+        var rows = document.querySelector(".rows");
+        entries.forEach(function (it, i) {
+          it = it || {};
+          var row = document.createElement("div"); row.className = "row" + (it.hl ? " hl" : "");
+          row.style.animationDelay = (0.4 + i * 0.13) + "s";
+          var dc = document.createElement("div"); dc.className = "dotcol";
+          var dot = document.createElement("div"); dot.className = "dot"; dc.appendChild(dot);
+          var body = document.createElement("div"); body.className = "body";
+          if (it.period != null && String(it.period).trim()) {
+            var pe = document.createElement("div"); pe.className = "period"; pe.textContent = String(it.period).normalize("NFC"); body.appendChild(pe);
+          }
+          var rt = document.createElement("div"); rt.className = "rtitle"; rt.textContent = it.title != null ? String(it.title).normalize("NFC") : "";
+          body.appendChild(rt);
+          if (it.desc != null && String(it.desc).trim()) {
+            var rd = document.createElement("div"); rd.className = "rdesc"; rd.textContent = String(it.desc).normalize("NFC"); body.appendChild(rd);
+          }
+          row.appendChild(dc); row.appendChild(body);
+          rows.appendChild(row);
+        });
+
+        var root = document.getElementById("root");
+        var dots = document.querySelectorAll(".dot");
+        if (dots.length > 1) {
+          var f = dots[0].getBoundingClientRect(), l = dots[dots.length - 1].getBoundingClientRect();
+          var cx = f.left + f.width / 2, cyTop = f.top + f.height / 2, cyBot = l.top + l.height / 2;
+          var spine = document.createElement("div"); spine.className = "spine";
+          spine.style.left = (cx - 1.5) + "px"; spine.style.top = cyTop + "px";
+          spine.style.height = Math.max(0, cyBot - cyTop) + "px";
+          root.appendChild(spine);
+        }
+      })();
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = { pause: function () {}, seek: function () {}, paused: function () { return true; } };
+    </script>
+  </body>
+</html>

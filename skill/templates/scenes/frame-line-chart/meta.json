@@ -1,0 +1,15 @@
+{
+  "id": "frame-line-chart",
+  "name": "Line Chart",
+  "description": "Animated trend line + area fill, dots, highlighted peak callout.",
+  "slots": {
+    "kicker": "str",
+    "title": "str",
+    "accent": "str",
+    "points": "[numbers]",
+    "xlabels": "[str]",
+    "peak_value": "str",
+    "peak_label": "str",
+    "note": "str"
+  }
+}

@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Line Chart · Portrait 9:16</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+    <style>
+      /*
+       * frame-line-chart — an animated TREND line (draws left→right) with an area
+       * fill, dots, and a highlighted final point + value callout. Pure SVG built in
+       * JS from `points:[numbers]`. Slots: kicker, title, accent, points, xlabels,
+       * peak_value, peak_label, note.
+       */
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #0a0913; }
+      #root {
+        position: relative; width: 1080px; height: 1920px; overflow: hidden;
+        background:
+          radial-gradient(ellipse 760px 620px at 82% 10%, rgba(168, 85, 247, 0.12), transparent 60%),
+          radial-gradient(ellipse 620px 620px at 6% 96%, rgba(99, 102, 241, 0.12), transparent 60%),
+          #0a0913;
+        color: #f1ecfb; font-family: "Be Vietnam Pro", sans-serif;
+      }
+      .head { position: absolute; left: 96px; right: 96px; top: 300px; z-index: 2; }
+      .kicker { font-size: 25px; font-weight: 700; letter-spacing: 7px; text-transform: uppercase; color: #b79cf5; opacity: 0; animation: fadeUp 0.7s ease-out 0.15s forwards; }
+      .title { margin-top: 22px; font-size: 80px; font-weight: 800; line-height: 1.16; letter-spacing: -1.5px; opacity: 0; animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s forwards; }
+      .title .accent { background: linear-gradient(96deg, #a855f7 0%, #6366f1 100%); -webkit-background-clip: text; background-clip: text; color: transparent; line-height: 1.4; padding-top: 0.14em; overflow: visible; display: inline-block; }
+
+      .chart { position: absolute; left: 84px; top: 660px; width: 912px; height: 640px; z-index: 2; }
+      .chart svg { width: 912px; height: 640px; overflow: visible; }
+
+      /* Fixed-width + clamped LEFT (no centering transform — an animation's transform
+         would override translate(-50%) and un-center it). */
+      .callout {
+        position: absolute; z-index: 3; text-align: center; width: 280px;
+        opacity: 0; animation: fadeUp 0.6s ease-out 0.9s forwards;
+      }
+      .callout .cv { font-family: "Space Grotesk", "Be Vietnam Pro", sans-serif; font-size: 64px; font-weight: 700; line-height: 1.0;
+        background: linear-gradient(120deg, #c084fc, #818cf8); -webkit-background-clip: text; background-clip: text; color: transparent; overflow: visible; }
+      .callout .cl { margin-top: 4px; font-size: 26px; font-weight: 600; color: #b0a6d6; }
+
+      .xrow { position: absolute; left: 84px; top: 1330px; width: 912px; z-index: 2; display: flex; justify-content: space-between; }
+      .xl { font-size: 25px; font-weight: 500; color: #8a83ab; text-align: center; flex: 1; }
+
+      .note { position: absolute; left: 96px; right: 96px; top: 1410px; z-index: 2; font-size: 30px; font-weight: 400; line-height: 1.45; color: #8f88ac;
+        opacity: 0; animation: fadeUp 0.8s ease-out 1.2s forwards; }
+
+      @keyframes fadeUp { 0% { opacity: 0; transform: translateY(24px); } 100% { opacity: 1; transform: translateY(0); } }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="6"
+      data-width="1080"
+      data-height="1920"
+      data-composition-variables='{"kicker":"XU HƯỚNG","title":"Tăng đều theo","accent":"thời gian","points":[12,20,18,34,52,68,96],"xlabels":["T1","T2","T3","T4","T5","T6","Nay"],"peak_value":"96","peak_label":"cao nhất","note":"Số liệu tích luỹ, tra tại chỗ nên dựng biểu đồ trong vài mili giây."}'
+    >
+      <div class="head">
+        <div class="kicker"></div>
+        <div class="title"></div>
+      </div>
+      <div class="chart">
+        <svg viewBox="0 0 912 640" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#6366f1" /><stop offset="1" stop-color="#c084fc" />
+            </linearGradient>
+            <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="rgba(168,85,247,0.34)" /><stop offset="1" stop-color="rgba(99,102,241,0.02)" />
+            </linearGradient>
+          </defs>
+          <g class="grid"></g>
+          <path class="area" fill="url(#areaGrad)" stroke="none"></path>
+          <path class="line" fill="none" stroke="url(#lineGrad)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"></path>
+          <g class="dots"></g>
+        </svg>
+      </div>
+      <div class="callout"><div class="cv"></div><div class="cl"></div></div>
+      <div class="xrow"></div>
+      <div class="note"></div>
+    </div>
+
+    <script>
+      (function () {
+        var v =
+          window.__hyperframes &&
+          typeof window.__hyperframes.getVariables === "function"
+            ? window.__hyperframes.getVariables()
+            : {};
+        var set = function (sel, text) { var el = document.querySelector(sel); if (el && text != null) el.textContent = String(text).normalize("NFC"); };
+        set(".kicker", v.kicker);
+        set(".note", v.note);
+
+        var titleEl = document.querySelector(".title");
+        if (titleEl) {
+          var t = v.title != null ? String(v.title).normalize("NFC") : "";
+          var acc = v.accent != null ? String(v.accent).normalize("NFC") : "";
+          titleEl.textContent = ""; titleEl.appendChild(document.createTextNode(acc ? t + " " : t));
+          if (acc) { var s = document.createElement("span"); s.className = "accent"; s.textContent = acc; titleEl.appendChild(s); }
+        }
+
+        var pts = Array.isArray(v.points) ? v.points.map(function (n) { return parseFloat(n) || 0; }) : [];
+        if (pts.length < 2) pts = [10, 40, 96];
+        var W = 912, H = 640, PADX = 30, PADT = 60, PADB = 40;
+        var max = Math.max.apply(null, pts), min = Math.min.apply(null, pts.concat([0]));
+        var span = (max - min) || 1;
+        var innerW = W - PADX * 2, innerH = H - PADT - PADB;
+        var xy = pts.map(function (p, i) {
+          var x = PADX + (innerW * i) / (pts.length - 1);
+          var y = PADT + innerH * (1 - (p - min) / span);
+          return [x, y];
+        });
+        var lineD = xy.map(function (p, i) { return (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1); }).join(" ");
+        var areaD = lineD + " L" + xy[xy.length - 1][0].toFixed(1) + " " + (H - PADB) + " L" + xy[0][0].toFixed(1) + " " + (H - PADB) + " Z";
+
+        var SVGNS = "http://www.w3.org/2000/svg";
+        var grid = document.querySelector(".grid");
+        for (var g = 0; g < 4; g++) {
+          var gy = PADT + (innerH * g) / 3;
+          var ln = document.createElementNS(SVGNS, "line");
+          ln.setAttribute("x1", PADX); ln.setAttribute("x2", W - PADX);
+          ln.setAttribute("y1", gy); ln.setAttribute("y2", gy);
+          ln.setAttribute("stroke", "rgba(255,255,255,0.06)"); ln.setAttribute("stroke-width", "1.5");
+          grid.appendChild(ln);
+        }
+
+        var area = document.querySelector(".area"); area.setAttribute("d", areaD);
+        area.style.opacity = "0"; area.style.animation = "areaFade 1s ease-out 0.9s forwards";
+        var line = document.querySelector(".line"); line.setAttribute("d", lineD);
+        var len = line.getTotalLength();
+        line.style.strokeDasharray = len; line.style.strokeDashoffset = 0;
+        var st = document.createElement("style");
+        st.textContent = "@keyframes drawLine{from{stroke-dashoffset:" + len + ";}to{stroke-dashoffset:0;}}@keyframes areaFade{to{opacity:1;}}@keyframes dotPop{to{transform:scale(1);}}";
+        document.head.appendChild(st);
+        line.style.animation = "drawLine 1.2s cubic-bezier(0.4,0,0.2,1) 0.45s forwards";
+
+        var dots = document.querySelector(".dots");
+        xy.forEach(function (p, i) {
+          var last = i === xy.length - 1;
+          var c = document.createElementNS(SVGNS, "circle");
+          c.setAttribute("cx", p[0]); c.setAttribute("cy", p[1]); c.setAttribute("r", last ? 15 : 8);
+          c.setAttribute("fill", last ? "#c084fc" : "#0a0913");
+          c.setAttribute("stroke", last ? "#f1ecfb" : "#8b7fe0"); c.setAttribute("stroke-width", last ? 5 : 3);
+          c.style.transformOrigin = p[0] + "px " + p[1] + "px"; c.style.transform = "scale(0)";
+          c.style.animation = "dotPop 0.4s cubic-bezier(0.16,1,0.3,1) " + (0.55 + i * 0.12) + "s forwards";
+          dots.appendChild(c);
+        });
+
+        // Callout over the last point (SVG viewBox is stretched to 912×640, x maps 1:1).
+        var lastXY = xy[xy.length - 1];
+        var callout = document.querySelector(".callout");
+        // Fixed 280px width; clamp the LEFT so the box stays inside x 96..990.
+        var cw = 280;
+        var cx = Math.max(96, Math.min(990 - cw, 84 + lastXY[0] - cw / 2));
+        callout.style.left = cx + "px";
+        callout.style.top = (660 + lastXY[1] - 104) + "px";
+        var cv = callout.querySelector(".cv"); cv.className = "cv num"; cv.textContent = v.peak_value != null ? String(v.peak_value) : "";
+        callout.querySelector(".cl").textContent = v.peak_label != null ? String(v.peak_label).normalize("NFC") : "";
+
+        var xrow = document.querySelector(".xrow");
+        var xlabels = Array.isArray(v.xlabels) ? v.xlabels : [];
+        xlabels.forEach(function (lbl) {
+          var d = document.createElement("div"); d.className = "xl"; d.textContent = String(lbl).normalize("NFC"); xrow.appendChild(d);
+        });
+      })();
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = { pause: function () {}, seek: function () {}, paused: function () { return true; } };
+    </script>
+  </body>
+</html>
