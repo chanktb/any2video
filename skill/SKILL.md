@@ -133,56 +133,46 @@ A good example to internalize:
 
 That single sentence has: contrast (`không phải … mà là`), specific name (`Hermes`), specific design choice (`trí nhớ dài hạn lưu state qua nhiều phiên`). One sentence does the work of 3 generic ones.
 
-#### 2.2.5 The 7-beat narrative arc (HARD)
+#### 2.2.5 The narrative arc (HARD — the opening decides retention)
 
-Every any2video runs through **7 beats** in this order. NEVER skip intro or outro.
+A GitHub tour runs this arc **in this order**. The first 2 seconds decide whether the viewer stays, so the opening is FIXED (feedback 2026-07-02).
 
 | # | Beat | Sec | What it does |
 |---|------|-----|--------------|
-| 1 | **intro** | 3-5 | PAIN-FIRST opener (HARD, §2.2.5.0). Lead with the viewer's problem in 2nd person — "Nếu bạn hay phải [pain] mà lại [friction], thì xem [repo này] — [one-breath value prop]." The avatar + name + tagline reveal VISUALLY while this line plays, so no "Hôm nay xem qua…" narration is needed to name the thing. NEVER a flat "Hôm nay xem qua repo này, một công cụ…". |
-| 2 | **hook** | 4-6 | Sharpen the value prop the intro opened — via contrast / a surprise stat, still 2nd-person, one breath. If the intro already fully hooked, this beat deepens the "why now" instead of re-hooking. |
-| 3 | **problem** | 5-8 | Pain it solves. Name competitors / status quo concretely. |
-| 4 | **solution** | 8-12 | How it works at a high level. Pipeline / architecture diagram. |
-| 5 | **details** | 7-10 | One specific differentiator — the thing nobody else does (e.g. cast lock, channel auto-ideate). |
-| 6 | **review** | 5-8 | Honest caveat-as-feature. Quick "what to know before installing". |
-| 7 | **outro** | 3-5 | Closing card — repo URL + license + soft sub icon. Narration MUST NOT spell URL char-by-char (rule below). |
+| 1 | **intro (identity)** | **≤2** | `frame-repo-identity`: circular owner avatar + GitHub mark + `owner/repo` (author's casing, never uppercased). Little or NO narration — it just says whose repo this is. Get off it fast; it is NOT where you hook. |
+| 2..k | **pain blocks** | 3-6 each | **4-6** short scenes, ONE felt pain each, **highlighted as it's spoken**. This IS the hook — dramatize the viewer's pains as separate blocks so the opening is dynamic, not one static sentence. Lead with THEIR problem (2nd person), name it concretely. |
+| pivot | **repo scroll** | = its narration | The instant the narration turns to the repo ("…thì repo này giúp bạn / thì cái này giúp bạn"), CUT to a **full-bleed repo-scroll** scene (`capture_url: https://github.com/<owner>/<repo>`). Describe what the repo solves; tune its `duration_sec` so the intro description finishes exactly as the scroll ends. |
+| k+2 | **problem** | 5-8 | NOW go into detail on the specific problem the repo tackles. |
+| k+3 | **details** | 7-10 | One differentiator — the thing nobody else does. |
+| k+4 | **review** | 5-8 | Honest caveat-as-feature. "What to know before installing." |
+| k+5 | **author outro** | 6 | Author-profile scroll (`capture_url: https://github.com/<owner>`) — ends with a **star nudge** (§2.2.5.0). |
+| k+6 | **promo** | 4 | `frame-made-with` "made with any2video" bumper — the FINAL scene, default ON (§2.2.7 item 10). |
 
-Total target: 50-75 sec. Intro and outro are NON-OPTIONAL — they are how the viewer figures out what they're watching and what to do next.
+Total target: 50-80 sec. `plan_critic` enforces: intro ≤2s + `frame-repo-identity`; ≥4 pain blocks before the scroll; a repo-scroll scene exists; the closing content scene is author-profile footage with a star line; promo (if present) is last.
 
-##### 2.2.5.0 Intro pain-hook (HARD — the opening 5 seconds decide the scroll)
+##### 2.2.5.0 Opening pains + closing star (HARD — the opening 2s decide the scroll)
 
-The #1 reason a repo-tour Short dies is a flat opener: "Hôm nay xem qua repo này…" / "Đây là một công cụ…". It states no problem, carries no hook, and gives the viewer nothing to stay for. Open on THEIR pain instead — the intro is the front bookend of the SAME pain the outro closes (§ outro pain-CTA below); write them as one thought split across the video.
+The intro is a **≤2s identity flash** (avatar + `owner/repo`) — it does NOT carry the hook. The hook lives in the **pain blocks** that follow: 4-6 short scenes, each naming ONE pain the viewer feels, highlighted as it's spoken. The OLD flat opener ("Hôm nay xem qua repo này…" / "Đây là một công cụ…") is still banned — but so is cramming the whole hook into one intro sentence. Break the pain into blocks.
 
-**Pattern (HARD):**
+**Pain-blocks pattern (HARD):** lead the FIRST block with the target viewer's pain-task, then let each following block add one more felt frustration, all 2nd-person:
 
 ```
-Nếu bạn [hay phải / thường xuyên] [pain-task the audience does],
-[hay chỉ là / hoặc] [softer version of the same audience] nhưng lại [friction they hate],
-thì xem [repo này] — [one-breath value prop, "chỉ với một câu lệnh"].
+[block 1] "Bạn hay phải [pain-task the audience does] đúng không."
+[block 2] "Rồi lại [second friction they hate]."
+[block 3] "Mà [third friction]…"
+[block 4] "Và [fourth friction]."
+→ pivot: "…thì repo này giúp bạn [one-breath value prop]."   → CUT to repo scroll
 ```
 
-Structure (mirrors the outro, reversed):
-1. **Name the pain-task** the target viewer does today ("hay phải làm video short giới thiệu repo", "thường xuyên audit SEO cho khách").
-2. **Widen to the audience + the friction** ("hay chỉ là thích review repo nhưng lại lười ngồi edit video").
-3. **Land the repo + value prop in ONE breath** ("thì xem repo này nhé — tự động làm video AI ngay trên máy, chỉ với một câu lệnh"). Naming the repo here is FINE (unlike the outro) — this is where the viewer learns what they're watching, but it comes AFTER the pain, never as the first words.
+- Each pain block is atomic (one idea), 2nd-person, and **highlights the key phrase as spoken** (the karaoke caption + a visual accent land together).
+- The pivot line is the LAST pain block's tail or its own tiny scene — the moment it names the repo, the repo-scroll scene starts.
+- **Where the pains come from:** `analysis.md > ## Problem` ("Who has it? Why does it matter?"). Same audience, same pains the outro will call back to.
+- **TTS-sanitize the repo name** in narration (rule 2.2.6 d.2): write it as pronounced (`any2video` → `en ni tu vi đeo`, `repo` → `rề pô`), display stays correct.
 
-**Reference (approved shape):**
-> "Nếu bạn thường xuyên phải làm video short giới thiệu repo, hay chỉ là thích review repo nhưng lại lười edit video, thì xem repo này nhé — một skill tự động làm video AI ngay trên máy tính của bạn, chỉ với một câu lệnh."
+**Closing star nudge (HARD).** The author-profile outro scene's narration MUST end by asking the viewer to star the repo, e.g.:
+> "…nếu thấy hay thì tặng tác giả một sao làm động lực nhé."
 
-That one sentence carries 2nd-person pain (`hay phải làm video short`), audience-widen (`hay chỉ là thích review repo`), friction (`lười edit video`), and the value prop in one breath (`tự động… chỉ với một câu lệnh`) — and never says "Hôm nay xem qua…".
-
-**Where the pain comes from:** `analysis.md > ## Problem` — the SAME source the outro uses. Intro opens the pain, outro closes it; keep them consistent (same audience, same pain), not two unrelated hooks.
-
-**Examples (per repo type — intro openers):**
-
-| Repo type | Example intro narration |
-|-----------|-------------------------|
-| Video generator | "Nếu bạn hay phải làm video giới thiệu repo mà lười ngồi edit, thì xem cái này — nó tự dựng video AI ngay trên máy, chỉ một câu lệnh." |
-| Google Ads plugin | "Nếu bạn đang chạy Google Ads mà không chắc tiền đang chảy đi đâu, thì xem skill này — nó tự soi tài khoản, chỉ ra chỗ đang lãng phí." |
-| Blog SEO auditor | "Nếu blog bạn đang tụt traffic mà không biết sửa từ đâu, thì xem cái này — nó tự audit rồi xếp việc cần làm theo thứ tự." |
-| CLI tool | "Nếu ngày nào bạn cũng phải làm [X] thủ công, thì xem một dòng lệnh này — nó làm hết trong vài giây." |
-
-**TTS-sanitize the repo name** in the intro line (rule 2.2.6d): write it as pronounced, not the raw slug (e.g. `any2video` → `en ni tu vi đeo`).
+`plan_critic` fails the plan (`outro_missing_star_line`) if the author-profile narration has no star nudge.
 
 **Outro narration (HARD — contextual pain-CTA, NO URL / no repo name).** The video always ships with a caption/post that already contains the URL — the link goes there when posting to FB / TG / TikTok. So the video's outro must NOT waste 5 seconds mentioning URLs or repo names. Instead: use those 5 seconds to hook the SPECIFIC PERSON who'd install this.
 
@@ -354,28 +344,34 @@ misses items 1–4 is **unfinished, not "chưa tới"** — re-open the phase, d
      narration: "Đây là repo <name> trên GitHub..."     # narrate over the scroll
      duration_sec: 10
    ```
-   Place it early (after hook). Render path auto-dispatches to `repo_footage.py`.
+   Place it at the **pivot** — right after the 4-6 pain blocks, the moment the
+   narration turns to the repo (§2.2.5). Render auto-dispatches to `repo_footage.py`.
    **Repo-footage rules (HARD):**
-   - The browser chrome shows the real `github.com/...` URL (padlock + address).
-     Rendered via PIL in `_render_chrome_png` — never fight ffmpeg drawtext on Win.
-   - Footage window is cropped short (`WIN_BOTTOM≈1470`) so the karaoke line sits
-     in the dark band below it, never over the page.
-   - Scroll is speed-capped (`PAN_SPEED_PX_PER_SEC≈300`) — a tall page shows less,
-     readably. Never blur past. Give the scene ≥7s.
-   - **Outro = author-profile footage (HARD), not a text card.** The LAST scene of a
-     repo tour MUST set `capture_url: https://github.com/<owner>` (profile root, NO
-     `/repo`) → shows the real person, bio, other repos, contribution graph. The white
-     paper-card / red-text `frame-statement-outro` is **BANNED** — `plan_critic` fails
-     any plan that uses it or that ends a GitHub tour without author-profile footage.
-     A plain text outro reads as "vô giá trị."
+   - **Full-bleed (feedback 2026-07-02):** the scroll fills the FULL width and runs
+     edge-to-edge — it does NOT obey the card safe-zone (it's real footage, not a
+     designed card). `repo_footage` keeps only a slim browser bar up top (the real
+     `github.com/...` URL + padlock, rendered via PIL) and a dark caption scrim at
+     the bottom so the karaoke line never drowns in the page. Nothing to configure.
+   - Scroll is speed-capped (`PAN_SPEED_PX_PER_SEC≈300`) and always spans the whole
+     narration, so **set `duration_sec` = the intro-description narration length** —
+     the scroll finishes exactly as the scene ends (§2.2.5 pivot). Give it ≥7s.
+   - **Outro = author-profile footage (HARD), not a text card.** The closing content
+     scene of a repo tour MUST set `capture_url: https://github.com/<owner>` (profile
+     root, NO `/repo`) → shows the real person, bio, other repos, contribution graph,
+     and its narration ends with the **star nudge** ("…tặng tác giả một sao làm động
+     lực nhé", §2.2.5.0). The white paper-card / red-text `frame-statement-outro` is
+     **BANNED** — `plan_critic` fails any plan that uses it or ends a GitHub tour
+     without author-profile footage + a star line. A plain text outro reads as "vô giá trị."
 
 3. **One honest-caveat scene** (retention feature, not filler). State a real
    limit or a "who should NOT use this". For claude-google-ads: *eCommerce-only,
    not LeadGen/Local/SaaS; needs ≥15 conv/week*. Every ref de-hypes on purpose
    ("benchmark đẹp không biến model thành nút mua bán").
 
-4. **Hook = one 2nd-person pain sentence OR a one-line analogy** — never "X. Y.
-   Z." fragments. Name real competitors + numbers every scene.
+4. **Hook = 4-6 pain blocks (§2.2.5), not one sentence.** After the ≤2s identity
+   intro, dramatize the viewer's pains as 4-6 short highlight-as-spoken blocks, then
+   pivot to the repo scroll. Each block is one 2nd-person pain — never "X. Y. Z."
+   fragments crammed together. Name real competitors + numbers.
 
 5. **Named + numbered "weapons".** Give each differentiator a title and a number
    (v3: "Vũ khí 01/02"). Mine any analysis.md / NotebookLM review for the 2–3
@@ -429,6 +425,15 @@ misses items 1–4 is **unfinished, not "chưa tới"** — re-open the phase, d
    see — a mojibake glyph, a wrong colour, a broken layout. Do not ship "close enough":
    all scenes must be correct before Phase 5.
 
+10. **Promo bumper — "made with any2video" (default ON).** Append a FINAL scene
+    `templateId: frame-made-with` crediting the tool (+ author). It's controlled by the
+    `--promo` flag (default ON; `--no-promo` to skip). The author name is NEVER hardcoded
+    in the repo — it comes from the operator's config (`ANY2VIDEO_PROMO_AUTHOR`, empty by
+    default → tool-credit only). `cli init` resolves the config into `source_pack.json →
+    promo_config`; copy those into the scene's `inputs`. `plan_critic` requires the promo,
+    when present, to be the LAST scene (after the author-profile outro). The tool name
+    (`any2video`) is shown as-is — not uppercased.
+
 #### 2.2.8 Only ever reference the CURRENT repo (HARD)
 
 The video, its `narration`, its template `inputs`, `analysis.md`, and the post caption
@@ -443,8 +448,10 @@ links — extract only what describes THIS repo.
 ```yaml
 meta:
   slug: <slug>
+  source: https://github.com/<owner>/<repo>   # the toured repo — plan_critic checks name casing vs this
+  source_type: github_repo
   lang: vi                          # vi (default) or en — drives narration language
-  total_duration_sec: <int>         # 45-75 sec for 9:16 Reels feel
+  total_duration_sec: <int>         # 50-80 sec for 9:16 Reels feel
   voice: vi-VN-Chirp3-HD-Charon     # DEFAULT: MALE, Google TTS. Female ONLY if the user asks.
   voice_provider: google            # DEFAULT google (Chirp 3 HD); auto-falls back to edge-tts (also MALE) if no key
   voice_rate: "+5%"                 # default: Chirp 3 HD at +5%, edge-tts fallback at +20% (bumped +5 — old default read a bit slow)
@@ -458,29 +465,50 @@ meta:
   footer: [ list of stat strings ]
 
 scenes:
+  # 1) INTRO IDENTITY — ≤2s, owner+repo in the author's casing (never uppercased).
   - id: 1
-    beat: hook                      # FREE-FORM label (hook / framing / demo / capability /
-                                    # honest-caveat / outro). Serves THIS repo's story.
-    templateId: frame-hub-spoke     # REQUIRED — pick from templates/scenes/CATALOG.md.
-    duration_sec: 5                 # from Phase 3 TTS (measured)
-    narration: "<flowing VN sentence(s), see principles 1-9 above>"
-    inputs:                         # REQUIRED — keys match the template's slots (see its meta.json).
-      headline: "..."               # template_render injects these; DO NOT hand-write HTML.
-      chips: [ ... ]                # real data only — see data_props rule below.
-    grounded_in:                    # provenance
-      - "<exact quote or fact from analysis.md Evidence this scene is built on>"
+    beat: intro
+    templateId: frame-repo-identity   # REQUIRED for a GitHub tour (CATALOG.md)
+    duration_sec: 2
+    narration: "Đây là repo của <owner>."   # short/empty — pain blocks carry the hook
+    inputs:
+      owner: "<owner>"                # exact casing from the source URL
+      repo: "<repo>"
+      avatar_url: "https://github.com/<owner>.png"
+      tagline: "<one-line repo description>"
+    grounded_in: [ "<repo identity from analysis.md>" ]
 
-  # Repo-footage / profile scene: NO templateId — set capture_url instead.
+  # 2..k) PAIN BLOCKS — 4-6 short scenes, one felt pain each, highlight-as-spoken.
   - id: 2
-    beat: proof
+    beat: pain
+    templateId: frame-vignelli
+    duration_sec: 4
+    narration: "Bạn hay phải <pain-task> đúng không."
+    inputs: { number: "...", label: "..." }
+    grounded_in: [ "<pain from analysis.md ## Problem>" ]
+  # ... id 3,4,5 (more pains) ...
+
+  # k+1) REPO-SCROLL PIVOT — full-bleed footage, NO templateId; duration = its narration.
+  - id: 6
+    beat: framing
     capture_url: https://github.com/<owner>/<repo>
-    duration_sec: 8
-    narration: "Đây là repo thật trên GitHub..."
+    duration_sec: 10
+    narration: "Thì repo này giúp bạn <one-breath value prop>..."
+
+  # ... problem / details / review scenes ...
+
+  # AUTHOR OUTRO — profile scroll, star nudge; then the promo bumper is appended last.
+  - id: 9
+    beat: outro
+    capture_url: https://github.com/<owner>     # profile root, NO /repo
+    duration_sec: 6
+    narration: "<pain-CTA> … nếu thấy hay thì tặng tác giả một sao làm động lực nhé."
 ```
 
 Constraints (HARD):
-- 7-10 atomic scenes total (per 2.2.6 atomicity rule — target 6-10s each)
-- Total duration target: 50-75 sec (Reels/Short feel)
+- A GitHub tour is ~11-14 scenes: 1 intro (≤2s) + 4-6 pain blocks + 1 repo scroll +
+  problem/details/review + author outro + promo. Non-github videos: 7-10 atomic scenes.
+- Total duration target: 50-80 sec (Reels/Short feel)
 - Every non-footage scene has a `templateId` from `templates/scenes/CATALOG.md` + an
   `inputs` block matching that template's slots. Scene HTML is generated by
   `template_render all` (Phase 4) — **never hand-write it.**
@@ -651,11 +679,14 @@ Final composite to `workspace/runs/<slug>/final.mp4` with:
   word-by-word, synced to voice, keyword-accent. `--no-subtitles` to disable
   (don't, unless the user asks). This is MANDATORY per rule 2.2.7 #1.
 - 350ms silence gap between scenes so voice never feels "tua nhanh cho kịp"
-- Optional outro CTA
+- **Tail guard on the LAST scene (HARD, `--tail-pad`, default 0.6s):** the final
+  scene's video is freeze-extended to cover the full voice + a closing breath, so the
+  last narration is NEVER clipped by `-shortest` (fixes "Link repo ở dưới comment" →
+  cut to "Link repo ở dưới"). Karaoke ignores the breath. Leave it at 0.6s.
 
 Recommended compose call: `python -m any2video.lib.compose.ffmpeg_compose <plan> --gap 350`
 (BGM is ON by default — a random bundled CC-BY track. `--bgm <name>` to pick one,
-`--bgm off` to silence.)
+`--bgm off` to silence. Tail guard is on by default — the closing narration won't be cut.)
 
 ### Phase 6 — Final delivery to Telegram (NEW, gated on `intake.telegram`, OPTIONAL)
 

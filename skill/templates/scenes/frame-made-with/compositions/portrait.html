@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=1080, height=1920" />
+        <title>Made With · Portrait 9:16</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            /*
+   * frame-made-with — the "made with any2video" promo bumper (feedback 2026-07-02).
+   * Appended at the very end when the promo flag is ON (default). Credits the
+   * TOOL (wordmark, kept lowercase) + optionally its author, separate from the
+   * subject repo. INPUT-DRIVEN: tool / tagline / author / author_avatar / url.
+   * The author name is supplied from the operator's config — the shipped default
+   * is EMPTY so the public template never hardcodes a real person's name; when
+   * no author is given the author pill is simply hidden. Portrait 9:16.
+   */
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            html, body { width: 1080px; height: 1920px; overflow: hidden; }
+            #root {
+                position: relative;
+                width: 1080px;
+                height: 1920px;
+                overflow: hidden;
+                background: #020c1a;
+                color: #fafaf8;
+                font-family: "Inter Tight", system-ui, sans-serif;
+            }
+            .blob { position:absolute; border-radius:50%; mix-blend-mode:screen; filter:blur(120px); z-index:0; opacity:0.5; }
+            @keyframes float1 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(80px,-60px) scale(1.15);} }
+            @keyframes float2 { 0%,100%{transform:translate(0,0) scale(1.1);} 50%{transform:translate(-100px,40px) scale(0.9);} }
+            @keyframes float3 { 0%,100%{transform:translate(0,0) scale(0.95);} 50%{transform:translate(50px,80px) scale(1.2);} }
+            .b1 { width:480px; height:480px; background:#1565c0; top:-100px; left:-120px; animation:float1 12s ease-in-out infinite; }
+            .b2 { width:400px; height:400px; background:#6a1b9a; top:22%; right:-120px; animation:float2 10s ease-in-out infinite; }
+            .b3 { width:380px; height:380px; background:#1976d2; bottom:-100px; left:22%; animation:float3 14s ease-in-out infinite; }
+            .b4 { width:300px; height:300px; background:#0097a7; top:62%; left:6%; animation:float1 16s ease-in-out infinite; }
+            .scrim {
+                position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+                width:1180px; height:1180px; z-index:3; pointer-events:none;
+                background:radial-gradient(ellipse at center, rgba(2,8,20,0.78) 0%, rgba(2,8,20,0.55) 44%, rgba(2,8,20,0) 72%);
+                filter:blur(24px);
+            }
+            .chip {
+                position:absolute; left:96px; right:96px; display:flex; justify-content:space-between;
+                font-size:22px; letter-spacing:4px; text-transform:uppercase; opacity:0.7; z-index:5;
+                font-weight:500; text-shadow:0 2px 12px rgba(0,0,0,0.4);
+            }
+            .chip.top { top:90px; }
+            .chip.bot { bottom:90px; }
+
+            @keyframes fadeUp { from{opacity:0;transform:translateY(28px);} to{opacity:1;transform:translateY(0);} }
+            @keyframes pop { 0%{opacity:0;transform:scale(.82);} 60%{transform:scale(1.04);} 100%{opacity:1;transform:scale(1);} }
+
+            .promo {
+                position:absolute; left:96px; right:96px; top:430px; z-index:10;
+                display:flex; flex-direction:column; align-items:center; text-align:center;
+            }
+            .kicker {
+                font-size:28px; font-weight:600; letter-spacing:8px; text-transform:uppercase;
+                color:#94a3b8; margin-bottom:30px; animation:fadeUp 0.6s ease-out 0.15s both;
+            }
+            /* tool wordmark — casing preserved (do NOT uppercase the tool name) */
+            .wordmark {
+                font-size:150px; font-weight:900; letter-spacing:-4px; line-height:1.0;
+                background:linear-gradient(120deg, #ff8c00 0%, #ff4d6d 38%, #e040fb 68%, #7c4dff 100%);
+                -webkit-background-clip:text; background-clip:text; color:transparent;
+                filter:drop-shadow(0 0 60px rgba(224,64,251,0.4)) drop-shadow(0 8px 40px rgba(0,0,0,0.6));
+                animation:pop 0.7s cubic-bezier(0.16,1,0.3,1) 0.3s both;
+            }
+            .tagline {
+                margin-top:26px; font-size:40px; font-weight:500; line-height:1.35; color:#5ce1e6;
+                opacity:0.92; max-width:840px; text-shadow:0 2px 16px rgba(0,0,0,0.4);
+                animation:fadeUp 0.7s ease-out 0.55s both;
+            }
+            .rule { width:120px; height:3px; border-radius:3px; margin:52px 0 40px;
+                background:linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+                animation:fadeUp 0.6s ease-out 0.7s both; }
+            .author {
+                display:inline-flex; align-items:center; gap:22px;
+                padding:18px 40px 18px 20px; border-radius:999px;
+                background:rgba(255,255,255,0.06); border:1.5px solid rgba(255,255,255,0.14);
+                box-shadow:0 8px 40px rgba(0,0,0,0.45);
+                animation:fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.85s both;
+            }
+            .author .ava {
+                width:84px; height:84px; border-radius:50%; object-fit:cover; flex:none;
+                background:radial-gradient(circle at 50% 38%, #7c4dff 0%, #2a1a52 70%);
+                box-shadow:0 0 0 3px rgba(224,64,251,0.5), 0 0 30px rgba(224,64,251,0.4);
+            }
+            .author .who { text-align:left; }
+            .author .by { font-size:24px; color:#94a3b8; font-weight:500; letter-spacing:1px; }
+            /* author name — casing preserved */
+            .author .name { font-size:42px; font-weight:800; color:#fafaf8; line-height:1.1; }
+            .repo-pill {
+                margin-top:44px; display:inline-flex; align-items:center; gap:18px;
+                padding:18px 36px; border-radius:999px;
+                background:rgba(0,0,0,0.35); border:1.5px solid rgba(92,225,230,0.35);
+                animation:fadeUp 0.7s ease-out 1.05s both;
+            }
+            .repo-pill .gh-mark { width:44px; height:44px; fill:#fff; flex:none; }
+            /* url — monospace, casing preserved */
+            .repo-pill .url { font-family:"JetBrains Mono",monospace; font-size:36px; font-weight:500;
+                color:#e2e8f0; letter-spacing:-0.5px; white-space:nowrap; }
+            /* .rtail (not .accent) — the universal accent-spacing guard in
+               template_render injects a space around .accent, which would break
+               the URL into 'chanktb/ any2video'. */
+            .repo-pill .url .rtail { color:#5ce1e6; }
+        </style>
+    </head>
+    <body>
+        <div
+            id="root"
+            data-composition-id="main"
+            data-start="0"
+            data-duration="4"
+            data-width="1080"
+            data-height="1920"
+            data-composition-variables='{"kicker":"Video này được tạo bởi","tool":"any2video","tagline":"Biến repo, URL hay bài viết thành video có lồng tiếng.","author":"","author_label":"Tác giả","author_avatar":"","url":"github.com/chanktb/any2video","category":"OPEN SOURCE","license":"MIT"}'
+        >
+            <div class="blob b1"></div>
+            <div class="blob b2"></div>
+            <div class="blob b3"></div>
+            <div class="blob b4"></div>
+            <div class="scrim"></div>
+
+            <div class="chip top"><span>MADE WITH</span><span>9:16</span></div>
+
+            <div class="promo">
+                <div class="kicker"></div>
+                <div class="wordmark"></div>
+                <p class="tagline"></p>
+
+                <div class="rule"></div>
+
+                <div class="author">
+                    <img class="ava" alt="author" />
+                    <span class="who">
+                        <span class="by"></span><br />
+                        <span class="name"></span>
+                    </span>
+                </div>
+
+                <div class="repo-pill">
+                    <svg class="gh-mark" viewBox="0 0 98 96" aria-hidden="true">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"/>
+                    </svg>
+                    <span class="url"></span>
+                </div>
+            </div>
+
+            <div class="chip bot"><span class="category"></span><span class="license"></span></div>
+        </div>
+
+        <script>
+            (function () {
+                var v =
+                    window.__hyperframes &&
+                    typeof window.__hyperframes.getVariables === "function"
+                        ? window.__hyperframes.getVariables()
+                        : {};
+                var set = function (sel, text) {
+                    var el = document.querySelector(sel);
+                    if (el && text != null) el.textContent = String(text);
+                };
+                set(".kicker", v.kicker);
+                set(".wordmark", v.tool);
+                set(".tagline", v.tagline);
+                set(".by", v.author_label);
+                set(".name", v.author);
+                set(".category", v.category);
+                set(".license", v.license);
+
+                // url — accent the tail after the last '/' (the repo name), casing kept
+                var urlEl = document.querySelector(".url");
+                if (urlEl && v.url) {
+                    var u = String(v.url);
+                    var i = u.lastIndexOf("/");
+                    if (i >= 0 && i < u.length - 1) {
+                        urlEl.innerHTML = "";
+                        urlEl.appendChild(document.createTextNode(u.slice(0, i + 1)));
+                        var acc = document.createElement("span");
+                        acc.className = "rtail";
+                        acc.textContent = u.slice(i + 1);
+                        urlEl.appendChild(acc);
+                    } else {
+                        urlEl.textContent = u;
+                    }
+                }
+
+                // author pill: only show when an author name is supplied (public
+                // default is empty). Bind avatar; keep the gradient fallback if none.
+                var authorBox = document.querySelector(".author");
+                if (!v.author || !String(v.author).trim()) {
+                    if (authorBox) authorBox.style.display = "none";
+                } else {
+                    var ava = document.querySelector(".author .ava");
+                    var asrc = v.author_avatar || v.avatar_url;
+                    if (ava) {
+                        if (asrc) {
+                            ava.src = asrc;
+                            ava.onerror = function () { ava.removeAttribute("src"); };
+                        } else {
+                            ava.removeAttribute("src");  // keep gradient fallback bg
+                        }
+                    }
+                }
+
+                [".kicker", ".tagline", ".category", ".license"].forEach(function (s) {
+                    var el = document.querySelector(s);
+                    if (el && !(el.textContent || "").trim()) el.style.display = "none";
+                });
+            })();
+        </script>
+    </body>
+</html>

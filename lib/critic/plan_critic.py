@@ -66,6 +66,18 @@ _PHONETIC_TERMS = [
     (r"\bany2video\b", re.IGNORECASE, "any2video", "en ni tu vi đeo"),
 ]
 
+# Author-profile outro MUST nudge a star (feedback 2026-07-02): "…nếu thấy hay thì
+# tặng tác giả một sao làm động lực nhé." Match a star-giving intent, not the
+# bare word "sao" (which also means why/how in VN).
+_STAR_LINE = re.compile(
+    r"(tặng|thả|cho|để lại|một|1)\s*(ngôi\s*)?sao|sao\b.{0,24}(động lực|tác giả|ủng hộ)",
+    re.IGNORECASE,
+)
+
+# github.com/<owner>/<repo> repo-scroll footage vs github.com/<owner> profile scroll.
+_RE_REPO_SCROLL = re.compile(r"https?://github\.com/[^/\s]+/[^/\s]+/?$", re.IGNORECASE)
+_RE_PROFILE_SCROLL = re.compile(r"https?://github\.com/[^/\s]+/?$", re.IGNORECASE)
+
 
 def load_plan(path: Path) -> dict:
     return plan_yaml.load_plan(path)
@@ -100,7 +112,7 @@ def check(plan_path: Path, analysis_path: Path | None) -> dict:
         issues.append({"kind": "hook_id_not_1", "got": s1.get("id")})
 
     # Per-scene structural checks (accept either legacy `role` or new `beat`)
-    for s in scenes:
+    for idx, s in enumerate(scenes):
         sid = s.get("id")
         for field in ("duration_sec", "narration", "visual_brief"):
             if not s.get(field):
@@ -109,7 +121,11 @@ def check(plan_path: Path, analysis_path: Path | None) -> dict:
         if not beat_or_role:
             issues.append({"kind": "scene_missing_field", "scene_id": sid, "field": "beat"})
         d = s.get("duration_sec") or 0
-        if not (2 <= d <= 14):
+        # The intro identity card is a fast ≤2s flash (retention) — allow a lower
+        # floor than the normal 2s minimum so d=1.5 isn't wrongly flagged.
+        _tpl = (s.get("templateId") or s.get("template_id") or "").lower()
+        dmin = 1.2 if (idx == 0 and _tpl == "frame-repo-identity") else 2
+        if not (dmin <= d <= 14):
             issues.append({"kind": "duration_out_of_range", "scene_id": sid, "got": d})
 
     # Total duration vs target
@@ -123,10 +139,13 @@ def check(plan_path: Path, analysis_path: Path | None) -> dict:
             "tolerance_pct": DURATION_TOLERANCE * 100,
         })
 
-    # ──────────── OUTRO RULES (SKILL 2.2.7 — HARD) ────────────
-    # The white paper-card / red-text outro (frame-statement-outro) is banned: a repo
-    # tour closes on AUTHOR-PROFILE scroll footage, not a text card.
+    # ──────────── OPENING + OUTRO ARC (SKILL §2.2.5 / §2.2.7 — HARD) ────────────
     source_type = (meta.get("source_type") or "").lower()
+    source_url = str(meta.get("source") or meta.get("source_url") or "")
+    is_github = (source_type in ("github_repo", "github")
+                 or bool(re.search(r"github\.com/[^/\s]+/[^/\s]+", source_url)))
+
+    # frame-statement-outro (white card / red text) is banned everywhere.
     for s in scenes:
         tpl = (s.get("templateId") or s.get("template_id") or "").lower()
         if tpl == "frame-statement-outro":
@@ -136,18 +155,97 @@ def check(plan_path: Path, analysis_path: Path | None) -> dict:
                 "hint": "frame-statement-outro (white card / red text) is banned. Close on "
                         "author-profile scroll footage: set capture_url to https://github.com/<owner>.",
             })
-    last = scenes[-1]
-    if source_type in ("github_repo", "github"):
-        cap = (last.get("capture_url") or "").strip()
-        # author profile = github.com/<owner> with NO repo path (that's the repo footage)
-        if not re.match(r"https?://github\.com/[^/\s]+/?$", cap):
+
+    # Promo bumper (frame-made-with), when present, MUST be the final scene.
+    promo_idxs = [i for i, s in enumerate(scenes)
+                  if (s.get("templateId") or s.get("template_id") or "").lower() == "frame-made-with"]
+    if promo_idxs and promo_idxs[-1] != len(scenes) - 1:
+        issues.append({
+            "kind": "promo_not_last",
+            "scene_id": scenes[promo_idxs[-1]].get("id"),
+            "hint": "The frame-made-with promo bumper must be the FINAL scene (after the author-profile outro).",
+        })
+    # The closing CONTENT scene = last scene that is NOT the promo bumper.
+    content_idxs = [i for i in range(len(scenes)) if i not in promo_idxs]
+    closing = scenes[content_idxs[-1]] if content_idxs else scenes[-1]
+
+    if is_github:
+        # Scene 1 = intro identity card, ≤2s (first 2s decide retention).
+        s1_tpl = (s1.get("templateId") or s1.get("template_id") or "").lower()
+        if s1_tpl != "frame-repo-identity":
+            issues.append({
+                "kind": "intro_not_identity",
+                "scene_id": s1.get("id"),
+                "got": s1_tpl or None,
+                "hint": "Scene 1 of a GitHub tour must be the identity card templateId "
+                        "frame-repo-identity (circular owner avatar + GitHub mark + owner/repo).",
+            })
+        if (s1.get("duration_sec") or 0) > 2:
+            issues.append({
+                "kind": "intro_too_long",
+                "scene_id": s1.get("id"),
+                "got": s1.get("duration_sec"),
+                "hint": "Intro identity scene must be ≤ 2s — get to the pain fast, it decides retention.",
+            })
+
+        # First FULL repo-scroll scene (capture_url = github.com/<owner>/<repo>).
+        scroll_idx = next((i for i, s in enumerate(scenes)
+                           if _RE_REPO_SCROLL.match((s.get("capture_url") or "").strip())), None)
+        if scroll_idx is None:
+            issues.append({
+                "kind": "missing_repo_scroll",
+                "hint": "After the pain blocks, add a FULL-BLEED repo-scroll scene right when the "
+                        "narration pivots to the repo: capture_url = https://github.com/<owner>/<repo>.",
+            })
+        else:
+            pain_count = scroll_idx - 1  # scenes between intro(idx 0) and the scroll
+            if pain_count < 4:
+                issues.append({
+                    "kind": "too_few_pain_blocks",
+                    "found": max(0, pain_count),
+                    "minimum": 4,
+                    "hint": "List ≥4 pain-point block scenes between the intro and the repo-scroll "
+                            "pivot (highlight-as-spoken) so the opening is dynamic. SKILL §2.2.5.",
+                })
+
+        # Closing content scene = author profile scroll (github.com/<owner>, NO /repo).
+        cap = (closing.get("capture_url") or "").strip()
+        if not _RE_PROFILE_SCROLL.match(cap):
             issues.append({
                 "kind": "outro_not_author_profile",
-                "scene_id": last.get("id"),
+                "scene_id": closing.get("id"),
                 "got": cap or None,
-                "hint": "GitHub repo tour MUST end on the author's profile scroll: set the last "
-                        "scene's capture_url to https://github.com/<owner> (profile root, NO /repo).",
+                "hint": "The closing content scene MUST be the author's profile scroll: capture_url = "
+                        "https://github.com/<owner> (profile root, NO /repo).",
             })
+        elif not _STAR_LINE.search(closing.get("narration") or ""):
+            issues.append({
+                "kind": "outro_missing_star_line",
+                "scene_id": closing.get("id"),
+                "hint": "End the author-profile narration with a star nudge, e.g. "
+                        "'…nếu thấy hay thì tặng tác giả một sao làm động lực nhé.'",
+            })
+
+    # Name casing: owner/repo must be shown EXACTLY as the author wrote them
+    # (never uppercased / title-cased). Verifiable against the source URL.
+    m = re.search(r"github\.com/([^/\s]+)/([^/\s?#]+)", source_url)
+    if m:
+        c_owner = m.group(1)
+        c_repo = re.sub(r"\.git$", "", m.group(2).rstrip("/"))
+        for s in scenes:
+            inp = s.get("inputs") or {}
+            for slot, canon in (("owner", c_owner), ("repo", c_repo)):
+                val = inp.get(slot)
+                if isinstance(val, str) and val and val.lower() == canon.lower() and val != canon:
+                    issues.append({
+                        "kind": "name_casing_changed",
+                        "scene_id": s.get("id"),
+                        "slot": slot,
+                        "got": val,
+                        "expected": canon,
+                        "hint": f"Show '{slot}' EXACTLY as the author wrote it: '{canon}', not '{val}'. "
+                                "Never uppercase/title-case a repo/owner name (respect the author).",
+                    })
 
     # Grounding: every data_props value present in Evidence
     if analysis_path and analysis_path.is_file():

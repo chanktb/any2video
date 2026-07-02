@@ -44,6 +44,71 @@ def _build_trim_filter(trim_leading: bool, trim_trailing: bool) -> str | None:
     return ",".join(parts)
 
 
+def _probe_dur(path: Path) -> float | None:
+    try:
+        cp = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+             "-of", "default=noprint_wrappers=1:nokey=1", str(path)],
+            capture_output=True, text=True, check=True, timeout=15,
+        )
+        return float(cp.stdout.strip())
+    except (subprocess.CalledProcessError, ValueError, subprocess.TimeoutExpired):
+        return None
+
+
+def mux_last_scene(video_mp4: Path, audio_mp3: Path, out_mp4: Path,
+                   sfx: dict | None = None, trim_leading: bool = True,
+                   tail_pad_sec: float = 0.6) -> dict:
+    """Mux the FINAL scene so its narration is NEVER clipped.
+
+    Root cause of "câu chót bị cắt" (user, e.g. 'Link repo ở dưới comment nhé'
+    → 'Link repo ở dưới'): the common mux path uses `-shortest`, which caps the
+    output at whichever of {video, voice} is SHORTER. If the last scene's voice
+    runs a hair longer than its rendered video, `-shortest` chops the tail words.
+
+    Fix (last scene only): freeze-extend the video to cover the full voice
+    length, pad the voice with `tail_pad_sec` of trailing silence (a closing
+    breath), and drop `-shortest` — both streams end at the same, voice-driven
+    length. Trailing-silence trim is always OFF here (we WANT the closing pause).
+    """
+    a_dur = _probe_dur(audio_mp3) or 0.0
+    v_dur = _probe_dur(video_mp4) or 0.0
+    target = max(a_dur, v_dur) + max(0.0, tail_pad_sec)
+    v_pad = max(0.0, target - v_dur)
+
+    trim_filter = _build_trim_filter(trim_leading, False)  # never trim the tail
+    a_chain = (trim_filter + ",") if trim_filter else ""
+    filters = [f"[0:v]tpad=stop_mode=clone:stop_duration={v_pad:.3f}[v_out]",
+               f"[1:a]{a_chain}apad=whole_dur={target:.3f}[a_pad]"]
+    a_map = "[a_pad]"
+    extra_inputs: list[str] = []
+    use_sfx = bool(sfx and Path(sfx.get("path", "")).is_file())
+    if use_sfx:
+        sfx_vol = float(sfx.get("volume", 0.6))
+        sfx_off = int(float(sfx.get("start_offset_sec", 0.0)) * 1000)
+        filters.append(f"[2:a]adelay={sfx_off}|{sfx_off},volume={sfx_vol}[sfx]")
+        filters.append("[a_pad][sfx]amix=inputs=2:duration=first:dropout_transition=0[a_out]")
+        a_map = "[a_out]"
+        extra_inputs = ["-i", str(sfx.get("path"))]
+
+    cp = subprocess.run(
+        ["ffmpeg", "-y", "-loglevel", "error",
+         "-i", str(video_mp4), "-i", str(audio_mp3), *extra_inputs,
+         "-filter_complex", ";".join(filters),
+         "-map", "[v_out]", "-map", a_map,
+         "-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
+         "-pix_fmt", "yuv420p", "-r", "30",
+         "-c:a", "aac", "-b:a", "192k",
+         str(out_mp4)],
+        capture_output=True, text=True,
+    )
+    if cp.returncode != 0:
+        return {"error": "mux_last_scene_failed", "stderr": cp.stderr[-500:]}
+    return {"muxed_path": str(out_mp4), "sfx": sfx if use_sfx else None,
+            "trim_leading": trim_leading, "trim_trailing": False,
+            "tail_pad_sec": tail_pad_sec, "voice_sec": round(a_dur, 2)}
+
+
 def mux_scene(video_mp4: Path, audio_mp3: Path, out_mp4: Path,
               sfx: dict | None = None, trim_leading: bool = True,
               trim_trailing: bool = True) -> dict:
@@ -365,7 +430,8 @@ def concat_gap_hardcut(muxed_paths: list[Path], durations: list[float],
 def compose(plan_path: Path, crossfade_ms: int = 0,
             add_poster: bool = True, poster_hold_sec: float = 0.1,
             gap_ms: int = 350, subtitles: bool = True,
-            bgm: str | None = None, bgm_gain: float = 0.22) -> dict:
+            bgm: str | None = None, bgm_gain: float = 0.22,
+            tail_pad_sec: float = 0.6) -> dict:
     if not shutil.which("ffmpeg"):
         return {"error": "ffmpeg_not_on_path"}
 
@@ -403,9 +469,16 @@ def compose(plan_path: Path, crossfade_ms: int = 0,
         # Last scene: keep trailing silence so the final word isn't clipped.
         is_first = idx == 0
         is_last = idx == last_idx
-        r = mux_scene(v, a, muxed, sfx=sfx,
-                      trim_leading=not is_first,
-                      trim_trailing=not is_last)
+        if is_last:
+            # Final scene: guard the closing narration from -shortest clipping
+            # + add a breath. See mux_last_scene.
+            r = mux_last_scene(v, a, muxed, sfx=sfx,
+                               trim_leading=not is_first,
+                               tail_pad_sec=tail_pad_sec)
+        else:
+            r = mux_scene(v, a, muxed, sfx=sfx,
+                          trim_leading=not is_first,
+                          trim_trailing=True)
         r["id"] = sid
         mux_results.append(r)
         if "error" in r:
@@ -431,7 +504,11 @@ def compose(plan_path: Path, crossfade_ms: int = 0,
         final_scene_path = muxed
         if subtitles:
             ass = scenes_dir / f"{sid}.ass"
-            sub_info = _subs.build_scene_ass(s, actual, ass)
+            # Karaoke tracks the SPEECH, not the trailing breath: on the last
+            # scene `actual` includes tail_pad silence, so subtract it or the
+            # final words would stretch past the voice.
+            sub_dur = actual - (tail_pad_sec if is_last else 0.0)
+            sub_info = _subs.build_scene_ass(s, max(0.5, sub_dur), ass)
             r["subtitles"] = sub_info
             if "events" in sub_info:
                 subbed = scenes_dir / f"{sid}.subbed.mp4"
@@ -548,6 +625,9 @@ def main() -> int:
                              "to a music file; or 'off' for none. Empty pool → silent.")
     parser.add_argument("--bgm-gain", type=float, default=0.22,
                         help="BGM volume multiplier before ducking (default 0.22)")
+    parser.add_argument("--tail-pad", type=float, default=0.6,
+                        help="Closing breath (sec) appended to the LAST scene so the "
+                             "final narration is never clipped by -shortest (default 0.6)")
     args = parser.parse_args()
 
     plan_path = Path(args.plan).resolve()
@@ -560,7 +640,8 @@ def main() -> int:
                      poster_hold_sec=args.poster_hold,
                      gap_ms=args.gap,
                      subtitles=not args.no_subtitles,
-                     bgm=args.bgm, bgm_gain=args.bgm_gain)
+                     bgm=args.bgm, bgm_gain=args.bgm_gain,
+                     tail_pad_sec=args.tail_pad)
     print(json.dumps(result, indent=2, ensure_ascii=False))
     return 0 if "error" not in result else 1
 

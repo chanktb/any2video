@@ -37,13 +37,22 @@ DEVICE_SCALE = 2
 # readably, instead of blurring past.
 PAN_SPEED_PX_PER_SEC = 300
 
-# Canvas / framing
+# Canvas / framing — FULL-BLEED scroll (feedback 2026-07-02): the repo-scroll scene
+# fills the whole width and runs edge-to-edge (it does NOT obey the card safe-zone
+# — it's real footage, not a designed card). We keep only a slim browser bar up
+# top (the real github.com URL is a HARD authenticity signal) and a dark caption
+# scrim down bottom so the karaoke line never drowns in the page background.
 CANVAS_W, CANVAS_H = 1080, 1920
-CARD_W = 900                   # screenshot width on canvas (leaves 90px side safe)
-WIN_TOP = 250                  # below the browser bar
-# Crop the footage window shorter (user feedback: "crop ngắn preview đi 1 chút
-# để chỗ cho captions") — footage ends here, dark band below seats the karaoke line.
-WIN_BOTTOM = 1470
+CARD_W = 1080                  # FULL width — no side margin (was 900)
+WIN_TOP = 200                  # slim browser bar height
+WIN_BOTTOM = 1920              # footage runs to the very bottom (was 1470)
+# Bottom caption scrim: a soft transparent→dark ramp (SCRIM_TOP→PLATE_TOP) that
+# blends into a near-solid dark plate (PLATE_TOP→bottom). The karaoke caption
+# (subtitles MARGIN_V≈300 → ~y1560-1680) lands on the plate at ≥PLATE_ALPHA so
+# white text stays legible even over a bright (light-mode) GitHub page.
+SCRIM_TOP = 1360
+PLATE_TOP = 1520
+PLATE_ALPHA = 185
 # System monospace for the address-bar URL (VN-safe, always present on Windows).
 ADDR_FONT = "C:/Windows/Fonts/consola.ttf"
 BG = "0x0a0e14"
@@ -110,39 +119,52 @@ def _addr_label(url: str) -> str:
     return s[:46]
 
 
-def _render_chrome_png(url_label: str, out_png: Path) -> None:
-    """Render the top browser-chrome bar (dark mask + 3 dots + address pill +
-    URL text) as an opaque PNG via PIL — avoids ffmpeg drawtext font-path pain
-    on Windows and gives full control of the address text."""
+def _render_overlay_png(url_label: str, out_png: Path) -> None:
+    """Render a FULL-CANVAS RGBA overlay for the footage: an opaque top browser
+    bar (dark mask + 3 dots + full-width address pill + URL text) AND a bottom
+    caption scrim (transparent → dark gradient). Overlaid once over the panned
+    screenshot. PIL avoids ffmpeg drawtext font-path pain on Windows and gives
+    full control of the address text + the scrim ramp."""
     from PIL import Image, ImageDraw, ImageFont
 
-    img = Image.new("RGBA", (CANVAS_W, WIN_TOP), (10, 14, 20, 255))  # BG opaque
+    img = Image.new("RGBA", (CANVAS_W, CANVAS_H), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    # window bar
-    d.rounded_rectangle([90, 140, 90 + CARD_W, 204], radius=14, fill=(22, 27, 34, 255))
-    # traffic-light dots
-    for cx, col in ((127, (255, 95, 87)), (153, (254, 188, 46)), (179, (40, 200, 64))):
-        d.ellipse([cx - 7, 166, cx + 7, 180], fill=col)
-    # address pill
-    d.rounded_rectangle([220, 156, 960, 192], radius=8, fill=(13, 17, 23, 255))
-    # small padlock glyph drawn with primitives (Consolas has no emoji)
-    lock_x, lock_y = 240, 166
+
+    # ── top browser bar (opaque, hides any upward footage spill) ──
+    d.rectangle([0, 0, CANVAS_W, WIN_TOP], fill=(10, 14, 20, 255))
+    d.rounded_rectangle([40, 118, CANVAS_W - 40, 182], radius=14, fill=(22, 27, 34, 255))
+    for cx, col in ((82, (255, 95, 87)), (108, (254, 188, 46)), (134, (40, 200, 64))):
+        d.ellipse([cx - 7, 143, cx + 7, 157], fill=col)
+    # address pill spans most of the (now full-width) bar
+    d.rounded_rectangle([178, 134, CANVAS_W - 60, 170], radius=8, fill=(13, 17, 23, 255))
+    lock_x, lock_y = 198, 144
     d.rounded_rectangle([lock_x, lock_y + 7, lock_x + 15, lock_y + 20], radius=3, fill=(139, 148, 158, 255))
     d.arc([lock_x + 3, lock_y, lock_x + 12, lock_y + 12], start=180, end=360, fill=(139, 148, 158, 255), width=2)
-    # URL text (monospace)
     try:
         font = ImageFont.truetype("C:/Windows/Fonts/consola.ttf", 25)
     except OSError:
         font = ImageFont.load_default()
-    d.text((268, 162), _addr_label(url_label), font=font, fill=(154, 164, 175, 255))
+    d.text((226, 140), _addr_label(url_label), font=font, fill=(154, 164, 175, 255))
+
+    # ── bottom caption scrim: soft ramp (SCRIM_TOP→PLATE_TOP) blending into a
+    #    near-solid plate (PLATE_TOP→bottom) so the caption band is solidly dark ──
+    for y in range(SCRIM_TOP, CANVAS_H):
+        if y < PLATE_TOP:
+            frac = (y - SCRIM_TOP) / max(1, PLATE_TOP - SCRIM_TOP)
+            a = int(PLATE_ALPHA * (frac ** 1.3))
+        else:
+            frac = (y - PLATE_TOP) / max(1, CANVAS_H - PLATE_TOP)
+            a = int(PLATE_ALPHA + (238 - PLATE_ALPHA) * frac)
+        d.line([(0, y), (CANVAS_W, y)], fill=(6, 10, 16, a))
+
     img.save(out_png)
 
 
 def build_scroll_clip(png: Path, png_w: int, png_h: int,
                       out_mp4: Path, duration_sec: float,
                       url_label: str = "") -> dict:
-    """Pan the tall screenshot vertically inside a 9:16 browser-framed canvas,
-    with a real address-bar URL and a caption-safe bottom crop."""
+    """Pan the tall screenshot vertically, full-bleed, inside a 9:16 canvas with
+    a slim real address-bar up top and a dark caption scrim at the bottom."""
     scaled_h = round(png_h * (CARD_W / png_w))
     win_h = WIN_BOTTOM - WIN_TOP
     crop_note = None
@@ -161,27 +183,27 @@ def build_scroll_clip(png: Path, png_w: int, png_h: int,
     else:
         y_expr = f"{WIN_TOP}+({(win_h - scaled_h)}/2)"  # center static
 
-    # Render the browser chrome (bar + dots + pill + URL) once as a PNG (PIL),
-    # then overlay it — dodges ffmpeg drawtext font-path escaping on Windows.
-    chrome_png = out_mp4.parent / f"._chrome_{out_mp4.stem}.png"
-    _render_chrome_png(url_label, chrome_png)
+    # Render the full-canvas overlay (top browser bar + bottom caption scrim)
+    # once as a PNG (PIL), then overlay it — dodges ffmpeg drawtext font-path
+    # escaping on Windows and bakes the caption-legibility gradient.
+    overlay_png = out_mp4.parent / f"._overlay_{out_mp4.stem}.png"
+    _render_overlay_png(url_label, overlay_png)
 
     # Filtergraph:
-    #  [bg] dark canvas → [img] screenshot scaled+panned via overlay →
-    #  overlay chrome PNG at top (opaque, hides upward spill) → bottom crop band.
+    #  [bg] dark canvas → [img] screenshot scaled to FULL width + panned →
+    #  overlay the full-canvas PNG (top bar hides upward spill, bottom scrim
+    #  darkens the caption band). Footage is full-bleed — no side/bottom crop.
     filt = (
         f"color=c={BG}:s={CANVAS_W}x{CANVAS_H}:d={duration_sec:.3f}:r=30[bg];"
         f"[0:v]scale={CARD_W}:-1[img];"
         f"[bg][img]overlay=x=(W-w)/2:y='{y_expr}':shortest=0[ov];"
-        f"[ov][1:v]overlay=x=0:y=0[chr];"
-        f"[chr]drawbox=x=0:y={WIN_BOTTOM}:w={CANVAS_W}:h={CANVAS_H - WIN_BOTTOM}:"
-        f"color={BG}:t=fill[out]"
+        f"[ov][1:v]overlay=x=0:y=0[out]"
     )
 
     cp = subprocess.run(
         ["ffmpeg", "-y", "-loglevel", "error",
          "-loop", "1", "-t", f"{duration_sec:.3f}", "-i", str(png),
-         "-i", str(chrome_png),
+         "-i", str(overlay_png),
          "-filter_complex", filt,
          "-map", "[out]",
          "-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
@@ -189,7 +211,7 @@ def build_scroll_clip(png: Path, png_w: int, png_h: int,
          str(out_mp4)],
         capture_output=True, text=True,
     )
-    chrome_png.unlink(missing_ok=True)
+    overlay_png.unlink(missing_ok=True)
     if cp.returncode != 0:
         return {"error": "scroll_clip_failed", "stderr": cp.stderr[-600:]}
     return {"mp4": str(out_mp4), "scaled_h": scaled_h, "pan_px": pan,
