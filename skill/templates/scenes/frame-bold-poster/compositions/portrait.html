@@ -51,10 +51,10 @@
 
   /* three-line headline — right-align + smaller font to avoid line wrap */
   .head { position: absolute; left: 96px; right: 96px; top: 880px;
-    font-family: 'Be Vietnam Pro', sans-serif; font-weight: 900; line-height: 1.02;
-    text-align: right; }
+    font-family: 'Be Vietnam Pro', sans-serif; font-weight: 900; line-height: 1.4;
+    text-align: right; }  /* 1.02 jammed adjacent lines' VN marks; 1.4 separates + clears stacked-mark tops */
   .head .ln { display: block; font-size: 104px; opacity: 0; transform: translateY(40px);
-    white-space: nowrap; }
+    white-space: nowrap; overflow: visible; }
   .head .ln1 { color: #e8f4fd; transform-origin: right bottom; animation: lineUp 0.7s cubic-bezier(0.16,1,0.3,1) 1.15s forwards; }
   .head .ln2 { color: #5ce1e6; animation: lineUpTilt 0.7s cubic-bezier(0.16,1,0.3,1) 1.35s forwards; }
   .head .ln3 { color: #e8f4fd; animation: lineUpTilt2 0.7s cubic-bezier(0.16,1,0.3,1) 1.55s forwards; }

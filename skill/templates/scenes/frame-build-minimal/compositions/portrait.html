@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=1080, height=1920" />
         <title>Build Minimal · Portrait 9:16</title>
         <link
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;700;800;900&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap"
             rel="stylesheet"
         />
         <style>
@@ -28,7 +28,7 @@
                 height: 1920px;
                 background: #020c1a;
                 color: #f5efe4;
-                font-family: "Inter", sans-serif;
+                font-family: "Be Vietnam Pro", sans-serif;   /* full VN glyphs — Inter lacks precomposed Ạ/Ộ (dot detaches) */
             }
 
             .wash {
@@ -133,11 +133,24 @@
                 font-weight: 800;
                 font-size: 195px;
                 letter-spacing: -4px;
-                line-height: 1.0;
+                line-height: 1.4;   /* VN stacked marks (Ầ Ổ) need real headroom; 1.0/1.24 still sliced the top */
                 text-align: center;
+                overflow: visible;
+                padding-top: 0.06em;
+                background: linear-gradient(135deg, #0097b2 0%, #7ed957 100%);
+                -webkit-background-clip: text;
+                background-clip: text;
+                color: transparent;
+                opacity: 0;
+                transform: translateY(30px);
+                animation: heroRise 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+            }
+            @keyframes heroRise {
+                to { opacity: 1; transform: translateY(0); }
             }
             .hero .ch {
                 display: inline-block;
+                overflow: visible;
                 opacity: 0;
                 transform: translateY(30px);
                 animation: chReveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -347,15 +360,12 @@
                 var hero = document.getElementById("hero");
                 if (hero && v.hero != null) {
                     hero.textContent = "";
-                    var chars = Array.from(String(v.hero));
-                    chars.forEach(function (c, i) {
-                        var span = document.createElement("span");
-                        span.className = "ch";
-                        span.textContent = c === " " ? " " : c;
-                        span.style.animationDelay =
-                            (0.6 + i * 0.06).toFixed(2) + "s";
-                        hero.appendChild(span);
-                    });
+                    // NFC-compose first so a Vietnamese below-dot (e.g. Ạ = A+U+0323 in
+                    // NFD) isn't split into its own char span → an orphaned floating mark.
+                    // Whole-word inline flow (NFC), NOT per-char inline-block spans: inline-block
+                    // detaches VN below-dots (A-dot: Ạ Ộ Ợ) and slices stacked above-marks.
+                    // Normal flow keeps every mark attached; the .hero block does the reveal.
+                    hero.textContent = String(v.hero).normalize("NFC");
 
                     /* Auto-scale hero to fit AVAILABLE WIDTH. MUST run AFTER Google
                      * Fonts (Inter) load — measuring scrollWidth with system-ui fallback

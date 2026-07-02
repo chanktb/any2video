@@ -204,6 +204,30 @@ def render_and_inspect(html_path: Path, png_path: Path) -> dict:
           tight.push({ sel: sel(o.e), ratio: +(lh / o.fs).toFixed(2), lines, sample: o.t.slice(0, 24) });
       }
 
+      // (F2) BIG display text carrying VN STACKED tone marks with too little vertical
+      // headroom. At line-height ~1.0 the marks (Ầ Ổ Ố Ề Ạ …) paint above/below the
+      // line box and get sliced — WORST with background-clip:text, where the gradient
+      // box won't even fill above the cap-height (the mark just vanishes). Box-model
+      // overflow can't see this (scrollHeight==clientHeight), so measure headroom =
+      // line-height slack + top padding directly. Fires on a SINGLE line too, unlike (F).
+      const diacritic_tight = [];
+      for (const o of textEls) {
+        if (o.fs < 55 || !VN_STACK.test(o.t)) continue;
+        const cs = getComputedStyle(o.e);
+        const lh = parseFloat(cs.lineHeight);
+        if (isNaN(lh)) continue;                 // 'normal' (~1.2) is safe → skip
+        const padTop = parseFloat(cs.paddingTop) || 0;
+        // Above-cap room ≈ HALF the line-height slack (the other half drops below the
+        // baseline as descender space) PLUS all of the top padding. Stacked marks
+        // (circumflex+tone: Ổ Ầ Ề) need ≳0.22em of it or their top gets sliced.
+        const headroom = (lh / o.fs - 1) / 2 + padTop / o.fs;
+        const clipText = /text/.test((cs.webkitBackgroundClip || cs.backgroundClip || ''));
+        if (headroom < (clipText ? 0.22 : 0.14))
+          diacritic_tight.push({ sel: sel(o.e), fs: Math.round(o.fs),
+            ratio: +(lh / o.fs).toFixed(2), pad_top_px: Math.round(padTop),
+            headroom: +headroom.toFixed(2), clip_text: clipText, sample: o.t.slice(0, 24) });
+      }
+
       // (G) Empty content box — a bordered, card-sized box that rendered with NO visible
       // content inside (icon/font/child failed → hollow rectangle showing only its border).
       const hasVisibleContent = (el) => {
@@ -254,6 +278,7 @@ def render_and_inspect(html_path: Path, png_path: Path) -> dict:
         clipped: clipped.slice(0, 12),
         text_overlaps: overlaps.slice(0, 12),
         tight_line_height: tight.slice(0, 12),
+        diacritic_tight: diacritic_tight.slice(0, 12),
         empty_blocks: empty_blocks.slice(0, 12),
         broken_images: broken_images.slice(0, 12),
         content_body: content_body,
@@ -383,6 +408,22 @@ def evaluate(html_path: Path, neighbor_pngs: list[Path]) -> dict:
             "selector": t["sel"], "ratio": t["ratio"], "lines": t["lines"],
             "sample": t.get("sample", ""),
             "fix": "Raise line-height to ≥ 1.15 (VN diacritics need vertical room between lines).",
+        })
+
+    # Big display text whose VN stacked tone marks get sliced for lack of headroom
+    # (line-height ~1.0 + background-clip:text) — invisible to box-model overflow.
+    for d in dom.get("diacritic_tight") or []:
+        issues.append({
+            "kind": "text_clipped_vn_diacritic",
+            "selector": d["sel"],
+            "font_px": d["fs"], "line_height_ratio": d["ratio"],
+            "pad_top_px": d["pad_top_px"], "headroom_em": d["headroom"],
+            "background_clip_text": d.get("clip_text", False),
+            "sample": d.get("sample", ""),
+            "fix": "Big Vietnamese text with stacked tone marks (Ầ Ổ Ố Ề Ạ) has too little "
+                   "headroom — the marks get sliced"
+                   + (" (background-clip:text won't paint above the box)" if d.get("clip_text") else "")
+                   + ". Raise line-height (≈1.4) and/or add padding-top + overflow:visible.",
         })
 
     # Empty content box — a bordered card that rendered hollow (icon/font/child failed).

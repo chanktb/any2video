@@ -152,7 +152,8 @@ def render_template(template_id: str, inputs: dict, out_html: Path,
     _vn_headroom = (
         "<style>/* VN diacritic headroom (any2video guard) */"
         ".hero,.headline,.figure,.number,.lbl,.title,.eyebrow,.kicker,.desc,.subtitle{"
-        "padding-top:0.06em;}"
+        "padding-top:0.1em;}"
+        ".hero,.headline,.figure,.number,.head,.ln{overflow:visible !important;}"
         ".accent,.kw,.hl,.ch,mark,.headline-accent{overflow:visible !important;}"
         "</style>"
     )
