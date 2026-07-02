@@ -35,6 +35,8 @@ Before any clone / WebFetch, ask the user 4 questions in ONE message (AskUserQue
 
 **User media (ảnh/clip):** một template duy nhất `frame-media-full` cho CẢ ảnh lẫn video — **full-width, không khung, không safezone**, `object-fit: contain` (thấy trọn nội dung, ko crop; clip 9:16 lấp đầy, ảnh dọc full width + dải tối trên/dưới có chấm theme). Video tự phát; ảnh đứng yên. Slot `media` nhận URL `https://` hoặc `file:///…assets/x`; tự nhận ảnh vs video theo đuôi. Chèn vào **body** (sau scroll / cạnh claim để làm proof), KHÔNG để media sáng-trắng làm scene 1 (ship-gate chặn thumb trắng). Scrim + karaoke + nền + ship-gate dùng chung, không cần chỉnh.
 
+**Steering overview (repo + text, optional):** khi input là repo mà mình lo AI phân tích lệch trọng tâm (nhấn sai vấn đề / bỏ sót "vũ khí" repo muốn khoe), user đưa THÊM một đoạn text mô tả đúng hướng repo muốn thể hiện. Repo VẪN được clone + đọc code như thường; overview chỉ là tham chiếu ĐỊNH HƯỚNG. Truyền qua `init --overview-file <path>` (ưu tiên file để không hỏng dấu tiếng Việt) hoặc `--overview "<text>"`. Lưu ở `runs/<slug>/overview.md`; Phase 1/2 coi nó là nguồn framing ưu tiên khi tín hiệu của repo (README/marketing) và overview lệch nhau về trọng tâm. Áp dụng được cho cả article/text, không riêng repo.
+
 If args present on `/any2video <url>` invocation, skip Q1. Otherwise wait for answer.
 
 Save intake to `workspace/runs/<slug>/intake.json`:
@@ -81,6 +83,15 @@ source.** Before writing `analysis.md` you MUST open and read the actual code:
 
 Every `## Evidence` line backing an Architecture / Flow / weapon / caveat claim MUST cite
 a real `path/to/file.ext:symbol` (or line) — NOT a README sentence. "Implied by README" = fail.
+
+**Steering overview (HARD — when `source_pack.json` has `has_overview: true`).** The operator
+supplied `runs/<slug>/overview.md` — their authoritative statement of what this source is
+*really* about and the problem→solution angle it wants to lead with. Read it FIRST. Still read
+the code / article for evidence + specifics, but let the overview set the ANGLE: which Problem,
+which hero "weapon", which hook. Where the source's own signals (README/marketing) and the
+overview disagree on emphasis, PREFER the overview. Cite it in `## Evidence` as `overview.md`,
+and any scene it drives gets `grounded_in: overview.md`. This exists to fix "the AI missed the
+point" — it steers, it does not replace the code-reading above.
 
 Write **`workspace/runs/<slug>/analysis.md`** with this fixed structure:
 
@@ -777,6 +788,8 @@ This step is OPTIONAL and only runs when `ANY2VIDEO_TG_BOT_TOKEN` / `ANY2VIDEO_T
 The bot sends the mp4 as a streamable video to the configured Telegram DM with the source URL pinned to the top, so it can be forwarded to channels from there.
 
 If TG send fails: skill notifies the user in chat with error + still produced final.mp4 locally. Don't block local delivery on TG failure.
+
+**Optional — local publish hook.** If a `local/` directory exists (operator-private, gitignored — a fork won't have it), it may hold a publisher that pushes `final.mp4` to the operator's own channel AFTER Gate-4 + caption.txt. It runs on the SAME two artifacts: the clean `caption.txt` body is the post caption, and the source/repo URL goes in the FIRST COMMENT (never the caption body) — matching the caption rule above. See `local/README.md` for the exact command. Same delivery discipline: post once, don't re-post to verify.
 
 ### Optional — Facebook intro post (reuses `analysis.md`)
 

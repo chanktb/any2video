@@ -21,6 +21,10 @@ workspace/
 # not ours to redistribute)
 references/
 
+# Operator-private tooling — NEVER public. Ships nothing to GitHub: FB-page
+# publisher + its .env (page id / access token). A fork won't have this dir.
+local/
+
 # OS cruft
 .DS_Store
 Thumbs.db

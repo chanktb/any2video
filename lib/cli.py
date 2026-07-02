@@ -48,7 +48,8 @@ def _promo_config() -> dict:
 
 
 def init(source: str, lang: str = "vi", fast: bool = False,
-         duration: int | None = None, promo: bool = True) -> dict:
+         duration: int | None = None, promo: bool = True,
+         overview: str | None = None) -> dict:
     """Phase 1 — detect type, extract source, write source_pack.json + per-type bundle.
 
     `lang` (default 'vi') drives the narration language in Phase 2 + the TTS voice
@@ -56,9 +57,21 @@ def init(source: str, lang: str = "vi", fast: bool = False,
     only; motion lost) instead of the default Playwright video recording. `duration`
     (optional target seconds) is a HARD target — Phase 2 budgets narration to it and
     Phase 3 must reconcile the measured total within ±10s (SKILL §2.2.6 b.2).
+
+    `overview` (optional) is an author-supplied text describing the source's INTENDED
+    focus / problem→solution angle. The extractor still analyzes the real source
+    (clone + read the code, fetch the article); the overview is a STEERING reference
+    that resolves "the AI missed the point" — where the source's own signals and the
+    overview disagree on emphasis, Phase 2 prefers the overview's framing. Saved to
+    `<run>/overview.md` and surfaced as an authoritative `grounded_in` source.
     """
     pack = R.dispatch(source)
     pack["lang"] = lang
+    if overview and overview.strip():
+        run = Path(pack["run_dir"])
+        (run / "overview.md").write_text(overview.strip() + "\n", encoding="utf-8")
+        pack["has_overview"] = True
+        pack["overview_path"] = str(run / "overview.md")
     pack["render_mode"] = "fast" if fast else "rich"
     if duration is not None:
         pack["target_duration_sec"] = duration
@@ -74,6 +87,14 @@ def init(source: str, lang: str = "vi", fast: bool = False,
     )
     pack["next_steps"] = [
         "Read source_pack.json + per-type bundle (github_bundle.json / article.md / input.txt).",
+        *(["STEERING OVERVIEW (HARD — has_overview:true): read overview.md FIRST. It is the "
+           "author's AUTHORITATIVE framing of what this source is about — its intended "
+           "problem→solution angle and what it does best. STILL analyze the real source "
+           "(read the code / article) for evidence + specifics, but let the overview set the "
+           "ANGLE: pick the Problem, the hero 'weapon', and the hook it points to. Where the "
+           "source's own signals (README/marketing) and the overview disagree on emphasis, "
+           "PREFER the overview. Cite it in analysis.md Evidence as `overview.md` and any "
+           "scene it drives gets `grounded_in: overview.md`."] if pack.get("has_overview") else []),
         f"Draft analysis.md with the 7 fixed sections (Problem/Solution/Architecture/Flow/How to use/Why/Evidence) → {pack['run_dir']}/analysis.md",
         f"Draft plan.md per templates/plan-schema.md. Narration MUST be in '{lang}'. Include meta.lang: '{lang}', meta.brand, meta.footer.{_dur_note} EACH non-footage scene MUST have a `templateId` from templates/scenes/CATALOG.md + an `inputs` block matching that template's slots. Default TTS = MALE + Google (voice: vi-VN-Chirp3-HD-Charon, voice_provider: google).",
         "OPENING ARC (HARD — SKILL §2.2.5): scene 1 = intro identity card (templateId frame-repo-identity, owner+repo shown EXACTLY as the author wrote them — never uppercase/title-case), duration ≤ 2s. THEN 4-6 short pain-point block scenes (highlight-as-spoken). The moment the narration pivots to the repo ('...thì repo này giúp bạn'), cut to a FULL-BLEED repo-scroll scene (capture_url set — full-width, no safezone, caption rides the dark bottom band) describing what the repo solves; its duration = the intro narration so the scroll finishes as the scene ends. THEN the 'problem' beat goes into detail. Author-profile outro scene ends with '...nếu thấy hay thì tặng tác giả một sao làm động lực nhé.'",
@@ -128,13 +149,24 @@ def main() -> int:
     s_init.add_argument("--no-promo", action="store_true",
                         help="Skip the closing 'made with any2video' promo bumper (default: ON). "
                              "Author name for the bumper comes from ANY2VIDEO_PROMO_AUTHOR (never hardcoded).")
+    s_init.add_argument("--overview", default=None,
+                        help="Author-supplied steering text: what the source is really about / its "
+                             "intended problem→solution angle. The source is still analyzed for real; "
+                             "the overview sets the ANGLE when the source's own signals miss the point.")
+    s_init.add_argument("--overview-file", default=None,
+                        help="Read --overview from a UTF-8 file (preferred for long/Vietnamese text — "
+                             "avoids Windows shell/argv mangling). Overrides --overview.")
     s_status = sub.add_parser("status", help="Inspect a run directory")
     s_status.add_argument("slug")
     args = parser.parse_args()
 
     if args.cmd == "init":
+        overview = args.overview
+        if args.overview_file:
+            overview = Path(args.overview_file).read_text(encoding="utf-8")
         result = init(args.source, lang=args.lang, fast=args.fast,
-                      duration=args.duration, promo=not args.no_promo)
+                      duration=args.duration, promo=not args.no_promo,
+                      overview=overview)
     else:
         result = status(args.slug)
 
