@@ -18,18 +18,18 @@
    * hero_accent / sub / category. Portrait 9:16 (1080×1920).
    */
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #020c1a; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--h-bg, #020c1a); }
   #root {
     position: relative; width: 1080px; height: 1920px; overflow: hidden;
-    background: #020c1a; color: #f4f7fb;
+    background: var(--h-bg, #020c1a); color: #f4f7fb;
     font-family: "Be Vietnam Pro", system-ui, sans-serif;
   }
   /* soft depth blobs */
   .blob { position:absolute; border-radius:50%; mix-blend-mode:screen; filter:blur(130px); z-index:0; opacity:0.5; }
   @keyframes fl1 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(70px,-50px) scale(1.12);} }
   @keyframes fl2 { 0%,100%{transform:translate(0,0) scale(1.08);} 50%{transform:translate(-80px,40px) scale(0.92);} }
-  .b1 { width:520px; height:520px; background:#0e7490; top:-120px; right:-140px; animation:fl1 13s ease-in-out infinite; }
-  .b2 { width:460px; height:460px; background:#9f1239; bottom:-140px; left:-120px; animation:fl2 15s ease-in-out infinite; }
+  .b1 { width:520px; height:520px; background:var(--h-blob1,#0e7490); top:-120px; right:-140px; animation:fl1 13s ease-in-out infinite; }
+  .b2 { width:460px; height:460px; background:var(--h-blob2,#9f1239); bottom:-140px; left:-120px; animation:fl2 15s ease-in-out infinite; }
 
   /* subtle github context chip — a real-tool watermark, kept on every pain scene */
   .ctx {
@@ -44,14 +44,14 @@
   /* chip handle — NEVER text-transform: owner/repo keep the author's casing */
   .ctx .handle { font-family:"JetBrains Mono",monospace; font-size:30px; font-weight:500;
     letter-spacing:-0.5px; color:#cbd5e1; white-space:nowrap; }
-  .ctx .handle .sep { color:#5ce1e6; margin:0 4px; }
-  .ctx .handle .repo { color:#5ce1e6; }
+  .ctx .handle .sep { color:var(--h-acc,#5ce1e6); margin:0 4px; }
+  .ctx .handle .repo { color:var(--h-acc,#5ce1e6); }
   .ctx .handle .src-label { color:#cbd5e1; }
 
   /* pain index (top-right) */
   .painNo {
     position:absolute; top:104px; right:96px; z-index:10;
-    font-size:26px; font-weight:700; letter-spacing:6px; color:#fb7185; opacity:0.85;
+    font-size:26px; font-weight:700; letter-spacing:6px; color:var(--h-acc2,#fb7185); opacity:0.85;
     text-transform:uppercase; white-space:nowrap;
     animation: fadeIn 0.6s ease-out 0.3s both;
   }
@@ -61,14 +61,14 @@
   .stage { position:absolute; left:90px; right:90px; top:300px; z-index:8; }
   .accentBar {
     width:96px; height:10px; border-radius:6px;
-    background:linear-gradient(90deg,#22d3ee,#fb7185);
+    background:linear-gradient(90deg,var(--h-acc,#22d3ee),var(--h-acc2,#fb7185));
     margin-bottom:52px; transform-origin:left;
     animation: growX 0.7s cubic-bezier(0.16,1,0.3,1) 0.35s both;
   }
   @keyframes growX { from{transform:scaleX(0);} to{transform:scaleX(1);} }
   .eyebrow {
     font-size:30px; font-weight:700; letter-spacing:8px; text-transform:uppercase;
-    color:#7ec8e3; margin-bottom:34px;
+    color:var(--h-eyebrow,#7ec8e3); margin-bottom:34px;
     animation: fadeUp 0.7s ease-out 0.45s both;
   }
   .hero {
@@ -80,12 +80,12 @@
   /* punchline block: .accent → recoloured by meta.accent (template_render._accent_css) */
   .hero .accent {
     display:block; overflow:visible;
-    background:linear-gradient(120deg,#22d3ee 0%,#fb7185 100%);
+    background:linear-gradient(120deg,var(--h-acc,#22d3ee) 0%,var(--h-acc2,#fb7185) 100%);
     -webkit-background-clip:text; background-clip:text; color:transparent;
     padding-top:0.18em; margin-top:0;
   }
   .sub {
-    margin-top:48px; font-size:40px; font-weight:500; line-height:1.5; color:#a9c3d6;
+    margin-top:48px; font-size:40px; font-weight:500; line-height:1.5; color:var(--h-sub,#a9c3d6);
     max-width:860px; overflow:visible; animation: fadeUp 0.8s ease-out 0.85s both;
   }
 

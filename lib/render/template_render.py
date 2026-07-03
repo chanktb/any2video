@@ -14,6 +14,7 @@ location and naming as before), so the downstream pipeline doesn't change.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import shutil
@@ -69,6 +70,71 @@ def _accent_css(accent) -> str:
         f"background-image:{grad} !important;"
         "-webkit-background-clip:text !important;background-clip:text !important;"
         "-webkit-text-fill-color:transparent !important;color:transparent !important;}"
+        "</style>"
+    )
+
+
+# ---- Hero palette ("intro theme") ---------------------------------------
+# The opening/pain-hero scene (frame-pain-hero) is the frame the compose step
+# lifts as the video POSTER (thumbnail). If every video opens on the same
+# palette, a channel's grid looks monotonous. These palettes recolour the hero
+# per video so thumbnails differ at a glance yet stay bold (dark base + one
+# bright accent pair = high contrast = pops). Every hex is scene_gate-safe
+# (none of the banned "slop" colours). frame-pain-hero reads them as CSS vars
+# (--h-bg/--h-blob1/--h-blob2/--h-acc/--h-acc2/--h-eyebrow/--h-sub) with the
+# azure-noir values as fallbacks, so an un-themed render is unchanged.
+HERO_TEMPLATES = {"frame-pain-hero"}
+
+HERO_PALETTES = [
+    {"name": "azure-noir",   "bg": "#020c1a", "blob1": "#0e7490", "blob2": "#9f1239",
+     "acc": "#22d3ee", "acc2": "#fb7185", "eyebrow": "#7ec8e3", "sub": "#a9c3d6"},
+    {"name": "crimson-ember", "bg": "#120609", "blob1": "#7f1d1d", "blob2": "#b45309",
+     "acc": "#fb7185", "acc2": "#fbbf24", "eyebrow": "#fca5a5", "sub": "#d8b4a0"},
+    {"name": "emerald-deep",  "bg": "#04140e", "blob1": "#065f46", "blob2": "#0e7490",
+     "acc": "#34d399", "acc2": "#5eead4", "eyebrow": "#6ee7b7", "sub": "#9fd6c0"},
+    {"name": "violet-dusk",   "bg": "#0d0820", "blob1": "#4338ca", "blob2": "#be185d",
+     "acc": "#818cf8", "acc2": "#f472b6", "eyebrow": "#a5b4fc", "sub": "#c7bfe0"},
+    {"name": "amber-gold",    "bg": "#14100a", "blob1": "#b45309", "blob2": "#7c2d12",
+     "acc": "#fbbf24", "acc2": "#fb923c", "eyebrow": "#fcd34d", "sub": "#d6c3a0"},
+    {"name": "coral-sunset",  "bg": "#140a08", "blob1": "#9a3412", "blob2": "#9f1239",
+     "acc": "#fb923c", "acc2": "#f472b6", "eyebrow": "#fdba74", "sub": "#d8b0a8"},
+    {"name": "slate-mono",    "bg": "#0b0f14", "blob1": "#334155", "blob2": "#1e3a5f",
+     "acc": "#38bdf8", "acc2": "#e2e8f0", "eyebrow": "#94a3b8", "sub": "#b6c2d0"},
+    {"name": "teal-lime",     "bg": "#04120f", "blob1": "#0f766e", "blob2": "#3f6212",
+     "acc": "#2dd4bf", "acc2": "#a3e635", "eyebrow": "#5eead4", "sub": "#a8c3a0"},
+]
+
+
+def hero_palette_by_name(name):
+    if not name:
+        return None
+    n = str(name).lower().strip()
+    for p in HERO_PALETTES:
+        if p["name"] == n:
+            return p
+    return None
+
+
+def pick_hero_palette(key):
+    """Deterministic palette for a video, keyed by its slug — same repo always
+    gets the same intro colour (stable re-renders), different repos spread across
+    the set (a channel looks varied). None key → the default (fallback) look."""
+    if not key:
+        return None
+    idx = int(hashlib.sha1(str(key).encode("utf-8")).hexdigest(), 16) % len(HERO_PALETTES)
+    return HERO_PALETTES[idx]
+
+
+def _hero_palette_css(pal) -> str:
+    """Set the hero CSS vars on :root so html/body/#root all inherit them."""
+    if not isinstance(pal, dict):
+        return ""
+    return (
+        "<style>/* hero palette: " + pal.get("name", "?") + " */"
+        ":root{"
+        f"--h-bg:{pal['bg']};--h-blob1:{pal['blob1']};--h-blob2:{pal['blob2']};"
+        f"--h-acc:{pal['acc']};--h-acc2:{pal['acc2']};"
+        f"--h-eyebrow:{pal['eyebrow']};--h-sub:{pal['sub']};}}"
         "</style>"
     )
 
@@ -153,7 +219,7 @@ def _theme_layer(theme) -> str:
 
 
 def render_template(template_id: str, inputs: dict, out_html: Path,
-                    accent=None, theme=None) -> dict:
+                    accent=None, theme=None, hero_palette=None) -> dict:
     """Inject `inputs` into the template's portrait.html, write to out_html.
 
     The out_html is self-contained: any relative asset paths in the template
@@ -314,6 +380,15 @@ def render_template(template_id: str, inputs: dict, out_html: Path,
         else:
             new_html = _acc + new_html
 
+    # Optional hero palette ("intro theme") — recolours frame-pain-hero via CSS
+    # vars so the poster/thumbnail differs per video (channel grid looks varied).
+    _hp = _hero_palette_css(hero_palette)
+    if _hp:
+        if "</head>" in new_html:
+            new_html = new_html.replace("</head>", _hp + "</head>", 1)
+        else:
+            new_html = _hp + new_html
+
     # Optional ambient background theme (meta.theme in plan.md).
     _theme = _theme_layer(theme)
     if _theme:
@@ -365,6 +440,13 @@ def render_all_from_plan(plan_path: Path) -> dict:
     accent = meta.get("accent")
     theme = meta.get("theme")   # aurora (default) / particles / grid
 
+    # Hero palette ("intro theme") — ONE per video, keyed by slug so the same repo
+    # is stable across re-renders and a channel's videos spread across the set.
+    # meta.hero_theme (a palette name) overrides the auto pick; a per-scene
+    # hero_theme overrides that. Applied only to HERO_TEMPLATES (the poster frame).
+    slug = meta.get("slug") or run_dir.name
+    base_palette = hero_palette_by_name(meta.get("hero_theme")) or pick_hero_palette(slug)
+
     results = []
     for s in scenes:
         sid = s["id"]
@@ -376,8 +458,12 @@ def render_all_from_plan(plan_path: Path) -> dict:
         # per-scene accent/theme override beats the video-wide one
         scene_accent = s.get("accent") or accent
         scene_theme = s.get("theme") or theme
+        hero_palette = None
+        if template_id in HERO_TEMPLATES:
+            hero_palette = hero_palette_by_name(s.get("hero_theme")) or base_palette
         out_html = scenes_dir / f"{sid}.html"
-        r = render_template(template_id, inputs, out_html, accent=scene_accent, theme=scene_theme)
+        r = render_template(template_id, inputs, out_html, accent=scene_accent,
+                            theme=scene_theme, hero_palette=hero_palette)
         r["id"] = sid
         results.append(r)
 
@@ -392,6 +478,9 @@ def main() -> int:
     one.add_argument("template_id")
     one.add_argument("--inputs", required=True, help="JSON string of slot values")
     one.add_argument("--out", required=True, help="Output HTML path")
+    one.add_argument("--hero-theme", default=None,
+                     help="Hero palette name (frame-pain-hero only): "
+                          + ", ".join(p["name"] for p in HERO_PALETTES))
     allp = sub.add_parser("all", help="Render every scene in plan.md that has templateId")
     allp.add_argument("plan")
     args = parser.parse_args()
@@ -400,7 +489,8 @@ def main() -> int:
         print(json.dumps({"templates": list_templates()}, indent=2))
         return 0
     if args.cmd == "one":
-        r = render_template(args.template_id, json.loads(args.inputs), Path(args.out).resolve())
+        r = render_template(args.template_id, json.loads(args.inputs), Path(args.out).resolve(),
+                            hero_palette=hero_palette_by_name(args.hero_theme))
         print(json.dumps(r, indent=2, ensure_ascii=False))
         return 0 if "error" not in r else 1
     r = render_all_from_plan(Path(args.plan).resolve())

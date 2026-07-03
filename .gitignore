@@ -25,6 +25,10 @@ references/
 # publisher + its .env (page id / access token). A fork won't have this dir.
 local/
 
+# Quarantined BGM — Content-ID-flagged tracks moved out of the pool (Kevin MacLeod
+# etc). Kept locally for reference only; must NOT ship (they trigger FB/YT claims).
+skill/templates/bgm/_disabled/
+
 # OS cruft
 .DS_Store
 Thumbs.db

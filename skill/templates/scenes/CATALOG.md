@@ -68,6 +68,15 @@ Set `meta.theme` to layer a subtle, always-moving background behind ALL content 
 | `rays` | a very slow rotating conic light fan from the top |
 | `stars` | a field of faint stars gently twinkling |
 
+## Intro / hero palettes (`meta.hero_theme` — thumbnail variety)
+
+The opening `frame-pain-hero` scene is the frame compose lifts as the video **poster (thumbnail)**. If every video opens on the same colours a channel's grid looks monotone, so the hero recolours per video — **auto-picked from the slug** (same repo → same colour every render; different repos spread across the set). Every palette is dark-base + one bright accent pair, so the thumbnail always pops; all hexes are `scene_gate`-safe.
+
+- Auto (default): nothing to set — the renderer hashes the slug to a palette.
+- Override whole video: `meta.hero_theme: <name>`. Override one scene: `hero_theme:` on the scene.
+- Palettes: `azure-noir` (default), `crimson-ember`, `emerald-deep`, `violet-dusk`, `amber-gold`, `coral-sunset`, `slate-mono`, `teal-lime` (see `lib/render/template_render.py:HERO_PALETTES`).
+- Mechanism: `frame-pain-hero` reads `--h-bg/--h-blob1/--h-blob2/--h-acc/--h-acc2/--h-eyebrow/--h-sub` with the azure values as fallbacks — **un-themed render is unchanged** (layout/text/position untouched, colour only).
+
 ## Respect the author's name casing (HARD)
 
 Show `owner` and `repo` **exactly as the author wrote them** — never uppercase or title-case them. `chanktb/any2video` stays `chanktb/any2video`, not `CHANKTB / ANY2VIDEO`. The identity/promo templates render these in a non-uppercased pill on purpose; only generic labels (OPEN SOURCE, MIT) are uppercased. plan_critic verifies the casing against the source URL (`name_casing_changed`).
