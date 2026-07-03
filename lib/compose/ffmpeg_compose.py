@@ -123,12 +123,16 @@ def mux_scene(video_mp4: Path, audio_mp3: Path, out_mp4: Path,
     """
     trim_filter = _build_trim_filter(trim_leading, trim_trailing)
     if not sfx:
+        # `apad` after the trim pads the voice with trailing silence so it is never
+        # SHORTER than the rendered video → `-shortest` then equals the VIDEO length
+        # (= duration_sec). Lets a footage scroll legitimately outlast its narration;
+        # for a normal scene video≈audio so this is a no-op.
         if trim_filter:
             cp = subprocess.run(
                 ["ffmpeg", "-y", "-loglevel", "error",
                  "-i", str(video_mp4),
                  "-i", str(audio_mp3),
-                 "-filter_complex", f"[1:a]{trim_filter}[a_out]",
+                 "-filter_complex", f"[1:a]{trim_filter},apad[a_out]",
                  "-map", "0:v", "-map", "[a_out]",
                  "-c:v", "copy",
                  "-c:a", "aac", "-b:a", "192k",
@@ -141,6 +145,7 @@ def mux_scene(video_mp4: Path, audio_mp3: Path, out_mp4: Path,
                 ["ffmpeg", "-y", "-loglevel", "error",
                  "-i", str(video_mp4),
                  "-i", str(audio_mp3),
+                 "-map", "0:v", "-map", "1:a", "-af", "apad",
                  "-c:v", "copy",
                  "-c:a", "aac", "-b:a", "192k",
                  "-shortest",
@@ -462,6 +467,12 @@ def compose(plan_path: Path, crossfade_ms: int = 0,
             return {"error": "scene_audio_missing", "scene_id": sid, "expected": str(a)}
         muxed = scenes_dir / f"{sid}.muxed.mp4"
         sfx = sfx_by_id.get(sid)
+        # Footage scenes (capture_url scroll) don't need a reveal-tick SFX, and the
+        # SFX mix path caps the scene to the voice length — which would trim a scroll
+        # that's intentionally longer than its narration. Skip SFX for them so they
+        # use the video-length (apad) mux path.
+        if s.get("capture_url"):
+            sfx = None
         # Validate SFX file exists; skip silently if not
         if sfx and not Path(sfx.get("path", "")).is_file():
             sfx = None
