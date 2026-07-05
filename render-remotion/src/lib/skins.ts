@@ -1,7 +1,9 @@
-// SKIN REGISTRY: 13 verified skins (4 proven in full videos + 9 in rendered stills;
-// previews in docs/skins/). A skin is TOKENS ONLY (palette + fonts + shape language +
+// SKIN REGISTRY: 14 verified skins (previews in docs/skins/; regenerate via the
+// skin-gallery composition). A skin is TOKENS ONLY (palette + fonts + shape language +
 // karaoke variant). There are NO prebuilt layouts: every video composes its own scenes
 // from the content's structure (see skill/references/remotion-render.md).
+// DEFAULT for GitHub repo tours: repo-dark (tech-dark-neon blended with
+// escbase-starfield), unless the user picks another skin.
 // Fonts name their @remotion/google-fonts module; all checked for the vietnamese
 // subset unless fontNote says otherwise.
 
@@ -19,6 +21,17 @@ export type SkinSpec = {
 };
 
 export const SKINS: SkinSpec[] = [
+  {
+    id: "repo-dark",
+    name: "Repo dark (tech neon x escbase)",
+    mood: "DEFAULT for GitHub repo tours: tech seriousness + infographic density",
+    bg: "#070f1d",
+    fg: "#F5F7FA",
+    accents: ["#22d3ee", "#fbbf24", "#4ADE80", "#c084fc", "#ef4444"],
+    fonts: { display: "BeVietnamPro", body: "BeVietnamPro", mono: "JetBrainsMono" },
+    shapes: "starfield bg, glow cards radius 24 with 1px border, badge pill opening scenes, icon squares, token chips, stat rows, ring %, brand header+footer",
+    karaoke: "neon",
+  },
   {
     id: "tech-dark-neon",
     name: "Tech dark neon",

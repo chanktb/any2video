@@ -26,8 +26,10 @@ real visual bug or a rejected draft. Read this BEFORE composing scenes.
 - `karaoke.tsx`: word-level captions. `KaraokeNeon` (dark skins, glow keywords),
   `KaraokeMarker` (light skins, highlighter fill), `KaraokeSticker` (pop skins).
   The caption band lives at y 1470-1635. Scenes must keep that band empty.
-- `skins.ts`: 13 verified skins as TOKENS (palette, fonts, shape language, karaoke
+- `skins.ts`: 14 verified skins as TOKENS (palette, fonts, shape language, karaoke
   flavor). A skin is never a layout. One skin per video, chosen by content mood.
+  GitHub repo tours default to `repo-dark` (tech-dark-neon blended with
+  escbase-starfield) unless the user picks another skin.
 - `footage.tsx`: `FootageScene` embeds a real mp4 (repo scroll, product capture)
   muted and cover-fit; karaoke and voice run on top.
 

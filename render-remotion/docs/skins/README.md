@@ -1,12 +1,20 @@
 # Skin gallery (render path B)
 
-13 verified skins for the Remotion free-compose path. A skin is **tokens only**
+14 verified skins for the Remotion free-compose path. A skin is **tokens only**
 (palette, fonts, shape language, karaoke variant), defined in
 [`src/lib/skins.ts`](../../src/lib/skins.ts). Layouts are never part of a skin:
 every video composes its own scenes (see [`SCENE-DESIGN.md`](../../SCENE-DESIGN.md)).
 
 Pick **one skin per video**, by content mood. All previews below show the same demo
-content restyled, so differences are the skin, not the layout.
+content restyled, so differences are the skin, not the layout. Most previews can be
+regenerated from the `skin-gallery` composition:
+`npx remotion still skin-gallery --frame=<N> out.png`.
+
+**Default for GitHub repo tours**: `repo-dark`, a blend of tech-dark-neon (glow
+cards, mono type) and escbase-starfield (starfield, badge pills, icon squares,
+token chips, stat rows, ring %). Use it unless the user picks another skin.
+
+![repo-dark](14-repo-dark.png)
 
 | | | |
 |---|---|---|

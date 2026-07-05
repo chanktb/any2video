@@ -30,8 +30,9 @@ narrative plan) unchanged and replace Phase 3-5 with the process in
 [references/remotion-render.md](references/remotion-render.md). The engine lives
 in `render-remotion/` (`npm i` on first use): scenes are composed freely from
 primitives following the content's structure (NO template pool, doctrine in
-`render-remotion/SCENE-DESIGN.md`), 13 skin tokens in `src/lib/skins.ts` (visual
-gallery in `render-remotion/docs/skins/`), voice + word timestamps via
+`render-remotion/SCENE-DESIGN.md`), 14 skin tokens in `src/lib/skins.ts` (visual
+gallery in `render-remotion/docs/skins/`; repo tours default to the `repo-dark`
+hybrid skin), voice + word timestamps via
 `tools/gen_voice.py` (edge-tts) or `tools/gen_voice_google.py` (Chirp3 HD),
 gates via `tsc` + a still-check of every scene. Complete living examples:
 `render-remotion/src/videos/flow-movie-pipeline-pop.tsx` and
