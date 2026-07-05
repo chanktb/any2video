@@ -19,7 +19,8 @@ workspace/
 
 # Third-party reference material (vendored study repos + curated sample videos —
 # not ours to redistribute)
-references/
+/references/
+# (root-anchored: skill/references/, our own docs, DOES ship)
 
 # Operator-private tooling — NEVER public. Ships nothing to GitHub: FB-page
 # publisher + its .env (page id / access token). A fork won't have this dir.
@@ -32,3 +33,9 @@ skill/templates/bgm/_disabled/
 # OS cruft
 .DS_Store
 Thumbs.db
+
+# Remotion render path (path B)
+render-remotion/node_modules/
+render-remotion/out/
+render-remotion/public/audio/
+render-remotion/public/footage/

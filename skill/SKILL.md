@@ -21,6 +21,23 @@ into templates instead of hand-writing HTML per scene, so a run is a normal agen
 session, not a token-heavy job. Best for videos you want to look bespoke; a
 fixed-template generator is still the better fit for high-volume, uniform output.
 
+## Render path B: Remotion free-compose (v8, optional)
+
+When the user says "render with remotion" / "--remotion", or the video needs
+animation beyond the CSS ceiling (live counters, self-drawing charts, springs,
+word-level karaoke rendered directly): keep Phase 0-2 (intake, deep extract,
+narrative plan) unchanged and replace Phase 3-5 with the process in
+[references/remotion-render.md](references/remotion-render.md). The engine lives
+in `render-remotion/` (`npm i` on first use): scenes are composed freely from
+primitives following the content's structure (NO template pool, doctrine in
+`render-remotion/SCENE-DESIGN.md`), 13 skin tokens in `src/lib/skins.ts` (visual
+gallery in `render-remotion/docs/skins/`), voice + word timestamps via
+`tools/gen_voice.py` (edge-tts) or `tools/gen_voice_google.py` (Chirp3 HD),
+gates via `tsc` + a still-check of every scene. Complete living examples:
+`render-remotion/src/videos/flow-movie-pipeline-pop.tsx` and
+`flow-movie-pipeline-tour.tsx`. Path A (HTML templates + Playwright) stays the
+default.
+
 ## Workflow — 6 phases, 7 quality gates (Phase 0 + 3.5 + 6 added 2026-06-30)
 
 ### Phase 0 — Interactive intake (NEW)
