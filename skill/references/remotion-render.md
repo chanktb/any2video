@@ -94,8 +94,10 @@ Write `src/videos/<slug>.tsx`: import `SCENES`/`TOTAL_FRAMES` from
 `<slug>-data.ts`, map scene ids to body components, each `<Sequence>` holds
 body + karaoke + `<Audio>` (from `@remotion/media`). Register the composition in
 `src/Root.tsx` (id = slug, 1080x1920, fps 30). Complete living examples:
-`src/videos/flow-movie-pipeline-pop.tsx` and
-`src/videos/flow-movie-pipeline-tour.tsx`.
+`src/videos/flow-movie-pipeline-pop.tsx`,
+`src/videos/flow-movie-pipeline-tour.tsx`, and
+`flow-movie-pipeline-repodark.tsx` (the tour re-skinned to repo-dark on the same
+data file: how to swap skins without touching script or audio).
 
 Hard rules while composing (inherited from path A + paid-for lessons):
 - Animate ONLY with `interpolate()`/`spring()` on the current frame. CSS

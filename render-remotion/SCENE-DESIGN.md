@@ -75,5 +75,8 @@ real visual bug or a rejected draft. Read this BEFORE composing scenes.
 - `src/videos/flow-movie-pipeline-pop.tsx`: pop-sticker skin, chart-heavy.
 - `src/videos/flow-movie-pipeline-tour.tsx`: cinematic-teal skin, full 15-scene
   arc with hybrid Playwright footage scenes and a moving hook.
-- Same doctrine, two completely different layout sets. That is the standard:
+- `src/videos/flow-movie-pipeline-repodark.tsx`: the SAME narration/audio/data as
+  the tour, re-skinned to repo-dark. Proof that a skin is tokens, not layouts:
+  structures stay, every surface changes.
+- Same doctrine, completely different layout sets. That is the standard:
   every run is a fresh design job.
