@@ -7,6 +7,8 @@ import { FlowMoviePipelineTour } from "./videos/flow-movie-pipeline-tour";
 import { TOTAL_FRAMES as FMP_FRAMES } from "./videos/flow-movie-pipeline-tour-data";
 import { SkinGallery, SKIN_COUNT } from "./videos/skin-gallery";
 import { FlowMoviePipelineRepoDark } from "./videos/flow-movie-pipeline-repodark";
+import { CavemanPonytail } from "./videos/caveman-ponytail";
+import { TOTAL_FRAMES as CP_FRAMES } from "./videos/caveman-ponytail-data";
 
 // One run = one file in src/videos/ + one <Composition> registered here.
 // id = the run's slug. Default 9:16 1080x1920 30fps.
@@ -34,6 +36,14 @@ export const RemotionRoot: React.FC = () => {
         id="flow-movie-pipeline-pop"
         component={FlowMoviePipelinePop}
         durationInFrames={TOTAL_FRAMES_V6}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="caveman-ponytail"
+        component={CavemanPonytail}
+        durationInFrames={CP_FRAMES}
         fps={30}
         width={1080}
         height={1920}

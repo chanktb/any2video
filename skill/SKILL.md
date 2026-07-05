@@ -261,6 +261,36 @@ The PA1 spine (**pain-first → reveal → body**) is universal — only the thr
 - **No star nudge off-repo.** The star line is repo-specific; for article/text close on a takeaway or "đọc full / lưu lại" — `plan_critic` won't force the star line (it's github-only).
 - Everything else — pain-first opening, count-up numbers, `meta.theme`, karaoke, TTS rules — applies unchanged.
 
+##### 2.2.5.2 Roundup arc: N repos/tools in ONE video (proven 2026-07-05)
+
+For "tổng hợp" requests (an editorial article covering 2+ repos, "cả 2 repo",
+weekly-picks formats), the single-repo PA1 spine does not fit: there is no one
+reveal moment and no single author to scroll. Run this arc instead
+(`plan_critic`'s repo-arc gate is single-repo only, so run an agent critic for
+Gate 2 checking the points below):
+
+1. **Hook, count-first**: the NUMBER of items is the keyword ("2 NHÂN SỰ MỚI"),
+   big type + continuous motion, 3-4s.
+2. **Context**: what they share (e.g. both hit #1 GitHub Trending) plus what
+   they are NOT (not new models). Kills the wrong expectation early.
+3. **Framing split**: one label per item ("BỚT NÓI / BỚT CODE"): the video's
+   thesis in one scene.
+4. **One chapter per item**, each a mini PA1: pain, mechanism, the author's
+   numbers, a per-item caveat. Keep chapters the same shape so they compare.
+5. **Combine scene**: how the items stack (different layers of one workflow);
+   this is the roundup's unique value over N separate videos.
+6. **Shared caveat**: benchmarks are the authors' own; when the opposite of the
+   pitch is still desirable, say so (caveat-as-feature, unchanged).
+7. **CTA**: all repo cards + "link dưới comment" (public repos make a link CTA
+   valid; NO star nudge, that belongs to single-author tours), then the promo
+   bumper last.
+
+FACTCHECK RULE (HARD, hit on the first run): the roundup source is an editorial
+article. Verify every number against each repo's own README before Phase 2 and
+use the README's numbers when they disagree (surface the correction at
+Checkpoint 1). Numbers must trace to `analysis.md` exactly as in 2.2.4.
+Living example (path B): `render-remotion/src/videos/caveman-ponytail.tsx`.
+
 #### 2.2.6 VN TTS optimization — voiceText rules (HARD)
 
 These apply to EVERY `narration` field. Violation = re-TTS will sound wrong even with the best voice (vi-VN-NamMinhNeural). Visual `inputs` (template slots) are EXEMPT — they keep formatted display ("82.7%", "$5", "GPT-5.5").

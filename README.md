@@ -80,11 +80,37 @@ layouts are template-driven (guards always on) **and** every filled scene is mea
   failing plan.** Faint "ghost echo" decoration is filtered out so the gate doesn't
   cry wolf.
 
+## Render path B: Remotion free-compose (v8)
+
+Say **"render with remotion"** (or `--remotion`) and Phases 3-5 switch from HTML
+templates to a [Remotion](https://www.remotion.dev/) engine in `render-remotion/`:
+scenes are composed **freely from primitives** following the content's structure
+(no template pool, every video gets bespoke layouts), with per-frame animation,
+word-level karaoke and hybrid Playwright footage. The extraction/planning brain
+and both checkpoints stay identical. Process: `skill/references/remotion-render.md`,
+design law: `render-remotion/SCENE-DESIGN.md`.
+
+A path B video picks **one of 14 verified skins** (tokens only: palette, fonts,
+shape language, karaoke variant). GitHub repo tours default to `repo-dark`:
+
+<p>
+<img src="render-remotion/docs/skins/14-repo-dark.png" width="132" alt="repo-dark"> <img src="render-remotion/docs/skins/10-tech-dark-neon.png" width="132" alt="tech-dark-neon"> <img src="render-remotion/docs/skins/11-escbase-starfield.png" width="132" alt="escbase-starfield"> <img src="render-remotion/docs/skins/06-cinematic-teal.png" width="132" alt="cinematic-teal"> <img src="render-remotion/docs/skins/13-pop-sticker.png" width="132" alt="pop-sticker"> <img src="render-remotion/docs/skins/12-mono-editorial.png" width="132" alt="mono-editorial"> <img src="render-remotion/docs/skins/01-terminal-crt.png" width="132" alt="terminal-crt">
+</p>
+<p>
+<img src="render-remotion/docs/skins/02-blueprint.png" width="132" alt="blueprint"> <img src="render-remotion/docs/skins/03-swiss.png" width="132" alt="swiss"> <img src="render-remotion/docs/skins/04-keynote-clean.png" width="132" alt="keynote-clean"> <img src="render-remotion/docs/skins/05-poster-70s.png" width="132" alt="poster-70s"> <img src="render-remotion/docs/skins/07-comic.png" width="132" alt="comic"> <img src="render-remotion/docs/skins/08-notebook.png" width="132" alt="notebook"> <img src="render-remotion/docs/skins/09-chalkboard.png" width="132" alt="chalkboard">
+</p>
+
+Full gallery with moods: [`render-remotion/docs/skins/`](render-remotion/docs/skins/).
+Living examples in `render-remotion/src/videos/`: a full single-repo tour
+(`flow-movie-pipeline-tour`), the same script re-skinned (`-repodark`), and a
+2-repo roundup (`caveman-ponytail`).
+
 ## Prerequisites
 
 - **Python 3.10+**
 - **FFmpeg** (`ffmpeg` + `ffprobe`) on your `PATH`
 - **Playwright** Chromium (renders scenes and captures repo footage)
+- **Node.js 18+** (path B only: `cd render-remotion && npm i`)
 
 ## Install
 
@@ -164,12 +190,13 @@ include when you publish.
 ## Repo layout
 
 ```
-lib/            the toolbox (sources, tts, render, compose, notify, critic)
-skill/          the Claude Code skill
-  SKILL.md      agent workflow spec (the "brain")
-  templates/    scene templates, SFX, background music, design tokens, schemas
-  references/   the reference-video craft teardown
-workspace/      generated runs (gitignored)
+lib/              the toolbox (sources, tts, render, compose, notify, critic)
+skill/            the Claude Code skill
+  SKILL.md        agent workflow spec (the "brain")
+  templates/      scene templates, SFX, background music, design tokens, schemas
+  references/     craft teardown + the path B (Remotion) process spec
+render-remotion/  render path B: Remotion engine, 14 skins, scene design law
+workspace/        generated runs (gitignored)
 ```
 
 ## Language
