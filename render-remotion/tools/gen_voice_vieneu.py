@@ -7,13 +7,16 @@ with the same syllable-weight distribution as the Google variant.
 
 VieNeu reads BILINGUAL text natively (sea-g2p code-switching): write English terms
 RAW with their correct spelling and casing ("GitHub", "AI", "Claude Code") and they
-are pronounced as English. Do NOT wrap them in <en>...</en> tags: the phonemizer has
-no tag support and mangles tagged acronyms (tagged "AI" flips to Vietnamese "ai").
-Do NOT use edge-tts style phonetics either ("git hâb" gets its diacritics spelled
-out letter by letter). Names containing digits still need spelling out ("any2video"
--> "any to video", else the 2 is read as Vietnamese "hai"); add a PHONETIC_MAP merge
-so captions show the clean name. Any leftover <en> tags are stripped from BOTH the
-TTS text and the karaoke words as a safety net.
+are pronounced as English (all-caps acronyms are letter-spelled, camelCase splits).
+sea-g2p DOES support <en>...</en>, but it FORCES English WORD g2p on the span, which
+is the wrong tool here: tagged "AI" reads as the English word "ai" (sounds exactly
+like Vietnamese "ai"), tagged "GitHub" collapses into one blob. Only tag a word the
+auto-detector would otherwise read as Vietnamese. Do NOT use edge-tts style
+phonetics either ("git hâb" gets its diacritics spelled out letter by letter).
+Names containing digits still need spelling out ("any2video" -> "any to video",
+else the 2 is read as Vietnamese "hai"); add a PHONETIC_MAP merge so captions show
+the clean name. This tool strips <en> tags from BOTH the TTS text and the karaoke
+words, so tags never reach the engine from this path.
 
 Setup: point --vieneu-dir (or the VIENEU_TTS_DIR env var) at your local VieNeu-TTS
 checkout (the dir holding its pyproject/uv env). The heavy work runs inside that env

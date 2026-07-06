@@ -69,8 +69,12 @@ python tools/gen_voice.py --scenes <run>/narration.json --prefix <slug> \
     `--style` (default tu_nhien) + `--temperature`. Karaoke timing is ESTIMATED
     like the Google path. BILINGUAL (sea-g2p code-switching): write English terms
     RAW with correct spelling/casing ("GitHub", "AI", "Claude Code") and they read
-    as native English. Do NOT use `<en>` markup (unsupported; a tagged acronym like
-    "AI" flips to the Vietnamese word "ai") and do NOT use edge-style phonetics
+    as native English (all-caps = letter-spelled acronym, camelCase splits). The
+    `<en>` markup that sea-g2p supports FORCES English WORD g2p on the span, so it
+    BREAKS acronyms (tagged "AI" reads as the English word "ai", which sounds like
+    the Vietnamese "ai") and camelCase names; reserve it for words the auto-detector
+    would read as Vietnamese, and never rely on it for common English terms (they
+    already auto-detect). No edge-style phonetics either
     ("git hâb" gets its diacritic names spelled out). Names containing digits still
     need spelling out ("any to video" for any2video, else "2" reads as Vietnamese
     "hai") + a PHONETIC_MAP merge so captions show the clean name. When unsure how
