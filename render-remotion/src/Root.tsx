@@ -9,6 +9,10 @@ import { SkinGallery, SKIN_COUNT } from "./videos/skin-gallery";
 import { FlowMoviePipelineRepoDark } from "./videos/flow-movie-pipeline-repodark";
 import { CavemanPonytail } from "./videos/caveman-ponytail";
 import { TOTAL_FRAMES as CP_FRAMES } from "./videos/caveman-ponytail-data";
+import { FbAds2026 } from "./videos/fb-ads-2026";
+import { TOTAL_FRAMES as FBA_FRAMES } from "./videos/fb-ads-2026-data";
+import { ChanktbAny2Video } from "./videos/chanktb-any2video";
+import { TOTAL_FRAMES as A2V_FRAMES } from "./videos/chanktb-any2video-data";
 
 // One run = one file in src/videos/ + one <Composition> registered here.
 // id = the run's slug. Default 9:16 1080x1920 30fps.
@@ -41,6 +45,14 @@ export const RemotionRoot: React.FC = () => {
         height={1920}
       />
       <Composition
+        id="fb-ads-2026"
+        component={FbAds2026}
+        durationInFrames={FBA_FRAMES}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
         id="caveman-ponytail"
         component={CavemanPonytail}
         durationInFrames={CP_FRAMES}
@@ -52,6 +64,14 @@ export const RemotionRoot: React.FC = () => {
         id="flow-movie-pipeline-repodark"
         component={FlowMoviePipelineRepoDark}
         durationInFrames={FMP_FRAMES}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="chanktb-any2video"
+        component={ChanktbAny2Video}
+        durationInFrames={A2V_FRAMES}
         fps={30}
         width={1080}
         height={1920}

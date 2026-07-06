@@ -25,8 +25,10 @@ HERE = Path(__file__).resolve().parent.parent  # render-remotion/
 # Phonetic clusters (spoken) -> clean word (karaoke display). Longest match first.
 PHONETIC_MAP = [
     (["ây-pi-ai"], "API"),   # Google variant: one hyphenated token so Chirp reads it as a unit
+    (["xê-pê-em"], "CPM"),
     (["ây-ai"], "AI"),
     (["git-hâb"], "GitHub"),
+    (["ca-pi"], "CAPI"),
     (["ây", "pi", "ai"], "API"),
     (["ây", "ai"], "AI"),
     (["rề", "pô"], "repo"),
@@ -34,6 +36,7 @@ PHONETIC_MAP = [
     (["ruýt", "my"], "README"),
     (["gí", "pi", "tí"], "GPT"),
     (["en", "ni", "tu", "vi", "đeo"], "any2video"),
+    (["any", "to", "video"], "any2video"),  # VieNeu bilingual: <en>any to video</en>
     (["diu", "túp"], "YouTube"),
     (["phây", "búc"], "Facebook"),
     (["tun"], "tool"),

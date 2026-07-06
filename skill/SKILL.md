@@ -33,7 +33,9 @@ primitives following the content's structure (NO template pool, doctrine in
 `render-remotion/SCENE-DESIGN.md`), 14 skin tokens in `src/lib/skins.ts` (visual
 gallery in `render-remotion/docs/skins/`; repo tours default to the `repo-dark`
 hybrid skin), voice + word timestamps via
-`tools/gen_voice.py` (edge-tts) or `tools/gen_voice_google.py` (Chirp3 HD),
+`tools/gen_voice.py` (edge-tts), `tools/gen_voice_google.py` (Chirp3 HD), or
+`tools/gen_voice_vieneu.py` (VieNeu-TTS local: free, instant voice cloning,
+bilingual `<en>` tags),
 gates via `tsc` + a still-check of every scene. Complete living examples:
 `render-remotion/src/videos/flow-movie-pipeline-pop.tsx` and
 `flow-movie-pipeline-tour.tsx`. Path A (HTML templates + Playwright) stays the

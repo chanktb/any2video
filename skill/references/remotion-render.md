@@ -29,6 +29,8 @@ render-remotion/
   src/Root.tsx            # one <Composition> registered per video
   tools/gen_voice.py      # TTS word-timestamps + phonetic merge (edge-tts)
   tools/gen_voice_google.py  # Google Chirp3 HD variant (estimated word timing)
+  tools/gen_voice_vieneu.py  # VieNeu-TTS local variant (free, voice cloning, bilingual <en> tags)
+  tools/vieneu_bridge.py     # runs INSIDE the VieNeu uv env (spawned by gen_voice_vieneu)
   public/audio/           # per-scene mp3 (gitignored)
   public/footage/         # Playwright/product footage mp4 (gitignored)
 ```
@@ -47,7 +49,7 @@ python tools/gen_voice.py --scenes <run>/narration.json --prefix <slug> \
 ```
 
 - Default voice: `vi-VN-NamMinhNeural`, rate `+15%` (female alt: `vi-VN-HoaiMyNeural`).
-- Two voice paths, pick per user request:
+- Three voice paths, pick per user request:
   - `tools/gen_voice.py` = edge-tts (free, real WordBoundary timestamps). Apply the
     phonetic spellings from rule 2.2.6 d.2 in full.
   - `tools/gen_voice_google.py` = Google Chirp3 HD (paid; default
@@ -60,6 +62,16 @@ python tools/gen_voice.py --scenes <run>/narration.json --prefix <slug> \
     "AI" gets letter-spelled in Vietnamese. Names containing digits always need
     phonetics (any2video = "en ni tu vi đeo"). Captions always display the clean
     spelling.
+  - `tools/gen_voice_vieneu.py` = VieNeu-TTS (local, free, CPU-friendly, instant
+    voice cloning). Point --vieneu-dir or the VIENEU_TTS_DIR env var at a local
+    VieNeu-TTS checkout; the heavy work runs inside that env via `uv run --no-sync`.
+    Voice: `--ref-audio <3-8s clip>` (clone) or `--voice <preset>`; delivery via
+    `--style` (default tu_nhien) + `--temperature`. Karaoke timing is ESTIMATED
+    like the Google path. BILINGUAL: wrap English words in `<en>...</en>` and the
+    model reads them natively; prefer these tags over phonetic spellings on this
+    engine. Tags are stripped from captions automatically; when the spoken form
+    differs from the display form (e.g. "any to video"), add a merge cluster to
+    PHONETIC_MAP ("any to video" -> "any2video").
 - edge-tts 7.x REQUIRES `boundary="WordBoundary"` (the script sets it; the lib
   default SentenceBoundary returns 0 words).
 - PHONETIC_MAP in gen_voice.py merges phonetic clusters back into clean caption
@@ -95,9 +107,12 @@ Write `src/videos/<slug>.tsx`: import `SCENES`/`TOTAL_FRAMES` from
 body + karaoke + `<Audio>` (from `@remotion/media`). Register the composition in
 `src/Root.tsx` (id = slug, 1080x1920, fps 30). Complete living examples:
 `src/videos/flow-movie-pipeline-pop.tsx`,
-`src/videos/flow-movie-pipeline-tour.tsx`, and
+`src/videos/flow-movie-pipeline-tour.tsx`,
 `flow-movie-pipeline-repodark.tsx` (the tour re-skinned to repo-dark on the same
-data file: how to swap skins without touching script or audio).
+data file: how to swap skins without touching script or audio),
+`chanktb-any2video.tsx` (the tool's own intro: VieNeu cloned voice, real skin
+montage via docs/skins PNGs, hybrid footage), and `fb-ads-2026.tsx` (a NEWS video
+from a fact-checked article, escbase-starfield skin).
 
 Hard rules while composing (inherited from path A + paid-for lessons):
 - Animate ONLY with `interpolate()`/`spring()` on the current frame. CSS
