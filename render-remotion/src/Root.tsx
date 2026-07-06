@@ -13,6 +13,8 @@ import { FbAds2026 } from "./videos/fb-ads-2026";
 import { TOTAL_FRAMES as FBA_FRAMES } from "./videos/fb-ads-2026-data";
 import { ChanktbAny2Video } from "./videos/chanktb-any2video";
 import { TOTAL_FRAMES as A2V_FRAMES } from "./videos/chanktb-any2video-data";
+import { ChanktbAny2VideoEn } from "./videos/chanktb-any2video-en";
+import { TOTAL_FRAMES as A2V_EN_FRAMES } from "./videos/chanktb-any2video-en-data";
 
 // One run = one file in src/videos/ + one <Composition> registered here.
 // id = the run's slug. Default 9:16 1080x1920 30fps.
@@ -72,6 +74,14 @@ export const RemotionRoot: React.FC = () => {
         id="chanktb-any2video"
         component={ChanktbAny2Video}
         durationInFrames={A2V_FRAMES}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="chanktb-any2video-en"
+        component={ChanktbAny2VideoEn}
+        durationInFrames={A2V_EN_FRAMES}
         fps={30}
         width={1080}
         height={1920}
