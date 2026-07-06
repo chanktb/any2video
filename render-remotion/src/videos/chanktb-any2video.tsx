@@ -463,15 +463,17 @@ const S07: React.FC = () => {
         <div style={{ position: "relative", marginTop: 40 }}>
           <svg width="900" height="980" style={{ position: "absolute", left: 0, top: 0 }}>
             {steps.slice(0, -1).map((_, i) => {
-              const y0 = 96 + i * 196 + 44;
+              // connector doctrine: circle-center x, start/end at the circle EDGES + 6px gap
+              const yStart = 96 + i * 196 + 88 + 6;
+              const yEnd = 96 + (i + 1) * 196 - 6;
               const p = progressAt(frame, startF(i) + 16, 26);
               return (
                 <line
                   key={i}
-                  x1="62"
-                  y1={y0 + 10}
-                  x2="62"
-                  y2={y0 + 10 + 132 * p}
+                  x1="44"
+                  y1={yStart}
+                  x2="44"
+                  y2={yStart + (yEnd - yStart) * p}
                   stroke={C.cyan}
                   strokeWidth="3"
                   opacity="0.7"
