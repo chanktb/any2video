@@ -35,7 +35,7 @@ gallery in `render-remotion/docs/skins/`; repo tours default to the `repo-dark`
 hybrid skin), voice + word timestamps via
 `tools/gen_voice.py` (edge-tts), `tools/gen_voice_google.py` (Chirp3 HD), or
 `tools/gen_voice_vieneu.py` (VieNeu-TTS local: free, instant voice cloning,
-bilingual `<en>` tags),
+bilingual code-switching with English terms written raw),
 gates via `tsc` + a still-check of every scene. Complete living examples:
 `render-remotion/src/videos/flow-movie-pipeline-pop.tsx` and
 `flow-movie-pipeline-tour.tsx`. Path A (HTML templates + Playwright) stays the

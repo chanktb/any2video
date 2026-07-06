@@ -67,11 +67,15 @@ python tools/gen_voice.py --scenes <run>/narration.json --prefix <slug> \
     VieNeu-TTS checkout; the heavy work runs inside that env via `uv run --no-sync`.
     Voice: `--ref-audio <3-8s clip>` (clone) or `--voice <preset>`; delivery via
     `--style` (default tu_nhien) + `--temperature`. Karaoke timing is ESTIMATED
-    like the Google path. BILINGUAL: wrap English words in `<en>...</en>` and the
-    model reads them natively; prefer these tags over phonetic spellings on this
-    engine. Tags are stripped from captions automatically; when the spoken form
-    differs from the display form (e.g. "any to video"), add a merge cluster to
-    PHONETIC_MAP ("any to video" -> "any2video").
+    like the Google path. BILINGUAL (sea-g2p code-switching): write English terms
+    RAW with correct spelling/casing ("GitHub", "AI", "Claude Code") and they read
+    as native English. Do NOT use `<en>` markup (unsupported; a tagged acronym like
+    "AI" flips to the Vietnamese word "ai") and do NOT use edge-style phonetics
+    ("git hâb" gets its diacritic names spelled out). Names containing digits still
+    need spelling out ("any to video" for any2video, else "2" reads as Vietnamese
+    "hai") + a PHONETIC_MAP merge so captions show the clean name. When unsure how
+    a term will read, inspect phonemes first:
+    `uv run --no-sync python -c "import sys; sys.path.insert(0,'src'); from vieneu_utils.phonemize_text import phonemize_text; print(phonemize_text('cau thu nghiem'))"`.
 - edge-tts 7.x REQUIRES `boundary="WordBoundary"` (the script sets it; the lib
   default SentenceBoundary returns 0 words).
 - PHONETIC_MAP in gen_voice.py merges phonetic clusters back into clean caption

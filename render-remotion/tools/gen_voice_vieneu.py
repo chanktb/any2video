@@ -5,10 +5,15 @@ VieNeu (github.com/pnnbao97/VieNeu-TTS, Apache-2.0) is a Vietnamese-native TTS w
 instant voice cloning. It returns NO word boundaries, so per-word timing is ESTIMATED
 with the same syllable-weight distribution as the Google variant.
 
-VieNeu reads BILINGUAL text: wrap English words in <en>...</en> and the model
-switches to native English pronunciation (e.g. "dung <en>GitHub Actions</en> de deploy").
-Prefer <en> tags over phonetic spellings for this engine. The tags are sent to the
-TTS as-is but STRIPPED from the karaoke words, so captions show the clean spelling.
+VieNeu reads BILINGUAL text natively (sea-g2p code-switching): write English terms
+RAW with their correct spelling and casing ("GitHub", "AI", "Claude Code") and they
+are pronounced as English. Do NOT wrap them in <en>...</en> tags: the phonemizer has
+no tag support and mangles tagged acronyms (tagged "AI" flips to Vietnamese "ai").
+Do NOT use edge-tts style phonetics either ("git hâb" gets its diacritics spelled
+out letter by letter). Names containing digits still need spelling out ("any2video"
+-> "any to video", else the 2 is read as Vietnamese "hai"); add a PHONETIC_MAP merge
+so captions show the clean name. Any leftover <en> tags are stripped from BOTH the
+TTS text and the karaoke words as a safety net.
 
 Setup: point --vieneu-dir (or the VIENEU_TTS_DIR env var) at your local VieNeu-TTS
 checkout (the dir holding its pyproject/uv env). The heavy work runs inside that env
@@ -62,10 +67,18 @@ def main() -> int:
 
     scenes_path = Path(args.scenes).resolve()
     audio_dir = Path(args.audio_dir).resolve()
+    audio_dir.mkdir(parents=True, exist_ok=True)
     ref = str(Path(args.ref_audio).resolve()) if args.ref_audio else ""
 
+    # Safety net: strip any <en> tags before the text reaches the phonemizer.
+    scenes = json.loads(scenes_path.read_text(encoding="utf-8"))
+    tts_json = audio_dir / f"_{args.prefix}_tts.json"
+    tts_json.write_text(json.dumps(
+        [dict(sc, narration=strip_en(sc["narration"])) for sc in scenes],
+        ensure_ascii=False), encoding="utf-8")
+
     cmd = ["uv", "run", "--no-sync", "python", str(BRIDGE),
-           "--scenes", str(scenes_path), "--audio-dir", str(audio_dir),
+           "--scenes", str(tts_json), "--audio-dir", str(audio_dir),
            "--prefix", args.prefix,
            "--style", args.style, "--temperature", str(args.temperature)]
     if ref:
