@@ -829,7 +829,7 @@ python -m lib.notify.telegram final workspace/runs/<slug>/final.mp4 \
   --caption-file workspace/runs/<slug>/caption.txt   # reads UTF-8 directly; ships the caption WITH the video
 ```
 
-Use `--caption-file` (NOT `--caption "$(cat …)"`): on Windows the shell/argv mangles Vietnamese diacritics; `--caption-file` reads the file as UTF-8 and drops any `\n---` note footer. If caption.txt exceeds the TG 1024-char video-caption cap, the send still works (Telegram truncates) — for the full text also send it as a follow-up `telegram text` message.
+Use `--caption-file` (NOT `--caption "$(cat …)"`): on Windows the shell/argv mangles Vietnamese diacritics; `--caption-file` reads the file as UTF-8 and drops any `\n---` note footer. If caption.txt exceeds the TG 1024-char video-caption cap, the send still works (Telegram truncates) — ALWAYS also attach caption.txt itself as a Telegram DOCUMENT (sendDocument via lib.notify.telegram._api) right after the video, so the reviewer gets the full untrimmed caption as a file (a follow-up text message can still be trimmed/mangled when copied).
 
 This step is OPTIONAL and only runs when `ANY2VIDEO_TG_BOT_TOKEN` / `ANY2VIDEO_TG_CHAT_ID` are configured (env vars or a local `.env`).
 
