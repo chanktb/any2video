@@ -36,7 +36,9 @@ PHONETIC_MAP = [
     (["ruýt", "my"], "README"),
     (["gí", "pi", "tí"], "GPT"),
     (["en", "ni", "tu", "vi", "đeo"], "any2video"),
-    (["any", "to", "video"], "any2video"),  # VieNeu bilingual: <en>any to video</en>
+    (["any", "to", "video"], "any2video"),  # VieNeu bilingual spelled-out name
+    (["rô", "át"], "ROAS"),        # VieNeu: raw ROAS letter-spells; word reading is the trade term
+    (["gi", "ây", "bốn"], "GA4"),  # VieNeu: raw GA4 reads the 4 as Vietnamese in an odd way
     (["diu", "túp"], "YouTube"),
     (["phây", "búc"], "Facebook"),
     (["tun"], "tool"),

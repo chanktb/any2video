@@ -1,6 +1,6 @@
 ---
 name: any2video
-description: Deep-analyze any input (URL, GitHub repo, article, image, raw text) and produce a chi-tiết video with non-templated visuals + voice narration. Unlike a fixed-template video generator (fixed layouts + themes + a small fixed context), the agent does the deep extraction, writes the plan, then assembles each scene by picking a template from a rich catalog and filling it with real data (via `template_render` — not free-hand HTML), and composes the mp4. Use when the user says "làm video từ <url>", "video giới thiệu repo <github>", "dùng any2video", "/any2video", or wants a repo/product tour video.
+description: Deep-analyze any input (URL, GitHub repo, article, image, raw text) and produce a chi-tiết video with non-templated visuals + voice narration. Unlike a fixed-template video generator (fixed layouts + themes + a small fixed context), the agent does the deep extraction, writes the plan, then composes each scene as bespoke animated visuals (Remotion by default, with an HTML-template path as fallback) and renders the mp4. Use when the user says "làm video từ <url>", "video giới thiệu repo <github>", "dùng any2video", "/any2video", or wants a repo/product tour video.
 ---
 
 # any2video — Deep Video from Any Input
@@ -21,25 +21,29 @@ into templates instead of hand-writing HTML per scene, so a run is a normal agen
 session, not a token-heavy job. Best for videos you want to look bespoke; a
 fixed-template generator is still the better fit for high-volume, uniform output.
 
-## Render path B: Remotion free-compose (v8, optional)
+## Render path (DEFAULT: Remotion free-compose, v8)
 
-When the user says "render with remotion" / "--remotion", or the video needs
-animation beyond the CSS ceiling (live counters, self-drawing charts, springs,
-word-level karaoke rendered directly): keep Phase 0-2 (intake, deep extract,
-narrative plan) unchanged and replace Phase 3-5 with the process in
-[references/remotion-render.md](references/remotion-render.md). The engine lives
-in `render-remotion/` (`npm i` on first use): scenes are composed freely from
-primitives following the content's structure (NO template pool, doctrine in
-`render-remotion/SCENE-DESIGN.md`), 14 skin tokens in `src/lib/skins.ts` (visual
-gallery in `render-remotion/docs/skins/`; repo tours default to the `repo-dark`
-hybrid skin), voice + word timestamps via
-`tools/gen_voice.py` (edge-tts), `tools/gen_voice_google.py` (Chirp3 HD), or
-`tools/gen_voice_vieneu.py` (VieNeu-TTS local: free, instant voice cloning,
-bilingual code-switching with English terms written raw),
-gates via `tsc` + a still-check of every scene. Complete living examples:
-`render-remotion/src/videos/flow-movie-pipeline-pop.tsx` and
-`flow-movie-pipeline-tour.tsx`. Path A (HTML templates + Playwright) stays the
-default.
+**Default render = path B (Remotion).** Free-composed React scenes read as more
+bespoke than the CSS-template path, so unless the run opts out (below), keep Phase
+0-2 (intake, deep extract, narrative plan) unchanged and run Phase 3-5 with the
+process in [references/remotion-render.md](references/remotion-render.md). The
+engine lives in `render-remotion/` (`npm i` on first use): scenes are composed
+freely from primitives following the content's structure (NO template pool,
+doctrine in `render-remotion/SCENE-DESIGN.md`), 14 skin tokens in `src/lib/skins.ts`
+(visual gallery in `render-remotion/docs/skins/`; repo tours default to the
+`repo-dark` hybrid skin), voice + word timestamps via `tools/gen_voice.py`
+(edge-tts), `tools/gen_voice_google.py` (Chirp3 HD), or `tools/gen_voice_vieneu.py`
+(VieNeu-TTS local: free, instant voice cloning, bilingual code-switching with
+English terms written raw), gates via `tsc` + a still-check of every scene.
+Complete living examples: `render-remotion/src/videos/flow-movie-pipeline-pop.tsx`
+and `flow-movie-pipeline-tour.tsx`.
+
+**Opt out to path A (HTML templates + Playwright)** when the user says "--html" /
+"--playwright" / "--fast", OR when Node/Remotion is unavailable in the environment
+(no `render-remotion/node_modules`, or `npm`/`npx` missing): then fall back to
+path A automatically. Path A is the fast, turnkey path where Phase 4 fills the
+template catalog via `template_render` (the 6-phase workflow below documents it
+end-to-end, and it shares Phases 0-2 + all quality gates with the Remotion path).
 
 ## Workflow — 6 phases, 7 quality gates (Phase 0 + 3.5 + 6 added 2026-06-30)
 
@@ -814,12 +818,24 @@ python -m lib.critic.ship_gate workspace/runs/<slug>/final.mp4
 
 It BLOCKS the ship (exit 1) unless all pass: (1) the t=0 frame is the scene-1 poster — a real settled hero, not a white/black/blank thumb (FB/TikTok grab t=0); (2) NONE of the first ~1.5s is white (the "1-2s màn hình trắng đầu video, voice đã phát" bug); (3) the audio is as long as the video AND there's real speech in the final scene's voice window (closing/promo narration not clipped). If it fails, fix the cause (re-render / re-compose) and re-gate — **never send a video that fails the ship gate.**
 
-**MANDATORY caption.txt (HARD — every ship carries a caption).** Before ANY ship, ALWAYS write `runs/<slug>/caption.txt` — the ready-to-post social caption. **Voice depends on ownership:**
+**MANDATORY caption.txt (HARD: every ship carries a caption). A caption is a HOOK, not a summary.** Before ANY ship, ALWAYS write `runs/<slug>/caption.txt`. Rewritten 2026-07-09 (operator feedback + research in `workspace/research/caption-best-practices.md`): a caption that re-tells the video narration is worthless. Its job is to ADD a layer the video doesn't say, and to start a conversation.
 
-- **Operator's OWN repo — ONLY when the operator EXPLICITLY says so** ("đây là repo của anh/mình", "viết fb post cho repo này") → write in the operator's first-person maker voice per **`fb-post.md`** ("mình" / "các bạn", humble, no oversell).
-- **Everything else (DEFAULT — other people's repos, articles, raw text, or ownership not stated)** → **NEUTRAL, NO PRONOUN**: zero "mình / tôi / bạn / các bạn / chúng ta". Descriptive/informational third-person-less prose. Keep the SAME hygiene as fb-post (paragraphs ≤ 2 lines, blank line between, NO em-dash, ≤ 3 icons, honest caveat, who-it's-for, soft CTA, link goes in the FIRST COMMENT not the body).
+**Format (4 short pieces, whole caption well under ~500 chars):**
+1. **Hook line** (max ~100 chars; mobile truncates around ~125 and ~99% of readers never tap "See more"): tension / curiosity / bold claim, in DIFFERENT words than the video's own hook.
+2. **Optional context line** (max ~90 chars): ONE extra stake/twist/number the video doesn't spell out. Not a plot summary.
+3. **One genuine open-ended question**: real opinion, many valid answers ("Mọi người quen tăng budget mỗi lần bao nhiêu phần trăm?"). This is the comment engine.
+4. **Soft CTA to the first comment** ("repo mình để ở comment đầu tiên") + keep the `---`/`Comment link: <url>` footer. The link is POSTED AS THE FIRST COMMENT, never in the caption body.
 
-Do not assume a `chanktb/...` repo is "his" — the trigger is an explicit statement in THIS request; when unsure, use the neutral voice.
+**Hard rules:**
+- **NEVER transcript/summarize the narration** ("headline, not transcript"). If the caption reads like the voiceover, rewrite it.
+- **No engagement bait**: Meta demotes explicit begging ("comment YES nếu...", "tag 1 người bạn", react/share requests; Business Help 259911614709806, tightened 04/2025 incl. fake-comment demotion). Genuine opinion questions are exempt and encouraged.
+- **No links in the caption body** (Meta Widely Viewed Content: 97-98% of top FB content is linkless; FB dashboard advice 06/2025 and the 2-link cap test 12/2025 both push links to the first comment). **0-1 hashtag**, never a hashtag wall (Meta 04/2025 flags "long, distracting captions... inordinate amount of hashtags" as spam). Max 3 emoji, emotional ones, or none.
+
+**Voice depends on ownership (unchanged):**
+- **Operator's OWN repo, ONLY when explicitly stated** ("đây là repo của anh/mình") → first-person maker voice per **`fb-post.md`** (humble, no oversell). A series bible may override with its own voice (e.g. user-of-the-repo).
+- **Everything else (DEFAULT)** → **NEUTRAL, NO PRONOUN**. Same hygiene everywhere: NO em-dash, honest, no superlatives.
+
+Do not assume a `chanktb/...` repo is "his": the trigger is an explicit statement in THIS request; when unsure, use the neutral voice. (`fb-post.md` remains the format for LONG-FORM intro posts, a separate artifact; caption.txt is never that long.)
 
 After `final.mp4` exists + Gate-3 + Gate-4 pass + caption.txt written, if `intake.telegram == true`:
 
@@ -829,11 +845,13 @@ python -m lib.notify.telegram final workspace/runs/<slug>/final.mp4 \
   --caption-file workspace/runs/<slug>/caption.txt   # reads UTF-8 directly; ships the caption WITH the video
 ```
 
-Use `--caption-file` (NOT `--caption "$(cat …)"`): on Windows the shell/argv mangles Vietnamese diacritics; `--caption-file` reads the file as UTF-8 and drops any `\n---` note footer. If caption.txt exceeds the TG 1024-char video-caption cap, the send still works (Telegram truncates) — ALWAYS also attach caption.txt itself as a Telegram DOCUMENT (sendDocument via lib.notify.telegram._api) right after the video, so the reviewer gets the full untrimmed caption as a file (a follow-up text message can still be trimmed/mangled when copied).
+Use `--caption-file` (NOT `--caption "$(cat …)"`): on Windows the shell/argv mangles Vietnamese diacritics; `--caption-file` reads the file as UTF-8 and drops any `\n---` note footer. **Two delivery cases, never both (CEO rule 2026-07-09):**
+1. **Caption fits the TG 1024-char video-caption cap** (the normal case with the hook-format caption): send ONE message, the video WITH the caption. Done. Do NOT also send caption.txt as a file (redundant).
+2. **Caption exceeds 1024 chars** (rare now): send the video with NO caption, then the full caption as its OWN separate message (sendMessage handles up to 4096 untrimmed; only fall back to a caption.txt DOCUMENT if it somehow exceeds that). Never ship a truncated video-caption plus a file copy.
 
 This step is OPTIONAL and only runs when `ANY2VIDEO_TG_BOT_TOKEN` / `ANY2VIDEO_TG_CHAT_ID` are configured (env vars or a local `.env`).
 
-**Caption auto-gen** (when `intake.caption_mode == "auto"`): pull `meta.brand.tagline` + `meta.total_duration_sec_measured` + 1-sentence hook from scene 1 narration. Keep under 1000 chars (TG video caption cap).
+**Caption auto-gen** (when `intake.caption_mode == "auto"`): generate in the SAME hook format above (hook line + optional context line + genuine question + first-comment CTA) from `analysis.md`. NEVER paste scene-1 narration or the tagline as the caption; those repeat the video. Keep under 1000 chars (TG video caption cap; the new format lands far below it anyway).
 
 The bot sends the mp4 as a streamable video to the configured Telegram DM with the source URL pinned to the top, so it can be forwarded to channels from there.
 

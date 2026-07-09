@@ -1,0 +1,557 @@
+<title>Nét tay: 3 hướng skin</title>
+
+<style>
+  :root {
+    /* Atelier by day (light) */
+    --wall:      #ddd8c9;
+    --wall-2:    #d2ccbb;
+    --surface:   #ece6d8;
+    --ink:       #2b2620;
+    --ink-soft:  #5f584c;
+    --line:      rgba(43, 38, 32, .16);
+    --brass:     #9c6b1e;
+    --tape:      rgba(188, 172, 132, .55);
+    --shadow:    rgba(40, 34, 24, .22);
+
+    --hand:  "Ink Free", "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
+    --serif: "Iowan Old Style", "Palatino Linotype", "Palatino", "Georgia", serif;
+    --sans:  "Corbel", "Segoe UI", system-ui, sans-serif;
+
+    --maxw: 1140px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      /* Atelier at night (dark) */
+      --wall:     #17151280;
+      --wall:     #171512;
+      --wall-2:   #100f0d;
+      --surface:  #211f1b;
+      --ink:      #e9e2d3;
+      --ink-soft: #a1998a;
+      --line:     rgba(233, 226, 211, .14);
+      --brass:    #cf9f45;
+      --tape:     rgba(120, 105, 75, .5);
+      --shadow:   rgba(0, 0, 0, .5);
+    }
+  }
+  :root[data-theme="light"] {
+    --wall:#ddd8c9; --wall-2:#d2ccbb; --surface:#ece6d8;
+    --ink:#2b2620; --ink-soft:#5f584c; --line:rgba(43,38,32,.16);
+    --brass:#9c6b1e; --tape:rgba(188,172,132,.55); --shadow:rgba(40,34,24,.22);
+  }
+  :root[data-theme="dark"] {
+    --wall:#171512; --wall-2:#100f0d; --surface:#211f1b;
+    --ink:#e9e2d3; --ink-soft:#a1998a; --line:rgba(233,226,211,.14);
+    --brass:#cf9f45; --tape:rgba(120,105,75,.5); --shadow:rgba(0,0,0,.5);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(120% 80% at 50% -10%, var(--wall) 0%, var(--wall-2) 100%);
+    color: var(--ink);
+    font-family: var(--serif);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: clamp(28px, 5vw, 64px) clamp(18px, 4vw, 40px) 72px; }
+
+  /* ---------- Hero ---------- */
+  .eyebrow {
+    font-family: var(--sans);
+    font-size: .72rem;
+    letter-spacing: .34em;
+    text-transform: uppercase;
+    color: var(--brass);
+    margin: 0 0 14px;
+    font-weight: 600;
+  }
+  .hero-title {
+    font-family: var(--hand);
+    font-weight: 400;
+    font-size: clamp(2.6rem, 8vw, 5rem);
+    line-height: .98;
+    margin: 0 0 18px;
+    text-wrap: balance;
+    letter-spacing: .01em;
+  }
+  .hero-sub {
+    font-size: clamp(1.02rem, 2.1vw, 1.22rem);
+    color: var(--ink-soft);
+    max-width: 40ch;
+    margin: 0;
+  }
+  .hero-rule {
+    height: 2px; width: 100%;
+    margin: 30px 0 8px;
+    background: var(--line);
+    position: relative;
+  }
+  .hero-rule::after {
+    content: ""; position: absolute; left: 0; top: 0; height: 2px; width: 84px;
+    background: var(--brass);
+  }
+
+  /* ---------- Gallery ---------- */
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(272px, 1fr));
+    gap: clamp(26px, 3.4vw, 44px);
+    margin-top: 46px;
+    align-items: start;
+  }
+
+  .card { position: relative; display: flex; flex-direction: column; }
+
+  .pick-tag {
+    align-self: flex-start;
+    font-family: var(--sans);
+    font-size: .68rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--brass);
+    border: 1.5px solid var(--brass);
+    border-radius: 999px;
+    padding: 4px 11px;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .pick-tag.ghost { visibility: hidden; }
+
+  /* ---------- Phone / 9:16 style frame ---------- */
+  .phone-hold { position: relative; padding-top: 14px; }
+  .tape {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%) rotate(-2.4deg);
+    width: 92px; height: 26px;
+    background: var(--tape);
+    box-shadow: 0 1px 3px var(--shadow);
+    z-index: 3;
+    mix-blend-mode: multiply;
+  }
+  @media (prefers-color-scheme: dark) { .tape { mix-blend-mode: screen; } }
+  :root[data-theme="dark"] .tape { mix-blend-mode: screen; }
+
+  .phone {
+    position: relative;
+    aspect-ratio: 9 / 16;
+    width: 100%;
+    max-width: 306px;
+    margin: 0 auto;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 18px 34px -14px var(--shadow), 0 2px 0 rgba(0,0,0,.04);
+    border: 7px solid #1b1a17;
+    background: #000;
+  }
+  @media (prefers-color-scheme: dark) { .phone { border-color: #000; } }
+
+  .screen { position: absolute; inset: 0; display: flex; flex-direction: column; }
+  .grain {
+    position: absolute; inset: 0; pointer-events: none; opacity: .5; z-index: 2;
+    mix-blend-mode: multiply;
+  }
+
+  .illo { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; padding: 8% 10% 0; }
+  .illo svg { width: 100%; height: 100%; }
+
+  .say {
+    padding: 0 9% 4%;
+    position: relative;
+    z-index: 1;
+  }
+  .say .line {
+    font-family: var(--hand);
+    font-weight: 400;
+    line-height: 1.24;
+    font-size: clamp(1.15rem, 5.6vw, 1.62rem);
+    margin: 0 0 10px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity .6s ease .9s, transform .6s ease .9s;
+  }
+  .frame.drawn .say .line { opacity: 1; transform: none; }
+
+  .say .cap {
+    font-family: var(--sans);
+    font-size: .64rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    opacity: 0;
+    transition: opacity .6s ease 1.25s;
+  }
+  .frame.drawn .say .cap { opacity: .78; }
+
+  .mark {
+    display: flex; align-items: center; gap: 6px;
+    padding: 0 9% 6%;
+    font-family: var(--sans);
+    font-size: .58rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    opacity: .0;
+    transition: opacity .8s ease 1.5s;
+  }
+  .frame.drawn .mark { opacity: .55; }
+  .mark .dot { width: 7px; height: 7px; border-radius: 50%; }
+
+  /* draw-on strokes */
+  .ink {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .frame:not(.static) .ink { transition: stroke-dashoffset 1.05s cubic-bezier(.6,.02,.3,1); }
+  .fillin { opacity: 0; transform-box: fill-box; transform-origin: center; transform: scale(.6); }
+  .frame:not(.static) .fillin { transition: opacity .5s ease, transform .5s cubic-bezier(.3,1.4,.5,1); }
+  .frame.drawn .fillin { opacity: 1; transform: none; }
+
+  /* ---------- Recipe ---------- */
+  .recipe {
+    margin-top: 20px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 18px 16px;
+  }
+  .recipe h3 {
+    font-family: var(--serif);
+    font-size: 1.28rem;
+    margin: 0 0 2px;
+    font-weight: 600;
+  }
+  .recipe .vibe {
+    font-family: var(--sans);
+    font-size: .82rem;
+    color: var(--ink-soft);
+    margin: 0 0 14px;
+  }
+  .rrow {
+    display: grid;
+    grid-template-columns: 4.4em 1fr;
+    gap: 8px 12px;
+    font-size: .88rem;
+    padding: 7px 0;
+    border-top: 1px solid var(--line);
+    align-items: center;
+  }
+  .rrow .k {
+    font-family: var(--sans);
+    font-size: .66rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding-top: 1px;
+  }
+  .rrow .v { color: var(--ink); }
+  .swatches { display: flex; gap: 6px; }
+  .sw { width: 20px; height: 20px; border-radius: 5px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.18); }
+
+  .replay {
+    margin-top: 12px;
+    font-family: var(--sans);
+    font-size: .72rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: transparent;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 14px;
+    cursor: pointer;
+    transition: border-color .2s ease, color .2s ease;
+  }
+  .replay:hover { border-color: var(--brass); color: var(--brass); }
+  .replay:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+
+  /* ---------- Closing note ---------- */
+  .note {
+    margin-top: 60px;
+    border-top: 2px solid var(--line);
+    padding-top: 28px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 26px 40px;
+  }
+  .note h4 {
+    font-family: var(--sans);
+    font-size: .72rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--brass);
+    margin: 0 0 8px;
+  }
+  .note p { margin: 0; font-size: .96rem; color: var(--ink-soft); }
+  .note p b { color: var(--ink); font-weight: 600; }
+  .foot {
+    margin-top: 40px; font-family: var(--sans); font-size: .72rem;
+    letter-spacing: .04em; color: var(--ink-soft); opacity: .8;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .frame .ink { transition: none !important; }
+    .frame .fillin, .frame .say .line, .frame .say .cap, .frame .mark { transition: none !important; }
+  }
+</style>
+
+<!-- shared filters -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="rough-a"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.4"/></filter>
+    <filter id="rough-b"><feTurbulence type="fractalNoise" baseFrequency="0.014" numOctaves="2" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.8"/></filter>
+    <filter id="rough-c"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" seed="12" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" result="d"/><feGaussianBlur in="d" stdDeviation="0.35"/></filter>
+    <filter id="paper"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .5 0"/></filter>
+  </defs>
+</svg>
+
+<div class="wrap">
+
+  <p class="eyebrow">Skin / Nét tay</p>
+  <h1 class="hero-title">Ba cái tay để anh chọn</h1>
+  <p class="hero-sub">Cùng một kênh từng trải, ba hướng nét khác nhau. Mỗi khung là 9:16 thật, tự vẽ ra trước mắt anh. Anh chấm cái tay, rồi em ráp engine quanh nó.</p>
+  <div class="hero-rule"></div>
+
+  <div class="gallery">
+
+    <!-- ======================= A: MARKER ======================= -->
+    <div class="card">
+      <span class="pick-tag">Em nghiêng về cái này</span>
+      <div class="phone-hold">
+        <div class="tape"></div>
+        <div class="phone">
+          <div class="frame" id="frameA" style="position:absolute; inset:0;">
+            <div class="screen" style="background: linear-gradient(170deg, #f0e7d3 0%, #e7dcc2 100%);">
+              <svg class="grain"><rect width="100%" height="100%" filter="url(#paper)"/></svg>
+              <div class="illo">
+                <svg viewBox="0 0 300 260" filter="url(#rough-a)" aria-hidden="true">
+                  <g stroke="#3a2c22">
+                    <!-- sun -->
+                    <circle class="ink" cx="62" cy="58" r="21" stroke-width="4"/>
+                    <path class="ink" d="M62 22 L62 30" stroke-width="4"/>
+                    <path class="ink" d="M28 40 L34 46" stroke-width="4"/>
+                    <path class="ink" d="M96 40 L90 46" stroke-width="4"/>
+                    <path class="ink" d="M24 78 L33 78" stroke-width="4"/>
+                    <!-- ground -->
+                    <path class="ink" d="M18 214 Q100 205 160 210 T292 202" stroke-width="4.5"/>
+                    <!-- hill -->
+                    <path class="ink" d="M172 213 C193 150 250 150 268 214" stroke-width="4.5"/>
+                    <!-- winding trail -->
+                    <path class="ink" d="M46 238 C74 214 58 188 96 178 C132 169 120 148 152 148 C196 148 200 138 224 176" stroke-width="4" stroke-dasharray="1 11"/>
+                    <!-- flag pole -->
+                    <path class="ink" d="M236 176 L236 132" stroke-width="4"/>
+                  </g>
+                  <!-- flag fill -->
+                  <path class="fillin" d="M238 134 L266 143 L238 154 Z" fill="#c58a2a"/>
+                </svg>
+              </div>
+              <div class="say" style="color:#3a2c22;">
+                <p class="line">Đi chậm mà chắc. Đường dài không thưởng kẻ vội.</p>
+                <p class="cap" style="color:#7a5a2a;">chuyện người đi trước</p>
+              </div>
+              <div class="mark" style="color:#3a2c22;">
+                <span class="dot" style="background:#c58a2a;"></span> Người Đi Trước
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="recipe">
+        <h3>Marker đậm</h3>
+        <p class="vibe">Ấm, mộc, gần. Hợp kể chuyện.</p>
+        <div class="rrow"><span class="k">Màu</span><span class="v swatches"><i class="sw" style="background:#e7dcc2"></i><i class="sw" style="background:#3a2c22"></i><i class="sw" style="background:#c58a2a"></i></span></div>
+        <div class="rrow"><span class="k">Nét</span><span class="v">Bút dạ đậm, tròn đầu, hơi run tay</span></div>
+        <div class="rrow"><span class="k">Chữ</span><span class="v">Viết tay đậm, đọc nhanh trên mobile</span></div>
+        <div class="rrow"><span class="k">Động</span><span class="v">Trail vẽ dần theo lời, cờ bung cuối</span></div>
+        <div class="rrow"><span class="k">Hợp</span><span class="v">Đại đa số bài, dễ đều tay, throughput cao</span></div>
+        <button class="replay" data-target="frameA">Vẽ lại</button>
+      </div>
+    </div>
+
+    <!-- ======================= B: FINE-LINER ======================= -->
+    <div class="card">
+      <span class="pick-tag ghost">.</span>
+      <div class="phone-hold">
+        <div class="tape"></div>
+        <div class="phone">
+          <div class="frame" id="frameB" style="position:absolute; inset:0;">
+            <div class="screen" style="background: linear-gradient(170deg, #f7f6f1 0%, #eeece4 100%);">
+              <div class="illo">
+                <svg viewBox="0 0 300 260" filter="url(#rough-b)" aria-hidden="true">
+                  <g stroke="#22231f" stroke-width="2">
+                    <!-- canopy -->
+                    <path class="ink" d="M150 122 C108 122 92 96 110 78 C99 56 132 42 150 54 C168 42 201 56 190 78 C208 96 192 122 150 122 Z"/>
+                    <!-- trunk -->
+                    <path class="ink" d="M150 205 L150 118"/>
+                    <!-- branches -->
+                    <path class="ink" d="M150 150 L126 128"/>
+                    <path class="ink" d="M150 158 L176 134"/>
+                    <!-- ground -->
+                    <path class="ink" d="M44 206 Q150 214 258 205" stroke-width="2.4"/>
+                    <!-- roots -->
+                    <path class="ink" d="M150 206 C136 220 122 224 106 236"/>
+                    <path class="ink" d="M150 206 C164 220 178 224 196 236"/>
+                    <path class="ink" d="M150 206 L150 242"/>
+                  </g>
+                  <circle class="fillin" cx="150" cy="86" r="4" fill="#35507e"/>
+                </svg>
+              </div>
+              <div class="say" style="color:#22231f;">
+                <p class="line">Rễ có sâu, tán mới rộng.</p>
+                <p class="cap" style="color:#35507e;">nghĩ dài một chút</p>
+              </div>
+              <div class="mark" style="color:#22231f;">
+                <span class="dot" style="background:#35507e;"></span> Người Đi Trước
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="recipe">
+        <h3>Bút kim mảnh</h3>
+        <p class="vibe">Tối giản, sang, tĩnh. Hợp chiêm nghiệm.</p>
+        <div class="rrow"><span class="k">Màu</span><span class="v swatches"><i class="sw" style="background:#f7f6f1"></i><i class="sw" style="background:#22231f"></i><i class="sw" style="background:#35507e"></i></span></div>
+        <div class="rrow"><span class="k">Nét</span><span class="v">Bút kim một độ dày, thanh, đều</span></div>
+        <div class="rrow"><span class="k">Chữ</span><span class="v">Viết tay mảnh, cần cỡ lớn kẻo mờ</span></div>
+        <div class="rrow"><span class="k">Động</span><span class="v">Nét chạy chậm, một chấm mực rơi</span></div>
+        <div class="rrow"><span class="k">Hợp</span><span class="v">Bài sâu, ít chữ. Legibility phải canh kỹ</span></div>
+        <button class="replay" data-target="frameB">Vẽ lại</button>
+      </div>
+    </div>
+
+    <!-- ======================= C: CHALK ======================= -->
+    <div class="card">
+      <span class="pick-tag ghost">.</span>
+      <div class="phone-hold">
+        <div class="tape"></div>
+        <div class="phone">
+          <div class="frame" id="frameC" style="position:absolute; inset:0;">
+            <div class="screen" style="background: radial-gradient(130% 100% at 50% 0%, #2a3a34 0%, #1f2d28 100%);">
+              <svg class="grain" style="opacity:.32; mix-blend-mode:screen;"><rect width="100%" height="100%" filter="url(#paper)"/></svg>
+              <div class="illo">
+                <svg viewBox="0 0 300 260" filter="url(#rough-c)" aria-hidden="true">
+                  <g stroke="#e8e5da" stroke-width="3" opacity="0.92">
+                    <!-- outer ring -->
+                    <circle class="ink" cx="150" cy="128" r="82"/>
+                    <!-- ticks -->
+                    <path class="ink" d="M150 50 L150 64"/>
+                    <path class="ink" d="M150 206 L150 192"/>
+                    <path class="ink" d="M228 128 L214 128"/>
+                    <path class="ink" d="M72 128 L86 128"/>
+                  </g>
+                  <!-- needle north (accent) -->
+                  <path class="fillin" d="M150 66 L138 128 L150 118 L162 128 Z" fill="#d59b8f"/>
+                  <!-- needle south -->
+                  <path class="fillin" d="M150 190 L138 128 L150 138 L162 128 Z" fill="#9db38a"/>
+                  <circle class="fillin" cx="150" cy="128" r="5" fill="#e8e5da"/>
+                </svg>
+              </div>
+              <div class="say" style="color:#e8e5da;">
+                <p class="line">Biết mình ở đâu, mới biết đi đâu.</p>
+                <p class="cap" style="color:#d59b8f;">trước khi bước tiếp</p>
+              </div>
+              <div class="mark" style="color:#e8e5da;">
+                <span class="dot" style="background:#d59b8f;"></span> Người Đi Trước
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="recipe">
+        <h3>Phấn trên bảng</h3>
+        <p class="vibe">Trầm, điện ảnh, đêm. Hợp lời khuyên.</p>
+        <div class="rrow"><span class="k">Màu</span><span class="v swatches"><i class="sw" style="background:#1f2d28"></i><i class="sw" style="background:#e8e5da"></i><i class="sw" style="background:#d59b8f"></i></span></div>
+        <div class="rrow"><span class="k">Nét</span><span class="v">Phấn, hạt bụi, cạnh vỡ nhẹ</span></div>
+        <div class="rrow"><span class="k">Chữ</span><span class="v">Phấn viết tay, nền tối làm chữ nổi</span></div>
+        <div class="rrow"><span class="k">Động</span><span class="v">Nét phấn miết ra, kim la bàn quay về</span></div>
+        <div class="rrow"><span class="k">Hợp</span><span class="v">Bài nặng đô. Khó giữ đều tay nhất</span></div>
+        <button class="replay" data-target="frameC">Vẽ lại</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="note">
+    <div>
+      <h4>Vì sao em nghiêng Marker</h4>
+      <p><b>Ấm và đọc nhanh.</b> Trên màn phone 9:16 lướt nhanh, nét đậm thắng nét mảnh. Marker vừa hợp giọng người kể, vừa dễ giữ đều tay khi ra tập hàng loạt. Bút kim (B) sang hơn nhưng kén bài và dễ mờ. Phấn (C) đẹp nhất về mood, khó nhất về throughput.</p>
+    </div>
+    <div>
+      <h4>Cái tay này khóa gì</h4>
+      <p><b>Consistency bằng cấu trúc.</b> Chọn xong, em khóa palette + nét + font + texture thành 1 kit. Mỗi tập chỉ thay hình minh họa và chữ, còn "cái tay" giữ nguyên. Đó là cách faceless thành thương hiệu chứ không thành 100 video lạ mặt.</p>
+    </div>
+    <div>
+      <h4>Bước kế</h4>
+      <p><b>Anh chấm 1 trong 3.</b> Chốt xong em dựng engine "vẽ dần" trong Remotion, gắn vào skin catalog của any2video, rồi chạy 1 pilot 45 tới 60 giây với 1 bài thật để soi nhịp giọng và caption.</p>
+    </div>
+  </div>
+
+  <p class="foot">Tên "Người Đi Trước", giọng và các câu ở đây là placeholder để anh thấy hình với chữ đi cùng nhau. Preview xem trên máy Windows dùng font viết tay hệ thống; bản production sẽ nhúng font riêng để ai xem cũng ra đúng nét.</p>
+
+</div>
+
+<script>
+(function () {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function prep(frame) {
+    var inks = frame.querySelectorAll('.ink');
+    inks.forEach(function (p, i) {
+      var len;
+      try { len = p.getTotalLength(); } catch (e) { len = 400; }
+      p.style.strokeDasharray = len;
+      p.style.strokeDashoffset = len;
+      p.style.transitionDelay = (i * 0.14) + 's';
+    });
+    var fills = frame.querySelectorAll('.fillin');
+    fills.forEach(function (f, i) {
+      f.style.transitionDelay = (0.9 + i * 0.12) + 's';
+    });
+  }
+
+  function draw(frame) {
+    frame.classList.remove('drawn');
+    // force reflow so a replay restarts cleanly
+    void frame.offsetWidth;
+    frame.querySelectorAll('.ink').forEach(function (p) { p.style.strokeDashoffset = 0; });
+    frame.classList.add('drawn');
+  }
+
+  var frames = document.querySelectorAll('.frame');
+  frames.forEach(prep);
+
+  if (reduce) {
+    frames.forEach(function (f) {
+      f.classList.add('static');
+      f.querySelectorAll('.ink').forEach(function (p) { p.style.strokeDashoffset = 0; });
+      f.classList.add('drawn');
+    });
+  } else if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { draw(en.target); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.4 });
+    frames.forEach(function (f) { io.observe(f); });
+  } else {
+    frames.forEach(draw);
+  }
+
+  document.querySelectorAll('.replay').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var f = document.getElementById(btn.getAttribute('data-target'));
+      if (!f) return;
+      f.querySelectorAll('.ink').forEach(function (p) {
+        p.style.strokeDashoffset = p.style.strokeDasharray;
+      });
+      void f.offsetWidth;
+      draw(f);
+    });
+  });
+})();
+</script>

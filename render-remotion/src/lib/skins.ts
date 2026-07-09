@@ -176,4 +176,15 @@ export const SKINS: SkinSpec[] = [
     shapes: "26px wood frame, chalk-dust speckles, wavy underlines, dashed boxes, chalk text-shadow",
     karaoke: "neon",
   },
+  {
+    id: "handcraft-marker",
+    name: "Handcraft marker",
+    mood: "reflective wisdom, business ethics, lifestyle; warm hand-drawn storytelling by a weathered narrator",
+    bg: "#E7DCC2",
+    fg: "#3A2C22",
+    accents: ["#C58A2A", "#7A5A2A"],
+    fonts: { display: "PatrickHand", body: "PatrickHand", mono: "JetBrainsMono" },
+    shapes: "rough ink strokes (feTurbulence + feDisplacementMap wobble, round caps, weight 4 to 4.5), draw-on reveals (stroke-dashoffset drawing left to right as the narrator speaks, fills pop in after), hand ink motifs (winding trail up a hill with a flag, tree with deep roots, compass), hand-underline under key words, taped paper cards, warm paper grain, NO ruled lines (that is notebook)",
+    karaoke: "marker",
+  },
 ];

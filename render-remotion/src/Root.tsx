@@ -15,6 +15,17 @@ import { ChanktbAny2Video } from "./videos/chanktb-any2video";
 import { TOTAL_FRAMES as A2V_FRAMES } from "./videos/chanktb-any2video-data";
 import { ChanktbAny2VideoEn } from "./videos/chanktb-any2video-en";
 import { TOTAL_FRAMES as A2V_EN_FRAMES } from "./videos/chanktb-any2video-en-data";
+import { MoneyLeakEp1 } from "./videos/money-leak-ep1";
+import { TOTAL_FRAMES as ML1_FRAMES } from "./videos/money-leak-ep1-data";
+import { MoneyLeakEp2 } from "./videos/money-leak-ep2";
+import { TOTAL_FRAMES as ML2_FRAMES } from "./videos/money-leak-ep2-data";
+import { MoneyLeakEp3 } from "./videos/money-leak-ep3";
+import { TOTAL_FRAMES as ML3_FRAMES } from "./videos/money-leak-ep3-data";
+import { MoneyLeakEp4 } from "./videos/money-leak-ep4";
+import { TOTAL_FRAMES as ML4_FRAMES } from "./videos/money-leak-ep4-data";
+import { ShopifySchema2Shop } from "./videos/shopify-schema-2shop";
+import { TOTAL_FRAMES as SS2_FRAMES } from "./videos/shopify-schema-2shop-data";
+import { AiNguoiMoiEp1, TOTAL_WITH_HOOK as ANM1_FRAMES } from "./videos/ai-nguoi-moi-ep1";
 
 // One run = one file in src/videos/ + one <Composition> registered here.
 // id = the run's slug. Default 9:16 1080x1920 30fps.
@@ -82,6 +93,54 @@ export const RemotionRoot: React.FC = () => {
         id="chanktb-any2video-en"
         component={ChanktbAny2VideoEn}
         durationInFrames={A2V_EN_FRAMES}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="money-leak-ep1"
+        component={MoneyLeakEp1}
+        durationInFrames={ML1_FRAMES}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="money-leak-ep2"
+        component={MoneyLeakEp2}
+        durationInFrames={ML2_FRAMES}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="money-leak-ep3"
+        component={MoneyLeakEp3}
+        durationInFrames={ML3_FRAMES}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="money-leak-ep4"
+        component={MoneyLeakEp4}
+        durationInFrames={ML4_FRAMES}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="shopify-schema-2shop"
+        component={ShopifySchema2Shop}
+        durationInFrames={SS2_FRAMES}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="ai-nguoi-moi-ep1"
+        component={AiNguoiMoiEp1}
+        durationInFrames={ANM1_FRAMES}
         fps={30}
         width={1080}
         height={1920}

@@ -26,9 +26,12 @@
       .title { margin-top: 22px; font-size: 80px; font-weight: 800; line-height: 1.16; letter-spacing: -1.5px; opacity: 0; animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s forwards; }
       .title .accent { background: linear-gradient(96deg, #38bdf8 0%, #818cf8 100%); -webkit-background-clip: text; background-clip: text; color: transparent; line-height: 1.4; padding-top: 0.14em; overflow: visible; display: inline-block; }
 
-      .grid { position: absolute; left: 96px; right: 96px; top: 690px; z-index: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 34px; }
+      /* grid + note FLOW inside .lower so the note always sits BELOW the grid
+       * (margin, not a fixed top), never overlapping when a card sub wraps to 2 lines. */
+      .lower { position: absolute; left: 96px; right: 96px; top: 600px; z-index: 2; }
+      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
       .card {
-        position: relative; border-radius: 34px; padding: 50px 46px 46px;
+        position: relative; border-radius: 34px; padding: 44px 46px 44px;
         background: linear-gradient(160deg, rgba(255,255,255,0.055), rgba(255,255,255,0.02));
         border: 1px solid rgba(255,255,255,0.09);
         box-shadow: 0 24px 60px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
@@ -45,7 +48,7 @@
       .card .csub { margin-top: 8px; font-size: 27px; font-weight: 400; line-height: 1.36; color: #93a6bd; }
       @keyframes cardIn { 0% { opacity: 0; transform: translateY(30px) scale(0.97); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
 
-      .note { position: absolute; left: 96px; right: 96px; top: 1420px; z-index: 2; font-size: 30px; font-weight: 400; line-height: 1.45; color: #849ab3;
+      .note { margin-top: 40px; font-size: 30px; font-weight: 400; line-height: 1.45; color: #849ab3;
         opacity: 0; animation: fadeUp 0.8s ease-out 1.2s forwards; }
 
       @keyframes fadeUp { 0% { opacity: 0; transform: translateY(24px); } 100% { opacity: 1; transform: translateY(0); } }
@@ -65,8 +68,10 @@
         <div class="kicker"></div>
         <div class="title"></div>
       </div>
-      <div class="grid"></div>
-      <div class="note"></div>
+      <div class="lower">
+        <div class="grid"></div>
+        <div class="note"></div>
+      </div>
     </div>
 
     <script>

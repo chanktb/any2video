@@ -198,8 +198,11 @@ ffmpeg -loop 1 -t 0.1 -i poster.png -i final_nobump.mp4 -filter_complex \
 ```
 
 Everything else matches path A: ship_gate on the final file, Telegram checkpoints
-if intake enabled them, post caption carries the repo URL (the video never speaks
-a URL, outro rule 2.2.5.0).
+if intake enabled them. The caption package carries the repo URL in its
+`Comment link:` footer (posted as the FIRST COMMENT, never in the caption body);
+the video never speaks a URL (outro rule 2.2.5.0). Caption format = SKILL.md
+Phase 6 "a caption is a HOOK, not a summary" (hook line + genuine question,
+never a narration transcript).
 
 ## Provenance
 

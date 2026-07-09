@@ -27,9 +27,12 @@
       .title { margin-top: 22px; font-size: 80px; font-weight: 800; line-height: 1.16; letter-spacing: -1.5px; opacity: 0; animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s forwards; }
       .title .accent { background: linear-gradient(96deg, #2dd4bf 0%, #34d399 100%); -webkit-background-clip: text; background-clip: text; color: transparent; line-height: 1.4; padding-top: 0.14em; overflow: visible; display: inline-block; }
 
-      .grid { position: absolute; left: 96px; right: 96px; top: 690px; z-index: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+      /* grid + note FLOW inside .lower so the note always sits BELOW the grid
+       * (margin, not a fixed top), never overlapping when cells grow to 2 lines. */
+      .lower { position: absolute; left: 96px; right: 96px; top: 596px; z-index: 2; }
+      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
       .card {
-        border-radius: 32px; padding: 44px 40px;
+        border-radius: 32px; padding: 40px 40px;
         background: linear-gradient(160deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
         border: 1px solid rgba(255,255,255,0.09);
         box-shadow: 0 22px 54px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
@@ -46,7 +49,7 @@
       .fdesc { margin-top: 10px; font-size: 28px; font-weight: 400; line-height: 1.38; color: #8fc4b6; }
       @keyframes cardIn { 0% { opacity: 0; transform: translateY(28px) scale(0.97); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
 
-      .note { position: absolute; left: 96px; right: 96px; top: 1430px; z-index: 2; font-size: 30px; font-weight: 400; line-height: 1.45; color: #7fae9f;
+      .note { margin-top: 42px; font-size: 30px; font-weight: 400; line-height: 1.45; color: #7fae9f;
         opacity: 0; animation: fadeUp 0.8s ease-out 1.2s forwards; }
 
       @keyframes fadeUp { 0% { opacity: 0; transform: translateY(24px); } 100% { opacity: 1; transform: translateY(0); } }
@@ -66,8 +69,10 @@
         <div class="kicker"></div>
         <div class="title"></div>
       </div>
-      <div class="grid"></div>
-      <div class="note"></div>
+      <div class="lower">
+        <div class="grid"></div>
+        <div class="note"></div>
+      </div>
     </div>
 
     <script>
