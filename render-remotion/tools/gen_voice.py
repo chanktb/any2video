@@ -37,6 +37,9 @@ PHONETIC_MAP = [
     (["gí", "pi", "tí"], "GPT"),
     (["en", "ni", "tu", "vi", "đeo"], "any2video"),
     (["any", "to", "video"], "any2video"),  # VieNeu bilingual spelled-out name
+    (["óp", "mai", "dơ"], "Optmyzr"),  # VieNeu: raw Optmyzr letter-spells O-P-T-M-Y-Z-R
+    (["hê", "ma"], "HEMA"),            # VieNeu: raw HEMA letter-spells H-E-M-A
+    (["en", "gram"], "n-gram"),        # VieNeu: raw "n gram" reads the n as Vietnamese "nờ"
     (["rô", "át"], "ROAS"),        # VieNeu: raw ROAS letter-spells; word reading is the trade term
     (["gi", "ây", "bốn"], "GA4"),  # VieNeu: raw GA4 reads the 4 as Vietnamese in an odd way
     (["diu", "túp"], "YouTube"),

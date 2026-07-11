@@ -65,34 +65,64 @@ def resolve_bgm(spec: str | None) -> Path | None:
     return None
 
 
+def _probe_dur(p: Path) -> float:
+    """Container duration in seconds (0.0 if ffprobe fails)."""
+    try:
+        cp = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+             "-of", "default=noprint_wrappers=1:nokey=1", str(p)],
+            capture_output=True, text=True, check=True, timeout=15,
+        )
+        return float(cp.stdout.strip())
+    except (subprocess.CalledProcessError, ValueError, subprocess.TimeoutExpired):
+        return 0.0
+
+
 def mix_bgm(final_in: Path, bgm: Path, final_out: Path,
             bgm_gain: float = 0.22, duck: bool = True) -> dict:
     """Loop `bgm` under `final_in`'s audio (voice+SFX), duck it beneath speech,
-    write `final_out`. Video stream copied untouched."""
+    write `final_out`. Video stream copied untouched.
+
+    Length is pinned to `final_in`'s duration via `-t` (NOT `-shortest`). Root
+    cause of "cau chot bi cat khi bat nhac" (user, 2026-07-09): `-shortest`
+    capped the output at whatever stream ended first, and the ducked-BGM branch
+    consumed `[0:a]` twice (sidechain key plus amix input) WITHOUT `asplit`, so
+    the mixed audio ran about 2s short and `-shortest` chopped the closing
+    narration off the VIDEO too. Fix: `asplit` the voice for the two consumers,
+    drop `-shortest`, and cut to the exact input-video length so nothing is lost.
+    """
+    dur = _probe_dur(final_in)
+    # apad the voice: a render's audio stream can end ~0.5s before the video
+    # (trailing scene pad not encoded), and amix duration=first would then cut
+    # the mixed audio short of the video, tripping ship_gate. The -t below is
+    # what bounds the padded stream to the exact video length.
     if duck:
         filt = (
+            f"[0:a]apad,asplit=2[a_main][a_key];"
             f"[1:a]volume={bgm_gain}[bgm];"
-            f"[bgm][0:a]sidechaincompress=threshold=0.02:ratio=8:attack=15:"
+            f"[bgm][a_key]sidechaincompress=threshold=0.02:ratio=8:attack=15:"
             f"release=350:makeup=1[bgmduck];"
-            f"[0:a][bgmduck]amix=inputs=2:duration=first:normalize=0[aout]"
+            f"[a_main][bgmduck]amix=inputs=2:duration=first:normalize=0[aout]"
         )
     else:
         filt = (
             f"[1:a]volume={bgm_gain}[bgm];"
-            f"[0:a][bgm]amix=inputs=2:duration=first:normalize=0[aout]"
+            f"[0:a]apad[a_pad];"
+            f"[a_pad][bgm]amix=inputs=2:duration=first:normalize=0[aout]"
         )
-    cp = subprocess.run(
-        ["ffmpeg", "-y", "-loglevel", "error",
-         "-i", str(final_in),
-         "-stream_loop", "-1", "-i", str(bgm),
-         "-filter_complex", filt,
-         "-map", "0:v", "-map", "[aout]",
-         "-c:v", "copy",
-         "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
-         "-shortest",
-         str(final_out)],
-        capture_output=True, text=True,
-    )
+    cmd = ["ffmpeg", "-y", "-loglevel", "error",
+           "-i", str(final_in),
+           "-stream_loop", "-1", "-i", str(bgm),
+           "-filter_complex", filt,
+           "-map", "0:v", "-map", "[aout]",
+           "-c:v", "copy",
+           "-c:a", "aac", "-b:a", "192k", "-ar", "48000"]
+    if dur > 0:
+        cmd += ["-t", f"{dur:.3f}"]   # pin to video length; never let BGM cut it
+    else:
+        cmd += ["-shortest"]          # fallback only if probe failed
+    cmd += [str(final_out)]
+    cp = subprocess.run(cmd, capture_output=True, text=True)
     if cp.returncode != 0:
         return {"error": "bgm_mix_failed", "stderr": cp.stderr[-500:]}
     return {"final_mp4": str(final_out), "bgm": str(bgm),
