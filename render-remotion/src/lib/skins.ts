@@ -1,4 +1,4 @@
-// SKIN REGISTRY: 14 verified skins (previews in docs/skins/; regenerate via the
+// SKIN REGISTRY: 15 verified skins (previews in docs/skins/; regenerate via the
 // skin-gallery composition). A skin is TOKENS ONLY (palette + fonts + shape language +
 // karaoke variant). There are NO prebuilt layouts: every video composes its own scenes
 // from the content's structure (see skill/references/remotion-render.md).

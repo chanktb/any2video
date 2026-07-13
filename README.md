@@ -90,7 +90,7 @@ word-level karaoke and hybrid Playwright footage. The extraction/planning brain
 and both checkpoints stay identical. Process: `skill/references/remotion-render.md`,
 design law: `render-remotion/SCENE-DESIGN.md`.
 
-A path B video picks **one of 14 verified skins** (tokens only: palette, fonts,
+A path B video picks **one of 15 verified skins** (tokens only: palette, fonts,
 shape language, karaoke variant). GitHub repo tours default to `repo-dark`:
 
 <p>
@@ -195,7 +195,7 @@ skill/            the Claude Code skill
   SKILL.md        agent workflow spec (the "brain")
   templates/      scene templates, SFX, background music, design tokens, schemas
   references/     craft teardown + the path B (Remotion) process spec
-render-remotion/  render path B: Remotion engine, 14 skins, scene design law
+render-remotion/  render path B: Remotion engine, 15 skins, scene design law
 workspace/        generated runs (gitignored)
 ```
 
